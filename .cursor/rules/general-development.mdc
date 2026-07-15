@@ -1,0 +1,79 @@
+---
+description: General development rules for the AI Cultivation RPG (architecture, AI boundaries, docs, testing)
+alwaysApply: true
+---
+
+# AI Cultivation RPG - Development Rules
+
+## General Philosophy
+
+This project is a long-term simulation RPG.
+
+Prioritize correctness, scalability, and maintainability. Never prioritize speed over architecture.
+
+## Before Making Changes
+
+- Read every document in `docs/` before making changes.
+- Treat `docs/` as the authoritative source of truth.
+- If documentation and code disagree, ask before changing either.
+
+## Coding Standards
+
+- Use Python 3.14+ (see docs/TECH_STACK.md)
+- Use type hints everywhere
+- Write docstrings for public classes and functions
+- Prefer readability over clever code
+- Avoid global variables
+- Use dependency injection where practical
+- Never hardcode magic numbers
+- Never duplicate logic
+
+## Architecture
+
+Keep responsibilities separate. Never mix them.
+
+| Layer | Owns |
+|-------|------|
+| **Game Engine** | Rules, calculations, time, combat, cultivation, economy |
+| **Database** | Persistent state only |
+| **AI** | Narration, dialogue, flavor text |
+
+## AI Rules
+
+AI never decides combat, money, cultivation, inventory, relationships, or database edits.
+
+AI only proposes narration. The engine decides all mechanics.
+
+## Database
+
+Everything important must have a permanent unique ID: players, NPCs, items, techniques, quests, sects, buildings, locations—everything.
+
+Never delete IDs.
+
+## Implementation
+
+- Implement only the requested feature
+- Never rewrite working systems unless asked
+- Never redesign architecture without approval
+- Never delete files without approval
+
+## Testing
+
+- Every new system requires tests
+- Run tests before marking work complete
+- If tests fail, fix them first
+
+## Documentation
+
+When architecture or a system changes, update `docs/` in the same change. Keep docs synchronized with code.
+
+## Performance
+
+Design for eventual scale: millions of events, thousands of NPCs, tens of thousands of techniques, hundreds of sects.
+
+## Communication
+
+- Explain major design decisions
+- List every file modified
+- State assumptions
+- Never claim complete work that is only partially implemented

@@ -1,0 +1,50 @@
+:root {
+  --bg: #1a1c18;
+  --fg: #e8e4d9;
+  --muted: #9a9588;
+  --accent: #c4a574;
+  --panel: #242820;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Georgia, serif;
+  background: radial-gradient(ellipse at top, #2a3028, var(--bg));
+  color: var(--fg);
+  min-height: 100vh;
+}
+
+.shell {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem;
+}
+
+h1 {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.lede {
+  color: var(--muted);
+  margin-top: 0;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid #3a4036;
+  border-radius: 0.35rem;
+  padding: 1rem 1.15rem;
+  margin-top: 1.25rem;
+}
+
+.card h2 {
+  font-size: 1rem;
+  color: var(--accent);
+  margin: 0 0 0.75rem;
+}
