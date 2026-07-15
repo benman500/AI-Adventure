@@ -21,7 +21,7 @@ Defines how a new character is assembled before play: identity, pre-game life hi
 2. **Background** — Select one data-driven life-history package.
 3. **Personality questions** — Five answers persisted raw.
 4. **Persist** — Save metadata, player row, inventory, background history JSON seeds, identity answers JSON, `character_created` event.
-5. **Enter status screen** — No opening story / gameplay loop yet.
+5. **Enter opening story** — Milestone 3 bootstraps `story_progress` on first play ([OPENING_STORY.md](OPENING_STORY.md)).
 
 ### What a background stores (seeds, not simulation)
 
@@ -47,7 +47,7 @@ Milestone 2 **does not** turn these into live NPCs, quests, or world simulation.
 
 - Boundless Foundation selection during creation.
 - Trait/Dao assignment from personality answers (later systems).
-- Cultivation / combat / sect / NPC simulation at creation.
+- Cultivation / combat / sect simulation **at creation** (opening story begins on first play).
 
 ## Related
 

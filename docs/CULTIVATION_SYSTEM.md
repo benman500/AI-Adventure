@@ -135,13 +135,22 @@ Qualitative bands for presentation (exact numeric internals hidden): fragmented 
 ### Engine tracking (every actor)
 
 - Realm id + stage
-- Path type (ordinary / Boundless Foundation)
+- Path type (ordinary / Boundless Foundation) + **path status** (provisional until story commit)
 - Body, Qi, Soul, Dao, Foundation Quality
-- Progress / breakthrough readiness
+- Qi reserve (current / max), cultivation progress, practice sessions
+- Breakthrough readiness, anomaly state
 - Active tribulation instance (if any)
 - Technique mastery links
 - Heaven's Will attention modifiers (reference)
 - Durable scars from failed/partial/damaged outcomes
+
+### Milestone 3 minimal loop (implementation)
+
+- Cultivation **methods** (Absorb Qi, Stabilize Foundation, Calm the Mind) build qi reserve and progress.
+- Breakthrough readiness from **thresholds**, not session count.
+- First **breakthrough attempt** on provisional path triggers anomaly; path choice resolves it.
+- Post-choice mechanical divergence (progress multiplier, resource cost, breakthrough thresholds).
+- Details: [OPENING_STORY.md](OPENING_STORY.md).
 
 ### Minor stages (proposed)
 

@@ -1,0 +1,58 @@
+{
+  "nodes": [
+    {
+      "id": "hunter_opening_01",
+      "title": "Wild Edge Dawn",
+      "narrative": "Pinehollow's Wild Edge camp stirs before the village wakes. Your uncle checks snares; you owe one more rack of cured meat to the storehouse. Ridge wind carries pine resin—and, faintly, the metallic tang of a cultivator's passage.",
+      "requirements": { "background_id": "hunter" },
+      "actions": [
+        {
+          "id": "check_snares",
+          "label": "Check the morning snares",
+          "next_node": "hunter_opening_02"
+        }
+      ]
+    },
+    {
+      "id": "hunter_opening_02",
+      "title": "Warden Shi's Report",
+      "narrative": "Warden Shi meets you on the outer trail. Beast sign is fresh near the ridge road—and last night he saw a Verdant Gate banner glint through the fog. 'Disciples recruit this season,' he says. 'You read trails better than half the outer disciples I've met.'",
+      "requirements": { "background_id": "hunter" },
+      "actions": [
+        {
+          "id": "offer_ranging",
+          "label": "Offer your ranging knowledge",
+          "effects": [{ "type": "set_flag", "payload": { "flag": "hunter_ranging_offer" } }],
+          "next_node": "hunter_opening_03"
+        },
+        {
+          "id": "report_only",
+          "label": "Report the beast sign and move on",
+          "next_node": "hunter_opening_03"
+        }
+      ]
+    },
+    {
+      "id": "hunter_opening_03",
+      "title": "Into the Tree Line",
+      "narrative": "Your uncle clasps your shoulder once. 'Come back if the sect chews you up,' he says, which is his version of love. You shoulder your pack and leave Pinehollow's edge for roads that promise something larger than game trails.",
+      "requirements": { "background_id": "hunter" },
+      "actions": [
+        {
+          "id": "leave_home",
+          "label": "Leave Pinehollow",
+          "effects": [
+            {
+              "type": "set_location",
+              "payload": {
+                "location_id": "road_from_pinehollow",
+                "location_name": "Forest Road from Pinehollow"
+              }
+            }
+          ],
+          "next_node": "shared_leave_home_01"
+        }
+      ]
+    }
+  ]
+}

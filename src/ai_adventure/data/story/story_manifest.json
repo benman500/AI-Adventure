@@ -1,0 +1,13 @@
+{
+  "background_entry_nodes": {
+    "merchant_family": "merchant_opening_01",
+    "alchemists_apprentice": "alchemist_opening_01",
+    "hunter": "hunter_opening_01"
+  },
+  "content_files": [
+    "opening_merchant_family.json",
+    "opening_alchemists_apprentice.json",
+    "opening_hunter.json",
+    "opening_shared.json"
+  ]
+}

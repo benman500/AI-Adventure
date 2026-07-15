@@ -12,6 +12,7 @@ from ai_adventure.engine.constants import (
     MIN_CHARACTER_NAME_LENGTH,
     STARTING_BODY,
     STARTING_CULTIVATION_PATH,
+    STARTING_DAO,
     STARTING_FOUNDATION_QUALITY,
     STARTING_QI,
     STARTING_REALM_ID,
@@ -49,6 +50,7 @@ class CreatedCharacterState:
     qi: int
     soul: int
     foundation_quality: int
+    dao: int
     identity_answers: dict[str, str]
     background_history: dict[str, Any]
     possessions: tuple[StartingPossession, ...]
@@ -120,6 +122,7 @@ def create_character(
         qi=STARTING_QI,
         soul=STARTING_SOUL,
         foundation_quality=STARTING_FOUNDATION_QUALITY,
+        dao=STARTING_DAO,
         identity_answers=answers,
         background_history=history,
         possessions=possessions,

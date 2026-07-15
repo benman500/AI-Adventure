@@ -1,0 +1,58 @@
+{
+  "nodes": [
+    {
+      "id": "merchant_opening_01",
+      "title": "Market Before Dawn",
+      "narrative": "Willowford wakes slowly. Stalls creak open; the Zhen household ledger waits on the counter. Your parent counts the autumn-fair advance again—you were meant to stay until the fair closes. Yet the north road carries a thin scent of iron and something sharper: qi, drifting down from the hills.",
+      "requirements": { "background_id": "merchant_family" },
+      "actions": [
+        {
+          "id": "finish_tally",
+          "label": "Finish the morning tally",
+          "next_node": "merchant_opening_02"
+        }
+      ]
+    },
+    {
+      "id": "merchant_opening_02",
+      "title": "Auntie Mo's Gossip",
+      "narrative": "Auntie Mo, the stall neighbor, leans across the awning. 'Verdant Gate disciples are on the recruitment circuit,' she whispers. 'Hauler Fen saw their banner on the north road. Your family will fuss—but coin and courtesy won't teach you to circulate qi.' She winks. The market hums; opportunity hums louder.",
+      "requirements": { "background_id": "merchant_family" },
+      "actions": [
+        {
+          "id": "mention_trade",
+          "label": "Mention your family's trade contacts",
+          "effects": [{ "type": "set_flag", "payload": { "flag": "merchant_trade_mention" } }],
+          "next_node": "merchant_opening_03"
+        },
+        {
+          "id": "listen_quietly",
+          "label": "Listen and say little",
+          "next_node": "merchant_opening_03"
+        }
+      ]
+    },
+    {
+      "id": "merchant_opening_03",
+      "title": "The Handshake",
+      "narrative": "Your parent does not forbid you. 'Send word if you find a sect worth the name,' they say, and clasp your hand the way traders seal a deal. You leave Market Lane with a scrap of ledger paper in your pocket and the weight of a promise on your shoulders.",
+      "requirements": { "background_id": "merchant_family" },
+      "actions": [
+        {
+          "id": "leave_home",
+          "label": "Leave Willowford",
+          "effects": [
+            {
+              "type": "set_location",
+              "payload": {
+                "location_id": "road_north_of_willowford",
+                "location_name": "North Road out of Willowford"
+              }
+            }
+          ],
+          "next_node": "shared_leave_home_01"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,363 @@
+{
+  "nodes": [
+    {
+      "id": "shared_leave_home_01",
+      "title": "Last Look Back",
+      "narrative": "Home recedes behind you. Obligations, favors, and familiar streets remain—but the cultivation world no longer waits on rumor alone. You walk with purpose toward whatever sect will have you.",
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Walk the road",
+          "effects": [{ "type": "increment_world_day", "payload": { "amount": 1 } }],
+          "next_node": "shared_travel_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_travel_01",
+      "title": "On the Road",
+      "narrative": "Days blur into campsites and waystones. Farmers share water; peddlers share warnings. Every story agrees: Verdant Gate Sect holds recruitment at Jade Ridge this season.",
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Press onward",
+          "next_node": "shared_cultivator_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_cultivator_01",
+      "title": "The Recruitment Circuit",
+      "narrative": "A young man in Verdant Gate green rests by a stream, polishing a talisman. Disciple Lu Han looks up as you approach. 'You walk like someone with a destination,' he says. 'The sect tests recruits at the Jade Ridge gate. If you have the will, come—I'll vouch that you didn't rob me on the road.'",
+      "on_enter_effects": [
+        {
+          "type": "spawn_npc",
+          "payload": {
+            "template_id": "npc_passing_cultivator_001",
+            "display_name": "Disciple Lu Han",
+            "role": "passing_cultivator"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "id": "travel_together",
+          "label": "Travel with Disciple Lu Han toward Jade Ridge",
+          "effects": [
+            { "type": "increment_world_day", "payload": { "amount": 1 } },
+            {
+              "type": "set_location",
+              "payload": {
+                "location_id": "jade_ridge_approach",
+                "location_name": "Approach to Jade Ridge"
+              }
+            }
+          ],
+          "next_node": "shared_travel_02"
+        }
+      ]
+    },
+    {
+      "id": "shared_travel_02",
+      "title": "Jade Ridge Approach",
+      "narrative": "Mist clings to pine slopes. Stone steps appear where forest gives way to carved mountain paths. Verdant Gate banners flutter above the first gate—modest, but proud.",
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Climb to the sect gates",
+          "next_node": "shared_sect_gate_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_sect_gate_01",
+      "title": "Verdant Gate Gates",
+      "narrative": "Disciple Lu Han presents you at the outer gate. Verdant Gate Sect is no immortal pinnacle—yet it is a true sect with halls, elders, and a Foundation Hall that keeps old manuscripts behind sealed shelves. You are directed to the registration hall.",
+      "actions": [
+        {
+          "id": "enter",
+          "label": "Enter the registration hall",
+          "effects": [
+            {
+              "type": "set_location",
+              "payload": {
+                "location_id": "verdant_gate_registration",
+                "location_name": "Verdant Gate — Registration Hall"
+              }
+            }
+          ],
+          "next_node": "shared_recruitment_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_recruitment_01",
+      "title": "Registration",
+      "narrative": "Clerks record your name and mundane origin. No one promises glory—only duty, instruction, and the chance to walk the cultivation road. You wait your turn with farmers, scribes, and a few children of minor households.",
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Submit to examination",
+          "next_node": "shared_recruitment_02"
+        }
+      ]
+    },
+    {
+      "id": "shared_recruitment_02",
+      "title": "Talent Examination",
+      "narrative": "Elder Examiner Feng runs the talent stone across your meridians. The crystal warms—adequate roots, no calamity, no prodigy flare. 'Acceptable,' Feng declares. 'Outer disciple probation. Report to Instructor Pei for foundational instruction.'",
+      "on_enter_effects": [
+        {
+          "type": "spawn_npc",
+          "payload": {
+            "template_id": "npc_sect_examiner_001",
+            "display_name": "Elder Examiner Feng",
+            "role": "sect_examiner"
+          }
+        },
+        {
+          "type": "set_sect_membership",
+          "payload": { "sect_id": "sect_verdant_gate", "rank_id": "outer_disciple" }
+        }
+      ],
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Proceed to quarters",
+          "effects": [
+            {
+              "type": "set_location",
+              "payload": {
+                "location_id": "verdant_gate_outer_quarters",
+                "location_name": "Verdant Gate — Outer Disciple Quarters"
+              }
+            }
+          ],
+          "next_node": "shared_recruitment_03"
+        }
+      ]
+    },
+    {
+      "id": "shared_recruitment_03",
+      "title": "Outer Disciple Quarters",
+      "narrative": "A narrow bunk, a shared courtyard, and the murmur of disciples who already know how to hold qi without spilling it. Tomorrow begins instruction. Tonight, you feel the sect's weight—institution, not adventure.",
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Attend the first lesson at dawn",
+          "effects": [{ "type": "increment_world_day", "payload": { "amount": 1 } }],
+          "next_node": "shared_lesson_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_lesson_01",
+      "title": "First Cultivation Lesson",
+      "narrative": "Instructor Pei teaches basic qi circulation without ceremony. 'Absorb gently. Stabilize before you greed. Calm the mind—restlessness wastes more qi than laziness.' You memorize the rhythm: gather, settle, breathe. This is cultivation—not legend, but work.",
+      "on_enter_effects": [
+        {
+          "type": "spawn_npc",
+          "payload": {
+            "template_id": "npc_instructor_001",
+            "display_name": "Instructor Pei",
+            "role": "sect_instructor"
+          }
+        },
+        { "type": "mark_lesson_complete" }
+      ],
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Begin practicing in the cultivation hall",
+          "effects": [
+            {
+              "type": "set_location",
+              "payload": {
+                "location_id": "verdant_gate_cultivation_hall",
+                "location_name": "Verdant Gate — Cultivation Hall"
+              }
+            }
+          ],
+          "next_node": "shared_cultivation_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_cultivation_01",
+      "title": "Cultivation Hall",
+      "narrative": "The hall is quiet. Cushions line the floor; disciples breathe in slow cycles. Instructor Pei said breakthrough comes when qi fills the reserve and the foundation steadies—not before. Choose a method and build your foundation session by session. When every indicator says you are ready, attempt the breakthrough yourself.",
+      "actions": [
+        {
+          "id": "wait",
+          "label": "Rest and observe other disciples",
+          "next_node": "shared_cultivation_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_anomaly_01",
+      "title": "The Silent Breakthrough",
+      "narrative": "You gather your qi exactly as Instructor Pei taught. Meridians hum; your reserve is full; progress feels complete. You reach for Body Tempering's next step—the breakthrough that should come as naturally as exhaling. Nothing happens. The qi remains. The stage remains. You are not drained, not injured—simply unchanged, as if the world refused to acknowledge your effort.",
+      "actions": [
+        {
+          "id": "report",
+          "label": "Report the failure to Instructor Pei",
+          "next_node": "shared_investigation_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_investigation_01",
+      "title": "Instructor Pei's Examination",
+      "narrative": "Instructor Pei presses meridians, checks your breathing, and runs a diagnostic circulation. His frown deepens—not contempt, but confusion. 'Your qi is sufficient. Your foundation reads stable. By every measure you should have advanced.' He sends you to Elder Examiner Feng with a note that says: *Breakthrough did not occur. Cause unknown.*",
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Go to Elder Examiner Feng",
+          "next_node": "shared_investigation_02"
+        }
+      ]
+    },
+    {
+      "id": "shared_investigation_02",
+      "title": "Second Examination",
+      "narrative": "Elder Examiner Feng repeats the talent stone test. The crystal glows steady—no corruption, no blocked meridians, no sign of dead roots. 'I have seen failed breakthroughs,' Feng mutters. 'This is not failure. Failure breaks something. You are intact—and stuck.' A formation master is summoned; the array finds no seal, no poison, no injury.",
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Endure the third examination",
+          "next_node": "shared_investigation_03"
+        }
+      ]
+    },
+    {
+      "id": "shared_investigation_03",
+      "title": "The Unexplained Case",
+      "narrative": "A sect medic checks your blood and breath. A senior disciple compares your readings to textbook breakthrough charts. Everything aligns—except the result. Whispers spread not that you are talentless, but that you are a *mystery*: a disciple who did everything correctly and still did not advance. Even Instructor Pei begins watching you with scholarly curiosity rather than pity.",
+      "on_enter_effects": [{ "type": "mark_investigation_complete" }],
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Wait for the sect's next move",
+          "next_node": "shared_mystery_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_mystery_01",
+      "title": "A Disciple of Questions",
+      "narrative": "Outer disciples gossip in corners—not cruelly, but intensely. Some think you encountered a rare qi-lock. Others say the heavens are testing you. Elder Examiner Feng forbids mockery; Instructor Pei assigns you reading instead of chores. You are not cast out. You are studied. That night a sealed note arrives under your door: *Foundation Hall. After midnight. Come alone. — Yun Mei*",
+      "actions": [
+        {
+          "id": "go",
+          "label": "Go to Foundation Hall at midnight",
+          "effects": [
+            {
+              "type": "set_location",
+              "payload": {
+                "location_id": "verdant_gate_foundation_hall",
+                "location_name": "Verdant Gate — Foundation Hall"
+              }
+            }
+          ],
+          "next_node": "shared_revelation_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_revelation_01",
+      "title": "Elder Yun Mei's Revelation",
+      "narrative": "Elder Yun Mei tends the Foundation Hall's oldest shelves—manuals half-eaten by time. 'You are not broken,' she says without preamble. 'Your body refused a shallow breakthrough because it can hold a deeper foundation than our standard curriculum allows.' She opens a fragmentary manuscript: the Boundless Foundation Path—ancient, once taught openly, abandoned centuries ago when cultivators realized its demands. Enormous resources. Extreme difficulty. Almost none who walked it finished. Surviving texts are incomplete; most modern elders dismiss it as obsolete theory or failed ambition. Yet the pattern in your meridians matches the old records. You may accept correction and walk the ordinary road your peers travel—viable, respected, faster. Or you may gamble your future on a path history itself set aside.",
+      "on_enter_effects": [
+        {
+          "type": "spawn_npc",
+          "payload": {
+            "template_id": "npc_foundation_elder_001",
+            "display_name": "Elder Yun Mei",
+            "role": "foundation_elder"
+          }
+        },
+        { "type": "mark_revelation_seen" }
+      ],
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Listen to the full explanation of both paths",
+          "next_node": "shared_choice_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_choice_01",
+      "title": "Two Paths, One Life",
+      "narrative": "Elder Yun Mei lays out the choice without romance. **Ordinary cultivation (accept correction):** the anomaly is resolved; breakthroughs proceed normally; you keep pace with peers; lower cost; a complete viable career— but you forgo the Boundless ceiling forever. **Boundless Foundation Path:** abandon the conventional ladder; accept vastly higher qi and resource demands; advance slowly for a long time; pursue near-flawless foundation quality and long-horizon strength— on incomplete ancient methods most consider a dead end. Neither path is a mistake. Both are permanent.",
+      "requirements": { "anomaly_state": "triggered" },
+      "actions": [
+        {
+          "id": "choose_ordinary",
+          "label": "Accept correction — walk the ordinary path",
+          "effects": [{ "type": "commit_path_ordinary" }],
+          "next_node": "shared_post_ordinary_01"
+        },
+        {
+          "id": "choose_boundless",
+          "label": "Commit to the Boundless Foundation Path",
+          "effects": [{ "type": "commit_path_boundless" }],
+          "next_node": "shared_post_boundless_01"
+        }
+      ]
+    },
+    {
+      "id": "shared_post_ordinary_01",
+      "title": "The Correction",
+      "narrative": "Elder Yun Mei guides a corrective circulation—subtle, precise. The blocked step unlocks. You advance to Body Tempering's mid stage as if a door finally opens. Instructor Pei exhales in relief. 'A rare qi-lock,' he tells the hall. 'Resolved.' You are no longer a mystery—you are a disciple who overcame an obstacle.",
+      "requirements": { "path_status": "confirmed_ordinary" },
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Return to cultivation with renewed confidence",
+          "next_node": "shared_post_ordinary_02"
+        }
+      ]
+    },
+    {
+      "id": "shared_post_ordinary_02",
+      "title": "Keeping Pace",
+      "narrative": "Ordinary cultivation feels clean and responsive. Qi fills your reserve; progress accumulates at the pace Instructor Pei promised. You are not ahead of your peers—but you are firmly among them. Use a cultivation method to continue building your foundation.",
+      "requirements": { "path_status": "confirmed_ordinary" },
+      "actions": [
+        {
+          "id": "rest",
+          "label": "Rest for now — opening complete",
+          "next_node": "shared_post_ordinary_02"
+        }
+      ]
+    },
+    {
+      "id": "shared_post_boundless_01",
+      "title": "The Deep Root",
+      "narrative": "You choose the manuscript over the easy door. Elder Yun Mei seals the correction rite unused. 'History abandoned this path for good reasons,' she warns. 'Do not expect quick victories.' The sect records you as a disciple with an unresolved anomaly—but Yun Mei shields you from expulsion while you walk a road almost no one finishes.",
+      "requirements": { "path_status": "confirmed_boundless" },
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Begin Boundless practice under supervision",
+          "next_node": "shared_post_boundless_02"
+        }
+      ]
+    },
+    {
+      "id": "shared_post_boundless_02",
+      "title": "Slow and Heavy",
+      "narrative": "Boundless cultivation feels different immediately—each cycle of qi heavier, each increment of progress hard-won. Your foundation quality shifts subtly, like stone settling deeper into bedrock. You are slower than peers, but not helpless. Use a cultivation method to feel the new rhythm.",
+      "requirements": { "path_status": "confirmed_boundless" },
+      "actions": [
+        {
+          "id": "rest",
+          "label": "Rest for now — opening complete",
+          "next_node": "shared_post_boundless_02"
+        }
+      ]
+    }
+  ]
+}

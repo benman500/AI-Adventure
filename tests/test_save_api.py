@@ -5,10 +5,8 @@ from pathlib import Path
 import pytest
 from httpx2 import ASGITransport, AsyncClient
 
-from ai_adventure.api import create_app
-from ai_adventure.config import Settings
 from ai_adventure.engine.constants import DELETE_CONFIRMATION_VALUE
-from tests.conftest_helpers import VALID_IDENTITY_ANSWERS
+from tests.conftest_helpers import VALID_IDENTITY_ANSWERS, make_test_app
 
 
 def _answer_form_fields() -> dict[str, str]:
@@ -19,9 +17,7 @@ def _answer_form_fields() -> dict[str, str]:
 async def test_new_game_load_delete_flow(tmp_path: Path) -> None:
     """Routes create, list, load, and delete saves with confirmation."""
 
-    db_path = tmp_path / "http_m2.db"
-    settings = Settings(database_url=f"sqlite:///{db_path.as_posix()}")
-    app = create_app(settings)
+    app = make_test_app(tmp_path, filename="http_m2.db")
 
     async with AsyncClient(
         transport=ASGITransport(app=app),
@@ -55,8 +51,8 @@ async def test_new_game_load_delete_flow(tmp_path: Path) -> None:
 
         play = await client.get(f"/play/{save_id}")
         assert play.status_code == 200
-        assert b"ordinary" in play.content
         assert b"Route Hero" in play.content
+        assert b"ordinary" in play.content
 
         confirm = await client.get(f"/saves/{save_id}/delete")
         assert confirm.status_code == 200
@@ -82,9 +78,7 @@ async def test_new_game_load_delete_flow(tmp_path: Path) -> None:
 async def test_invalid_background_via_route(tmp_path: Path) -> None:
     """Invalid background produces a 400 on the creation form."""
 
-    db_path = tmp_path / "http_bad.db"
-    settings = Settings(database_url=f"sqlite:///{db_path.as_posix()}")
-    app = create_app(settings)
+    app = make_test_app(tmp_path, filename="http_bad.db")
 
     async with AsyncClient(
         transport=ASGITransport(app=app),

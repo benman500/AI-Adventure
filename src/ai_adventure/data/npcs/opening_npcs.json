@@ -1,0 +1,28 @@
+{
+  "templates": [
+    {
+      "template_id": "npc_passing_cultivator_001",
+      "display_name": "Disciple Lu Han",
+      "role": "passing_cultivator",
+      "description": "Verdant Gate outer disciple on the recruitment circuit."
+    },
+    {
+      "template_id": "npc_sect_examiner_001",
+      "display_name": "Elder Examiner Feng",
+      "role": "sect_examiner",
+      "description": "Verdant Gate elder who conducts talent examinations."
+    },
+    {
+      "template_id": "npc_instructor_001",
+      "display_name": "Instructor Pei",
+      "role": "sect_instructor",
+      "description": "Verdant Gate instructor for foundational cultivation."
+    },
+    {
+      "template_id": "npc_foundation_elder_001",
+      "display_name": "Elder Yun Mei",
+      "role": "foundation_elder",
+      "description": "Foundation Hall elder; keeper of ancient foundation manuscripts."
+    }
+  ]
+}

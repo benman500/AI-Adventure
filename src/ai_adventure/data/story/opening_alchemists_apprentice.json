@@ -1,0 +1,58 @@
+{
+  "nodes": [
+    {
+      "id": "alchemist_opening_01",
+      "title": "Green Ember Morning",
+      "narrative": "Ashridge smells of bitter herbs. In the Green Ember Workshop you catalogue autumn cords while Master Qu watches without speaking. A cracked flask near-miss still lives in your memory—patience and clean work were your first lessons here.",
+      "requirements": { "background_id": "alchemists_apprentice" },
+      "actions": [
+        {
+          "id": "continue_catalogue",
+          "label": "Continue cataloguing herb cords",
+          "next_node": "alchemist_opening_02"
+        }
+      ]
+    },
+    {
+      "id": "alchemist_opening_02",
+      "title": "Clinic Delivery",
+      "narrative": "Master Qu sends you to the lower clinic with a wrapped bundle. Outside, two travelers in Verdant Gate green discuss recruitment at Jade Ridge. Old Lian the herb seller mutters that cultivation sects always want steady hands—'especially ones who know not to mix the wrong jars.'",
+      "requirements": { "background_id": "alchemists_apprentice" },
+      "actions": [
+        {
+          "id": "ask_master",
+          "label": "Ask Master Qu about the sect",
+          "effects": [{ "type": "set_flag", "payload": { "flag": "alchemist_master_blessing" } }],
+          "next_node": "alchemist_opening_03"
+        },
+        {
+          "id": "complete_errand",
+          "label": "Complete the errand in silence",
+          "next_node": "alchemist_opening_03"
+        }
+      ]
+    },
+    {
+      "id": "alchemist_opening_03",
+      "title": "Clean Departure",
+      "narrative": "Master Qu's farewell is stern and fair: finish what you start, respect fire, and never lie about materia. You bow, leave the workshop keys on the bench, and step into Ashridge's morning mist with mortar-stained fingers and a clear conscience.",
+      "requirements": { "background_id": "alchemists_apprentice" },
+      "actions": [
+        {
+          "id": "leave_home",
+          "label": "Leave Ashridge",
+          "effects": [
+            {
+              "type": "set_location",
+              "payload": {
+                "location_id": "road_out_of_ashridge",
+                "location_name": "Hillside Road out of Ashridge"
+              }
+            }
+          ],
+          "next_node": "shared_leave_home_01"
+        }
+      ]
+    }
+  ]
+}

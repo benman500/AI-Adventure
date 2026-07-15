@@ -40,6 +40,8 @@ Orders delivery so the project stays a **world simulation** with small MVP incre
 ### Phase 2 — MVP playable loop
 
 - Per [MVP_SCOPE.md](MVP_SCOPE.md): creation, tiny cultivation loop, profession earn, small technique set on real schema, save/load, stub narration.
+- **Milestone 3 (shipped):** opening story, first cultivation loop, anomaly, path choice, save/reload ([OPENING_STORY.md](OPENING_STORY.md)).
+- **Milestone 4+ (planned):** profession earn, technique records, deeper breakthrough/tribulation.
 - Prove Boundless Foundation costs/behavior differ from ordinary path.
 - Presentation text-first; stack unresolved.
 

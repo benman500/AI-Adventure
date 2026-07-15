@@ -5,17 +5,14 @@ from pathlib import Path
 import pytest
 from httpx2 import ASGITransport, AsyncClient
 
-from ai_adventure.api import create_app
-from ai_adventure.config import Settings
+from tests.conftest_helpers import make_test_app
 
 
 @pytest.mark.asyncio
 async def test_health_and_home(tmp_path: Path) -> None:
     """Routes call services; JSON and HTML both expose engine-backed data."""
 
-    db_path = tmp_path / "http.db"
-    settings = Settings(database_url=f"sqlite:///{db_path.as_posix()}")
-    app = create_app(settings)
+    app = make_test_app(tmp_path, filename="http.db")
 
     async with AsyncClient(
         transport=ASGITransport(app=app),

@@ -7,17 +7,21 @@ from fastapi.staticfiles import StaticFiles
 
 from ai_adventure.api.routes import router
 from ai_adventure.config import Settings, get_settings
-from ai_adventure.db import Base, create_db_engine, create_session_factory
+from ai_adventure.db import create_db_engine, create_session_factory
 from ai_adventure.db import models as _models  # noqa: F401 — register models
 from ai_adventure.services import GameAppService
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
-    """Build the FastAPI app with wired layers (routes → services → engine → repos)."""
+    """Build the FastAPI app with wired layers (routes → services → engine → repos).
+
+    Schema must already exist via Alembic migrations (`alembic upgrade head`).
+    This factory does **not** call ``Base.metadata.create_all`` so production
+    startup cannot silently bypass migration history.
+    """
 
     cfg = settings or get_settings()
     db_engine = create_db_engine(cfg)
-    Base.metadata.create_all(bind=db_engine)
     session_factory = create_session_factory(cfg, engine=db_engine)
     game_service = GameAppService(settings=cfg, session_factory=session_factory)
 

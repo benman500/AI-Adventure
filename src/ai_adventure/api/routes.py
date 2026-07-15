@@ -158,6 +158,74 @@ def load_save_route(
 
 
 @router.get("/play/{save_id}", response_class=HTMLResponse)
+def play_scene(
+    request: Request,
+    save_id: str,
+    service: GameAppService = Depends(get_game_app_service),
+) -> Response:
+    """Story scene play UI (Milestone 3 opening loop)."""
+
+    try:
+        scene = service.get_play_scene(save_id)
+    except EngineValidationError:
+        return RedirectResponse(url="/saves", status_code=303)
+    return templates.TemplateResponse(
+        request,
+        "play_scene.html",
+        {
+            "app_name": scene.app_name,
+            "scene": scene,
+        },
+    )
+
+
+@router.post("/play/{save_id}/action")
+async def play_action(
+    request: Request,
+    save_id: str,
+    service: GameAppService = Depends(get_game_app_service),
+) -> Response:
+    """Submit a story or cultivation action."""
+
+    form = await request.form()
+    action_id = str(form.get("action_id", "")).strip()
+    if not action_id:
+        try:
+            scene = service.get_play_scene(save_id, message="No action selected")
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    try:
+        scene = service.submit_story_action(save_id, action_id)
+    except EngineValidationError as exc:
+        try:
+            scene = service.get_play_scene(save_id, message=exc.message)
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    return templates.TemplateResponse(
+        request,
+        "play_scene.html",
+        {
+            "app_name": scene.app_name,
+            "scene": scene,
+        },
+    )
+
+
+@router.get("/play/{save_id}/status", response_class=HTMLResponse)
 def play_status(
     request: Request,
     save_id: str,

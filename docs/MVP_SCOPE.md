@@ -48,10 +48,10 @@ Prove that a player can:
 |------|----------------|
 | Character creation | Backgrounds + identity answers + name — **not** path. Milestone 2 ships three data-driven backgrounds (Merchant Family, Alchemist's Apprentice, Hunter); full ten remain the MVP content goal |
 | Boundless story event | Mandatory informed permanent choice in first ~30 min; every background reaches it |
-| Cultivation | Tiny loop on locked early realms; axes present; breakthrough outcomes stubbed; ordinary vs Boundless diverge after choice |
+| Cultivation | Tiny loop on locked early realms; axes present; breakthrough outcomes stubbed; ordinary vs Boundless diverge after choice. **Milestone 3** ships opening loop only ([OPENING_STORY.md](OPENING_STORY.md)). |
 | Tribulations / Heaven's Will | Minimal stub hooks (same APIs later expanded) |
-| Profession | Minimal earn action yielding resources, money, and/or reputation/knowledge |
-| Techniques | Small starter set; full metadata schema present even if many fields are empty |
+| Profession | Minimal earn action yielding resources, money, and/or reputation/knowledge — **deferred past Milestone 3** |
+| Techniques | Small starter set; full metadata schema present even if many fields are empty — **deferred past Milestone 3** |
 | Persistence | Save/load of important state via engine |
 | World | Tiny starting context; world clock exists (even if few off-screen actors) |
 | Narration | Template/stub text; no AI dependency |
@@ -92,14 +92,14 @@ Architecture, module boundaries, and data models should anticipate (without impl
 **MVP implementation**
 
 - [ ] New game → create character → upbringing background + identity package applied (no path at creation)
-- [ ] Every background reaches the Boundless Foundation choice event in the first ~30 minutes
-- [ ] Boundless choice is informed and permanent: fix→ordinary **or** Boundless hard path
-- [ ] Choosing fix clears the anomaly and supports a **viable ordinary** cultivation loop
-- [ ] Ordinary vs Boundless show mechanical divergence (cost/tribulation/progress) after the choice; neither path is a dead end
-- [ ] Profession-adjacent earn action works
-- [ ] At least a few techniques exist as persistent records with the shared schema
-- [ ] Save/load restores important fields (including path type after the event)
-- [ ] Playable with no AI configured
+- [ ] Every background reaches the Boundless Foundation choice event in the first ~30 minutes — **Milestone 3 opening slice**
+- [ ] Boundless choice is informed and permanent: fix→ordinary **or** Boundless hard path — **Milestone 3**
+- [ ] Choosing fix clears the anomaly and supports a **viable ordinary** cultivation loop — **Milestone 3**
+- [ ] Ordinary vs Boundless show mechanical divergence (cost/tribulation/progress) after the choice — **Milestone 3 partial**
+- [ ] Profession-adjacent earn action works — *later milestone*
+- [ ] At least a few techniques exist as persistent records with the shared schema — *later milestone*
+- [ ] Save/load restores important fields (including path type after the event) — **Milestone 3**
+- [ ] Playable with no AI configured — **Milestone 3**
 - [ ] No path for AI to write saves directly
 
 **Long-term architecture checks (even in MVP)**

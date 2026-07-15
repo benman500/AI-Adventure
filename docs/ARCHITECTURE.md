@@ -188,7 +188,7 @@ src/ai_adventure/
   engine/        # Game engine (authoritative rules)
   repositories/  # Persistence adapters
   db/            # SQLAlchemy Base, models, engine helpers
-  data/          # Authored content (backgrounds, identity questions)
+  data/          # Authored content (backgrounds, identity, story, npcs, sects)
   narration/     # Abstract Narrator + StubNarrator
   presentation/  # Jinja2 templates + static CSS/JS
   config.py
@@ -201,6 +201,8 @@ saves/           # SQLite DB path (default: saves/game.db)
 **MVP defaults locked by scaffold:** sync SQLAlchemy; Jinja2 under `src/ai_adventure/presentation/`; SQLite default URL `sqlite:///…/saves/game.db` via pydantic-settings.
 
 **Milestone 2 save model:** multiple save slots in one SQLite database; each `game_saves` row is a world-owned save (soft-delete; UUID ids). Active save remembered via cookie `active_save_id`. Backgrounds and personality questions are loaded from `data/` so content expands without engine code changes.
+
+**Milestone 3 play model:** `/play/{save_id}` renders data-driven story scenes; `POST /play/{save_id}/action` submits story or cultivation intents through `GameAppService` → `engine/story.py` + `engine/cultivation.py` → repositories. Story position in `story_progress.current_node_id`.
 
 ---
 

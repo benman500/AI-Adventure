@@ -17,10 +17,31 @@ from ai_adventure.engine import (
     EngineValidationError,
     GameEngine,
 )
-from ai_adventure.engine.constants import DELETE_CONFIRMATION_VALUE
+from ai_adventure.engine.constants import (
+    DELETE_CONFIRMATION_VALUE,
+    PATH_STATUS_CONFIRMED_BOUNDLESS,
+    PATH_STATUS_CONFIRMED_ORDINARY,
+)
+from ai_adventure.engine.cultivation import cultivation_state_from_player, cultivation_view
 from ai_adventure.engine.identity import PersonalityQuestion
+from ai_adventure.engine.story import (
+    StoryContext,
+    apply_on_enter,
+    apply_story_action,
+    build_scene_view,
+    entry_node_for_background,
+    flags_to_json,
+    parse_flags,
+)
 from ai_adventure.narration import Narration, Narrator, create_narrator
-from ai_adventure.repositories import EventLogRepository, MetaRepository, SaveRepository
+from ai_adventure.repositories import (
+    EventLogRepository,
+    MetaRepository,
+    NpcRepository,
+    SaveRepository,
+    SectRepository,
+    StoryRepository,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,6 +106,26 @@ class LoadedSaveModel:
     inventory: list[InventoryViewItem]
     narration: str | None = None
     created: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class PlaySceneModel:
+    """Story scene view for the play UI."""
+
+    app_name: str
+    save_id: str
+    character_name: str
+    background_display_name: str
+    current_location_name: str
+    world_day: int
+    node_id: str
+    title: str
+    narrative: str
+    actions: list[dict[str, str]]
+    cultivation_methods: list[dict[str, str]]
+    cultivation: dict[str, Any]
+    message: str | None = None
+    opening_complete: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -273,6 +314,175 @@ class GameAppService:
                 }
                 for entry in entries
             ]
+
+    def get_play_scene(self, save_id: str, *, message: str | None = None) -> PlaySceneModel:
+        """Load authoritative story scene for a save (bootstrap if needed)."""
+
+        with self._session_factory() as session:
+            save_repo = SaveRepository(session)
+            save = save_repo.get_with_player(save_id)
+            if save is None or save.player is None:
+                raise EngineValidationError("Save not found")
+
+            story_repo = StoryRepository(session)
+            progress = save.story_progress
+            if progress is None:
+                entry = entry_node_for_background(save.background_id)
+                progress = story_repo.create(save_id=save.id, current_node_id=entry)
+                save_repo.mark_story_started(save)
+
+            player = save.player
+            context = self._story_context(save, player, progress)
+            scene = build_scene_view(context)
+            save_repo.touch_last_played(save)
+            session.commit()
+            return self._play_scene_model(
+                save=save,
+                player=player,
+                scene=scene,
+                message=message,
+            )
+
+    def submit_story_action(
+        self,
+        save_id: str,
+        action_id: str,
+    ) -> PlaySceneModel:
+        """Apply a story or cultivation action through the engine."""
+
+        with self._session_factory() as session:
+            save_repo = SaveRepository(session)
+            story_repo = StoryRepository(session)
+            npc_repo = NpcRepository(session)
+            sect_repo = SectRepository(session)
+
+            save = save_repo.get_with_player(save_id)
+            if save is None or save.player is None:
+                raise EngineValidationError("Save not found")
+            progress = save.story_progress
+            if progress is None:
+                raise EngineValidationError("Story progress not initialized")
+
+            player = save.player
+            context = self._story_context(save, player, progress)
+            result = apply_story_action(context, action_id)
+
+            self._persist_story_result(
+                save_repo=save_repo,
+                story_repo=story_repo,
+                npc_repo=npc_repo,
+                sect_repo=sect_repo,
+                save=save,
+                player=player,
+                progress=progress,
+                result=result,
+            )
+            save_repo.touch_last_played(save)
+            session.commit()
+
+            progress.current_node_id = result.next_node_id
+            context = self._story_context(save, player, progress)
+            scene = build_scene_view(context)
+            return self._play_scene_model(
+                save=save,
+                player=player,
+                scene=scene,
+                message=result.summary,
+            )
+
+    def _story_context(self, save: object, player: object, progress: object) -> StoryContext:
+        return StoryContext(
+            background_id=getattr(save, "background_id"),
+            current_node_id=getattr(progress, "current_node_id"),
+            flags=parse_flags(getattr(progress, "flags_json")),
+            cultivation=cultivation_state_from_player(player),
+            world_day=getattr(save, "world_day"),
+        )
+
+    def _persist_story_result(
+        self,
+        *,
+        save_repo: SaveRepository,
+        story_repo: StoryRepository,
+        npc_repo: NpcRepository,
+        sect_repo: SectRepository,
+        save: object,
+        player: object,
+        progress: object,
+        result: object,
+    ) -> None:
+        story_repo.update(
+            progress,
+            current_node_id=result.next_node_id,
+            flags_json=flags_to_json(result.flags),
+        )
+        save_repo.apply_player_cultivation(player, result.cultivation)
+
+        if getattr(result.cultivation, "path_status", None) in (
+            PATH_STATUS_CONFIRMED_ORDINARY,
+            PATH_STATUS_CONFIRMED_BOUNDLESS,
+        ):
+            save_repo.mark_path_confirmed(player)
+
+        if result.location_id and result.location_name:
+            save_repo.update_locations(
+                save,
+                player,
+                location_id=result.location_id,
+                location_name=result.location_name,
+            )
+        if result.world_day != getattr(save, "world_day"):
+            save_repo.set_world_day(save, result.world_day)
+        for npc in result.spawned_npcs:
+            npc_repo.spawn_if_absent(
+                save_id=getattr(save, "id"),
+                template_id=npc["template_id"],
+                display_name=npc["display_name"],
+                role=npc["role"],
+            )
+        if result.sect_id and result.sect_rank:
+            sect_repo.upsert(
+                save_id=getattr(save, "id"),
+                sect_id=result.sect_id,
+                rank_id=result.sect_rank,
+            )
+        for event in result.events:
+            save_repo.append_event(
+                getattr(save, "id"),
+                event_type=str(event["event_type"]),
+                payload=dict(event.get("payload", {})),
+            )
+
+    def _play_scene_model(
+        self,
+        *,
+        save: object,
+        player: object,
+        scene: object,
+        message: str | None,
+    ) -> PlaySceneModel:
+        cultivation = cultivation_view(cultivation_state_from_player(player))
+        opening_complete = cultivation["path_status"] in (
+            PATH_STATUS_CONFIRMED_ORDINARY,
+            PATH_STATUS_CONFIRMED_BOUNDLESS,
+        ) and scene.node_id in {"shared_post_ordinary_02", "shared_post_boundless_02"}
+
+        return PlaySceneModel(
+            app_name=self._settings.app_name,
+            save_id=getattr(save, "id"),
+            character_name=getattr(player, "character_name"),
+            background_display_name=getattr(save, "background_display_name"),
+            current_location_name=getattr(player, "current_location_name"),
+            world_day=getattr(save, "world_day"),
+            node_id=scene.node_id,
+            title=scene.title,
+            narrative=scene.narrative,
+            actions=list(scene.actions),
+            cultivation_methods=list(scene.cultivation_methods),
+            cultivation=cultivation,
+            message=message,
+            opening_complete=opening_complete,
+        )
 
     def _loaded_model_from_state(
         self,

@@ -37,14 +37,11 @@ This path replaces the earlier design name “Perfect Foundation Path.” All de
 1. **Unique background introduction** — Every background has its own upbringing-based opening ([BACKGROUNDS.md](BACKGROUNDS.md)).
 2. **Leave home → arrive at the sect** — Join the shared early pipeline.
 3. **Initial recruitment**, **talent examination**, and **first cultivation lesson**.
-4. **First true cultivation attempt** — An **anomaly** occurs:
-   - The player absorbs enough Qi that a breakthrough should occur.
-   - **The breakthrough never happens.**
-5. **Sect response** — Elders are confused; the player is temporarily treated as a **failed cultivator**.
-6. **Secret revelation** (same day or night) — An ancient elder, founder remnant, hidden master, or similar figure explains privately:
-   - The body is **not** defective.
-   - It holds latent potential for the **Boundless Foundation Path**.
-   - The player may instead be **guided/corrected (“fixed”)** onto the conventional path and cultivate normally.
+4. **First true cultivation attempt** — Player builds qi via cultivation methods, reaches readiness, and **attempts breakthrough**. An **anomaly** occurs:
+   - All indicators say breakthrough should happen.
+   - **The breakthrough never happens** on that attempt.
+5. **Investigation** — Instructors and examiners are confused; multiple checks fail to explain the stall; the player is a **mystery**, not a failed cultivator.
+6. **Elder revelation** — Elder Yun Mei (M3) explains Boundless history and both paths privately.
 7. **Permanent choice** (both viable):
    - **Option 1 — Get fixed / ordinary path:** Accept correction. The anomaly is resolved; the player proceeds as a **normal cultivator** with baseline costs, tribulations, and pacing. Sect “failed cultivator” stigma is cleared as the fix takes. This path is **designed to remain competitive and satisfying** for a full playthrough.
    - **Option 2 — Boundless Foundation Path (hard path):** **Abandon** the conventional cultivation path **forever** and walk Boundless—far greater time, resources, and perseverance for extraordinary long-term foundation and ceiling.
@@ -118,7 +115,12 @@ Content, sect advancement, professions, techniques, and endgame must be **reacha
 
 ### Revealer archetype
 
-- One of: ancient elder, founder remnant, hidden master, or equivalent—**content casting may vary by save/sect**, same structural beat.
+- **Milestone 3 (locked):** Elder Yun Mei, Verdant Gate Foundation Hall elder — keeper of incomplete Boundless manuscripts ([OPENING_STORY.md](OPENING_STORY.md)).
+- Long-term: other sects may use different revealers; same structural beat.
+
+### Historical framing (Milestone 3)
+
+The revelation must convey that Boundless Foundation was an **ancient, openly taught path** later **abandoned** for extreme cost and difficulty; surviving texts are **incomplete**; modern doctrine treats it as **obsolete or failed theory**. The player gambles on history's abandoned road—not a cheat code.
 
 ### Information package before choice (proposed checklist)
 

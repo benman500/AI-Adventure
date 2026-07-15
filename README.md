@@ -50,11 +50,12 @@ Core and systems docs live under `docs/`. Start with [GAME_PRINCIPLES.md](docs/G
 | [TECH_STACK.md](docs/TECH_STACK.md) | Locked language, backend, DB, frontend, AI |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Layered runtime flow and responsibilities |
 | [MVP_SCOPE.md](docs/MVP_SCOPE.md) | MVP vs architecture |
+| [OPENING_STORY.md](docs/OPENING_STORY.md) | Milestone 3 opening slice |
 | [DEVELOPMENT_ROADMAP.md](docs/DEVELOPMENT_ROADMAP.md) | Phased delivery |
 
 ## Getting Started
 
-Requires **Python 3.14+**. Milestone 2: character creation + multi-save persistence (no gameplay loop yet).
+Requires **Python 3.14+**. Milestone 3: character creation, multi-save persistence, **opening story + first cultivation loop**.
 
 ```bash
 cd "AI- Adventure"
@@ -62,14 +63,15 @@ py -3.14 -m venv .venv
 .venv\Scripts\activate
 pip install -e ".[dev]"
 pytest
+alembic upgrade head
 uvicorn ai_adventure.main:app --reload
 ```
 
-Open http://127.0.0.1:8000 — use **New Game** / **Load Saves**.
+Open http://127.0.0.1:8000 — **New Game**, then play through the opening (background intro → Verdant Gate → cultivation → path choice).
 
 Default SQLite file: `saves/game.db`. Override with `AI_ADVENTURE_DATABASE_URL`.
 
-Migrations: `alembic upgrade head` (after install; `alembic/env.py` reads the same settings).
+Migrations: `alembic upgrade head` (after install; `alembic/env.py` reads the same settings). Schema is Alembic-owned — the app no longer auto-creates tables on startup.
 
 ## Development Notes
 

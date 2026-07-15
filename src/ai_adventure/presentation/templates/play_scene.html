@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ scene.title }} — {{ scene.character_name }}</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+  <main class="shell play-shell">
+    <p class="breadcrumb">
+      <a href="/">Home</a> / <a href="/saves">Saves</a> / {{ scene.character_name }}
+    </p>
+
+    <header class="play-header">
+      <h1>{{ scene.title }}</h1>
+      <p class="meta-line">
+        <strong>{{ scene.character_name }}</strong> · {{ scene.background_display_name }}
+        · Day {{ scene.world_day }} · {{ scene.current_location_name }}
+      </p>
+    </header>
+
+    {% if scene.message %}
+    <p class="flash message">{{ scene.message }}</p>
+    {% endif %}
+
+    {% if scene.opening_complete %}
+    <p class="flash success">Opening complete — your path is set. Continue cultivating or save and return later.</p>
+    {% endif %}
+
+    <section class="panel story-panel">
+      <div class="story-text">{{ scene.narrative }}</div>
+    </section>
+
+    <section class="panel cultivation-panel">
+      <h2>Cultivation</h2>
+      <dl class="cultivation-stats">
+        <div><dt>Realm</dt><dd>{{ scene.cultivation.realm_stage }}</dd></div>
+        <div><dt>Path</dt><dd>{{ scene.cultivation.cultivation_path }} ({{ scene.cultivation.path_status }})</dd></div>
+        <div><dt>Qi reserve</dt><dd>{{ scene.cultivation.qi_reserve_current }} / {{ scene.cultivation.qi_reserve_max }}</dd></div>
+        <div><dt>Progress</dt><dd>{{ scene.cultivation.cultivation_progress }} / {{ scene.cultivation.cultivation_progress_max }}</dd></div>
+        <div><dt>Foundation</dt><dd>{{ scene.cultivation.foundation_quality_label }}</dd></div>
+        {% if scene.cultivation.breakthrough_ready %}
+        <div class="highlight"><dt>Readiness</dt><dd>Breakthrough conditions met</dd></div>
+        {% endif %}
+      </dl>
+      <div class="progress-bar" aria-hidden="true">
+        <span style="width: {{ scene.cultivation.cultivation_progress }}%"></span>
+      </div>
+    </section>
+
+    {% if scene.cultivation_methods %}
+    <section class="panel actions-panel">
+      <h2>Cultivation Methods</h2>
+      <form method="post" action="/play/{{ scene.save_id }}/action" class="action-grid">
+        {% for method in scene.cultivation_methods %}
+        <button type="submit" name="action_id" value="{{ method.id }}" class="button method-button">
+          {{ method.label }}
+        </button>
+        {% endfor %}
+      </form>
+    </section>
+    {% endif %}
+
+    {% if scene.actions %}
+    <section class="panel actions-panel">
+      <h2>Actions</h2>
+      <form method="post" action="/play/{{ scene.save_id }}/action" class="action-grid">
+        {% for action in scene.actions %}
+        <button type="submit" name="action_id" value="{{ action.id }}" class="button">
+          {{ action.label }}
+        </button>
+        {% endfor %}
+      </form>
+    </section>
+    {% endif %}
+
+    <p class="footer-links">
+      <a class="button secondary" href="/play/{{ scene.save_id }}/status">Character sheet</a>
+      <a class="button secondary" href="/saves">Back to saves</a>
+    </p>
+  </main>
+</body>
+</html>

@@ -15,12 +15,35 @@ from ai_adventure.engine.character_creation import (
     CreatedCharacterState,
     create_character,
 )
+from ai_adventure.engine.cultivation import (
+    CultivationResult,
+    CultivationState,
+    apply_cultivation_method,
+    attempt_breakthrough,
+    commit_path_choice,
+    cultivation_view,
+)
 from ai_adventure.engine.errors import EngineValidationError
 from ai_adventure.engine.identity import (
     PersonalityQuestion,
     clear_personality_questions_cache,
     list_personality_questions,
     validate_identity_answers,
+)
+from ai_adventure.engine.story import (
+    SceneView,
+    StoryContext,
+    StoryFlags,
+    StoryTransitionResult,
+    apply_on_enter,
+    apply_story_action,
+    build_scene_view,
+    clear_story_cache,
+    entry_node_for_background,
+    flags_to_json,
+    get_story_node,
+    load_story_registry,
+    parse_flags,
 )
 
 
@@ -109,17 +132,36 @@ class GameEngine:
 __all__ = [
     "BackgroundDefinition",
     "CreatedCharacterState",
+    "CultivationResult",
+    "CultivationState",
     "EngineOutcome",
     "EngineValidationError",
     "GameEngine",
     "OutcomeKind",
     "PersonalityQuestion",
+    "SceneView",
+    "StoryContext",
+    "StoryFlags",
+    "StoryTransitionResult",
+    "apply_cultivation_method",
+    "apply_on_enter",
+    "apply_story_action",
+    "attempt_breakthrough",
+    "build_scene_view",
     "clear_background_registry_cache",
     "clear_personality_questions_cache",
+    "clear_story_cache",
+    "commit_path_choice",
     "create_character",
+    "cultivation_view",
+    "entry_node_for_background",
+    "flags_to_json",
     "get_background",
+    "get_story_node",
     "list_backgrounds",
     "list_personality_questions",
     "load_background_registry",
+    "load_story_registry",
+    "parse_flags",
     "validate_identity_answers",
 ]

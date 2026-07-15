@@ -54,6 +54,9 @@ class SaveRepository:
             .options(
                 selectinload(GameSave.player).selectinload(Player.inventory_items),
                 selectinload(GameSave.inventory_items),
+                selectinload(GameSave.story_progress),
+                selectinload(GameSave.sect_membership),
+                selectinload(GameSave.npc_records),
             )
         )
         return self._session.scalar(statement)
@@ -91,6 +94,7 @@ class SaveRepository:
             qi=state.qi,
             soul=state.soul,
             foundation_quality=state.foundation_quality,
+            dao=state.dao,
             identity_answers_json=json.dumps(state.identity_answers, sort_keys=True),
             background_history_json=json.dumps(state.background_history, sort_keys=True),
         )
@@ -118,6 +122,83 @@ class SaveRepository:
         )
         self._session.flush()
         return save
+
+    def append_event(
+        self,
+        save_id: str,
+        *,
+        event_type: str,
+        payload: dict[str, object],
+    ) -> EventLogEntry:
+        """Append one event log row."""
+
+        entry = EventLogEntry(
+            save_id=save_id,
+            event_type=event_type,
+            payload_json=json.dumps(payload, sort_keys=True),
+            created_at=_utcnow(),
+        )
+        self._session.add(entry)
+        self._session.flush()
+        return entry
+
+    def apply_player_cultivation(self, player: Player, cultivation: object) -> Player:
+        """Persist cultivation state from engine CultivationState."""
+
+        player.cultivation_path = cultivation.cultivation_path
+        player.path_status = cultivation.path_status
+        player.realm_id = cultivation.realm_id
+        player.stage_id = cultivation.stage_id
+        player.body = cultivation.body
+        player.qi = cultivation.qi
+        player.soul = cultivation.soul
+        player.dao = cultivation.dao
+        player.foundation_quality = cultivation.foundation_quality
+        player.qi_reserve_current = cultivation.qi_reserve_current
+        player.qi_reserve_max = cultivation.qi_reserve_max
+        player.cultivation_progress = cultivation.cultivation_progress
+        player.practice_sessions = cultivation.practice_sessions
+        player.anomaly_state = cultivation.anomaly_state
+        player.breakthrough_readiness = cultivation.breakthrough_readiness
+        self._session.add(player)
+        return player
+
+    def mark_path_confirmed(self, player: Player) -> None:
+        """Record permanent path confirmation timestamp."""
+
+        if player.path_confirmed_at is None:
+            player.path_confirmed_at = _utcnow()
+            self._session.add(player)
+
+    def update_locations(
+        self,
+        save: GameSave,
+        player: Player,
+        *,
+        location_id: str,
+        location_name: str,
+    ) -> None:
+        """Update current location on save and player."""
+
+        save.current_location_id = location_id
+        save.current_location_name = location_name
+        player.current_location_id = location_id
+        player.current_location_name = location_name
+        self._session.add(save)
+        self._session.add(player)
+
+    def set_world_day(self, save: GameSave, world_day: int) -> None:
+        """Update world day counter."""
+
+        save.world_day = world_day
+        self._session.add(save)
+
+    def mark_story_started(self, save: GameSave) -> None:
+        """Record when the opening story began."""
+
+        if save.story_started_at is None:
+            save.story_started_at = _utcnow()
+            self._session.add(save)
 
     def touch_last_played(self, save: GameSave) -> GameSave:
         """Update last_played_at for a load."""
