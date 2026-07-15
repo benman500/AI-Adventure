@@ -86,37 +86,33 @@ Do **not** introduce:
 
 ---
 
-## Proposed layout (informational)
+## Confirmed layout (scaffold)
 
-How the stack maps to existing folders (not gameplay code):
-
-| Concern | Likely home |
-|---------|-------------|
-| Engine + FastAPI app | `src/` |
+| Concern | Location |
+|---------|----------|
+| Engine + FastAPI app | `src/ai_adventure/` |
 | Tests | `tests/` |
-| SQLite files / saves bridge | `saves/` and/or configured DB path via pydantic-settings |
-| Jinja2 templates + static CSS/JS | under `src/` presentation package or `assets/` for static |
-| Prompt/style assets | `prompts/` (when AI is enabled) |
+| SQLite default | `saves/game.db` (override with `AI_ADVENTURE_DATABASE_URL`) |
+| Jinja2 + static CSS/JS | `src/ai_adventure/presentation/` |
+| Prompt assets | `prompts/` (when AI providers are added) |
 | Design truth | `docs/` |
 
-Exact package names remain an implementation detail to be approved at coding start.
+**MVP defaults:** sync SQLAlchemy; StubNarrator; no Docker.
 
 ---
 
 ## Out of scope / non-goals
 
-- Implementing application code in this pass
-- Choosing host/deploy targets beyond local MVP
-- Shipping Ollama/OpenAI integrations in MVP (architecture: Narrator interface only)
+- Full gameplay systems in the initial scaffold
+- Shipping Ollama/OpenAI integrations in MVP (Narrator interface + stub only)
+- Docker during MVP
 
 ---
 
 ## Unresolved design questions
 
-1. Single-process FastAPI serving Jinja2 vs separate static asset layout conventions?
-2. SQLite file location convention (one DB under `saves/` vs data/)?
-3. Async SQLAlchemy engine usage vs sync for MVP simplicity?
-4. Minimum Python patch version within 3.14+ for CI?
+1. Async SQLAlchemy in a later phase?
+2. CI Python exact micro-version within 3.14+?
 
 ---
 

@@ -26,7 +26,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.session_factory = session_factory
     app.state.game_app_service = game_service
 
-    static_dir = Path(__file__).resolve().parent / "presentation" / "static"
+    static_dir = Path(__file__).resolve().parent.parent / "presentation" / "static"
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
     app.include_router(router)
     return app

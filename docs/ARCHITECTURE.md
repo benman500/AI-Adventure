@@ -174,18 +174,37 @@ These attach **without** collapsing layers:
 
 ## Out of scope / non-goals
 
-- Implementing packages or modules in this pass
-- Detailed class diagrams or exact folder names (proposed when coding starts)
+- Implementing packages or modules beyond the approved scaffold in ad-hoc PRs without docs sync
 - Changing the locked stack
+
+---
+
+## Package layout (confirmed in scaffold)
+
+```text
+src/ai_adventure/
+  api/           # FastAPI app factory + routes
+  services/      # Application services
+  engine/        # Game engine (authoritative rules)
+  repositories/  # Persistence adapters
+  db/            # SQLAlchemy Base, models, engine helpers
+  narration/     # Abstract Narrator + StubNarrator
+  presentation/  # Jinja2 templates + static CSS/JS
+  config.py
+  main.py
+alembic/         # Migrations
+tests/
+saves/           # SQLite DB path (default: saves/game.db)
+```
+
+**MVP defaults locked by scaffold:** sync SQLAlchemy; Jinja2 under `src/ai_adventure/presentation/`; SQLite default URL `sqlite:///…/saves/game.db` via pydantic-settings.
 
 ---
 
 ## Unresolved design questions
 
-1. Exact Python package layout under `src/` (e.g. `api/`, `services/`, `engine/`, `repositories/`)?
-2. Sync vs async SQLAlchemy sessions for MVP?
-3. Where Jinja2 templates and static assets live on disk?
-4. Single SQLite file path convention relative to `saves/`?
+1. Async SQLAlchemy later vs keep sync indefinitely?
+2. Auth/session model for multi-save slots?
 
 ---
 

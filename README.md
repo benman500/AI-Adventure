@@ -53,10 +53,27 @@ Core and systems docs live under `docs/`. Start with [GAME_PRINCIPLES.md](docs/G
 
 ## Getting Started
 
-Gameplay code is not implemented yet. Approve design (see [DESIGN_REVIEW.md](docs/DESIGN_REVIEW.md)) before Phase 1 coding.
+Requires **Python 3.14+**. Architecture scaffold is in place (no full gameplay yet).
+
+```bash
+cd "AI- Adventure"
+py -3.14 -m venv .venv
+.venv\Scripts\activate
+pip install -e ".[dev]"
+pytest
+uvicorn ai_adventure.main:app --reload
+```
+
+Open http://127.0.0.1:8000 — home page uses engine → repository → stub narrator.
+
+Default SQLite file: `saves/game.db`. Override with `AI_ADVENTURE_DATABASE_URL`.
+
+Migrations: `alembic upgrade head` (after install; `alembic/env.py` reads the same settings).
 
 ## Development Notes
 
+- Layers: Browser → FastAPI → Services → Engine → Repositories → SQLAlchemy → SQLite ([ARCHITECTURE.md](docs/ARCHITECTURE.md)).
+- AI only narrates completed outcomes; StubNarrator keeps mechanics online without AI.
 - The world persists without the player; AI never mutates state or decides numerical outcomes.
 - No global good/evil meter; reputation is local.
 - Dao is understanding, not a combat stat; CPI is internal-only.
