@@ -4,12 +4,32 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
+from ai_adventure.engine.backgrounds import (
+    BackgroundDefinition,
+    clear_background_registry_cache,
+    get_background,
+    list_backgrounds,
+    load_background_registry,
+)
+from ai_adventure.engine.character_creation import (
+    CreatedCharacterState,
+    create_character,
+)
+from ai_adventure.engine.errors import EngineValidationError
+from ai_adventure.engine.identity import (
+    PersonalityQuestion,
+    clear_personality_questions_cache,
+    list_personality_questions,
+    validate_identity_answers,
+)
+
 
 class OutcomeKind(StrEnum):
     """Kinds of completed engine outcomes (narrator input only)."""
 
     SYSTEM = "system"
     STATUS = "status"
+    CHARACTER_CREATED = "character_created"
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,7 +45,7 @@ class GameEngine:
     """Authoritative game rules host.
 
     Cultivation, combat, economy, and time systems plug in here later.
-    This scaffold only exposes health-check style outcomes for wiring tests.
+    Milestone 2 adds character creation composition and validation only.
     """
 
     def ping(self) -> EngineOutcome:
@@ -36,3 +56,70 @@ class GameEngine:
             summary="Engine ready.",
             facts={"authoritative": True, "ai_decides_mechanics": False},
         )
+
+    def list_selectable_backgrounds(
+        self,
+        backgrounds_dir: str | None = None,
+    ) -> list[BackgroundDefinition]:
+        """Return data-driven backgrounds available for new games."""
+
+        return list_backgrounds(backgrounds_dir)
+
+    def list_personality_questions(
+        self,
+        path: str | None = None,
+    ) -> list[PersonalityQuestion]:
+        """Return universal personality questions (answers stored raw later)."""
+
+        return list_personality_questions(path)
+
+    def create_character(
+        self,
+        *,
+        character_name: str,
+        background_id: str,
+        identity_answers: dict[str, str],
+        backgrounds_dir: str | None = None,
+        personality_questions_path: str | None = None,
+    ) -> tuple[CreatedCharacterState, EngineOutcome]:
+        """Validate and compose a new character; Boundless path is never offered."""
+
+        state = create_character(
+            character_name=character_name,
+            background_id=background_id,
+            identity_answers=identity_answers,
+            backgrounds_dir=backgrounds_dir,
+            personality_questions_path=personality_questions_path,
+        )
+        if state.cultivation_path != "ordinary":
+            raise EngineValidationError("New characters must start on the ordinary path")
+        outcome = EngineOutcome(
+            kind=OutcomeKind.CHARACTER_CREATED,
+            summary=f"{state.character_name} begins their journey.",
+            facts={
+                "character_name": state.character_name,
+                "background_id": state.background_id,
+                "cultivation_path": state.cultivation_path,
+                "boundless_offered": False,
+            },
+        )
+        return state, outcome
+
+
+__all__ = [
+    "BackgroundDefinition",
+    "CreatedCharacterState",
+    "EngineOutcome",
+    "EngineValidationError",
+    "GameEngine",
+    "OutcomeKind",
+    "PersonalityQuestion",
+    "clear_background_registry_cache",
+    "clear_personality_questions_cache",
+    "create_character",
+    "get_background",
+    "list_backgrounds",
+    "list_personality_questions",
+    "load_background_registry",
+    "validate_identity_answers",
+]

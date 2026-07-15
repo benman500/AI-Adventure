@@ -9,16 +9,17 @@
 <body>
   <main class="shell">
     <h1>{{ app_name }}</h1>
-    <p class="lede">Engine-authoritative scaffold. AI only narrates completed outcomes.</p>
-    <section class="card">
-      <h2>Engine outcome</h2>
+    <p class="lede">A persistent cultivation world. Engine decides; AI only narrates later.</p>
+    <nav class="nav-actions">
+      <a class="button" href="/new">New Game</a>
+      <a class="button secondary" href="/saves">Load Saves</a>
+    </nav>
+    <section class="panel">
+      <h2>Scaffold status</h2>
       <p><strong>Kind:</strong> {{ outcome_kind }}</p>
       <p><strong>Summary:</strong> {{ outcome_summary }}</p>
       <p><strong>Authoritative:</strong> {{ authoritative }}</p>
       <p><strong>Schema marker:</strong> {{ schema_marker }}</p>
-    </section>
-    <section class="card">
-      <h2>Narration (stub)</h2>
       <p id="narration">{{ narration }}</p>
     </section>
   </main>

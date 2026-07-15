@@ -46,7 +46,7 @@ Prove that a player can:
 
 | Area | MVP inclusion |
 |------|----------------|
-| Character creation | Ten backgrounds; identity/personality; name — **not** path |
+| Character creation | Backgrounds + identity answers + name — **not** path. Milestone 2 ships three data-driven backgrounds (Merchant Family, Alchemist's Apprentice, Hunter); full ten remain the MVP content goal |
 | Boundless story event | Mandatory informed permanent choice in first ~30 min; every background reaches it |
 | Cultivation | Tiny loop on locked early realms; axes present; breakthrough outcomes stubbed; ordinary vs Boundless diverge after choice |
 | Tribulations / Heaven's Will | Minimal stub hooks (same APIs later expanded) |

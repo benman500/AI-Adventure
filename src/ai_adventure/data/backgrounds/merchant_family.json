@@ -1,0 +1,83 @@
+{
+  "id": "merchant_family",
+  "display_name": "Merchant Family",
+  "intro_flavor": "You grew up counting coin, courtesy, and the weight of a handshake. The market lane was your school; ledgers were lullabies. Cultivation is still a rumor on the road—but trade taught you that every path has a price.",
+  "starting_location_id": "hometown_market_lane",
+  "starting_location_name": "Market Lane of Willowford",
+  "starting_money_copper": 120,
+  "history": {
+    "family_or_household": "The Zhen trading household—parents and an elder cousin who keep books for caravan partners.",
+    "hometown": "Willowford, a riverside market town.",
+    "upbringing": "Raised among stalls, warehouses, and evening accounts.",
+    "education": "Practical literacy, basic arithmetic, and trader etiquette.",
+    "former_occupation": "Junior helper on the family stall and messenger for consignments.",
+    "memories": [
+      "First hard bargain settled with tea instead of threats.",
+      "A caravan delayed by rain; learning patience and inventory loss."
+    ],
+    "existing_obligations": [
+      "Return a small advance if leaving before the autumn fair."
+    ],
+    "favors": [
+      "A warehouse clerk once covered a tally mistake for you."
+    ]
+  },
+  "reputation_seeds": [
+    {
+      "scope_id": "willowford_merchants",
+      "scope_label": "Willowford merchant circle",
+      "standing": "known_as_one_of_theirs",
+      "notes": "Recognized as the Zhen family's junior."
+    }
+  ],
+  "relationship_seeds": [
+    {
+      "seed_id": "rel_zhen_parent",
+      "label": "Parent (Zhen household)",
+      "bond": "family",
+      "notes": "Expects news if you leave home."
+    }
+  ],
+  "known_contacts": [
+    {
+      "contact_id": "contact_local_trader",
+      "display_name": "Auntie Mo, stall neighbor",
+      "role": "local_trader",
+      "notes": "Shares gossip and spare goods."
+    },
+    {
+      "contact_id": "contact_caravan_acquaintance",
+      "display_name": "Hauler Fen",
+      "role": "caravan_acquaintance",
+      "notes": "Knows roads between towns."
+    }
+  ],
+  "opportunities": [
+    {
+      "opportunity_id": "opp_consignment_intro",
+      "label": "Consignment introduction",
+      "notes": "Family can vouch for a small goods run."
+    },
+    {
+      "opportunity_id": "opp_market_intro",
+      "label": "Market introduction",
+      "notes": "Introduction to a travelling factor."
+    }
+  ],
+  "starting_knowledge": [
+    "trade_custom",
+    "basic_appraisal"
+  ],
+  "starting_possessions": [
+    {
+      "item_code": "ledger_scrap",
+      "display_name": "Scrap of a household ledger",
+      "quantity": 1
+    },
+    {
+      "item_code": "trade_goods_sample",
+      "display_name": "Sample pouch of trade goods",
+      "quantity": 1
+    }
+  ]
+}

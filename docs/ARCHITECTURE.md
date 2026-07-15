@@ -188,6 +188,7 @@ src/ai_adventure/
   engine/        # Game engine (authoritative rules)
   repositories/  # Persistence adapters
   db/            # SQLAlchemy Base, models, engine helpers
+  data/          # Authored content (backgrounds, identity questions)
   narration/     # Abstract Narrator + StubNarrator
   presentation/  # Jinja2 templates + static CSS/JS
   config.py
@@ -199,15 +200,16 @@ saves/           # SQLite DB path (default: saves/game.db)
 
 **MVP defaults locked by scaffold:** sync SQLAlchemy; Jinja2 under `src/ai_adventure/presentation/`; SQLite default URL `sqlite:///…/saves/game.db` via pydantic-settings.
 
+**Milestone 2 save model:** multiple save slots in one SQLite database; each `game_saves` row is a world-owned save (soft-delete; UUID ids). Active save remembered via cookie `active_save_id`. Backgrounds and personality questions are loaded from `data/` so content expands without engine code changes.
+
 ---
 
 ## Unresolved design questions
 
 1. Async SQLAlchemy later vs keep sync indefinitely?
-2. Auth/session model for multi-save slots?
 
 ---
 
 ## Expansion notes
 
-- Related: [TECH_STACK.md](TECH_STACK.md), [AI_BOUNDARIES.md](AI_BOUNDARIES.md), [AI_SYSTEM.md](AI_SYSTEM.md), [DATABASE.md](DATABASE.md), [MVP_SCOPE.md](MVP_SCOPE.md), [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md).
+- Related: [TECH_STACK.md](TECH_STACK.md), [AI_BOUNDARIES.md](AI_BOUNDARIES.md), [AI_SYSTEM.md](AI_SYSTEM.md), [DATABASE.md](DATABASE.md), [MVP_SCOPE.md](MVP_SCOPE.md), [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md), [DECISIONS.md](DECISIONS.md).

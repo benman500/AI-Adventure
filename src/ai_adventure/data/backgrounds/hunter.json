@@ -1,0 +1,88 @@
+{
+  "id": "hunter",
+  "display_name": "Hunter",
+  "intro_flavor": "You read mud, wind, and silence before you read books. Game and danger taught the same lesson: move cleanly, or pay later. The cultivation world waits beyond the tree line—but you already know how to survive when plans fail.",
+  "starting_location_id": "hometown_wild_edge",
+  "starting_location_name": "Wild Edge Camp outside Pinehollow",
+  "starting_money_copper": 55,
+  "history": {
+    "family_or_household": "A small hunting camp shared with an uncle and seasonal ranging partners.",
+    "hometown": "Pinehollow, a village pressed against forested hills.",
+    "upbringing": "Trails, traps, and nights under lean-to canvas.",
+    "education": "Tracking, field dressing, and wilderness caution—literacy light but practical.",
+    "former_occupation": "Village hunter and contract ranger for skins and meat.",
+    "memories": [
+      "Losing a deer to wolves and learning when to abandon a trail.",
+      "Guiding a lost child out of the fog without asking for coin."
+    ],
+    "existing_obligations": [
+      "Deliver one more rack of cured meat to the village storehouse."
+    ],
+    "favors": [
+      "A warden overlooked a poaching rumor when you reported a beast sighting."
+    ]
+  },
+  "reputation_seeds": [
+    {
+      "scope_id": "pinehollow_wilder_villages",
+      "scope_label": "Wilder villages near Pinehollow",
+      "standing": "reliable_in_the_wild",
+      "notes": "Trusted for ranging when others stay home."
+    }
+  ],
+  "relationship_seeds": [
+    {
+      "seed_id": "rel_uncle_hunter",
+      "label": "Uncle (camp partner)",
+      "bond": "family",
+      "notes": "Taught your first quiet stalk."
+    }
+  ],
+  "known_contacts": [
+    {
+      "contact_id": "contact_warden",
+      "display_name": "Warden Shi",
+      "role": "warden",
+      "notes": "Keeps the outer trails."
+    },
+    {
+      "contact_id": "contact_village_hunter",
+      "display_name": "Lan the snare-setter",
+      "role": "village_hunter",
+      "notes": "Shares trail signs over cheap wine."
+    }
+  ],
+  "opportunities": [
+    {
+      "opportunity_id": "opp_ranging_contract",
+      "label": "Ranging contract",
+      "notes": "Paid scouting along the ridge."
+    },
+    {
+      "opportunity_id": "opp_material_gather",
+      "label": "Material gather",
+      "notes": "Collect beast parts for tanners and bone-workers."
+    }
+  ],
+  "starting_knowledge": [
+    "wilderness_travel",
+    "tracking"
+  ],
+  "starting_possessions": [
+    {
+      "item_code": "hunting_knife",
+      "display_name": "Hunting knife",
+      "quantity": 1
+    },
+    {
+      "item_code": "provisions",
+      "display_name": "Travel provisions",
+      "quantity": 3
+    },
+    {
+      "item_code": "rope",
+      "display_name": "Coil of rope",
+      "quantity": 1
+    }
+  ]
+}

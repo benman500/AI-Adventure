@@ -1,0 +1,83 @@
+{
+  "id": "alchemists_apprentice",
+  "display_name": "Alchemist's Apprentice",
+  "intro_flavor": "Smoke, bitter herbs, and careful hands shaped your youth. You know which jars must never mix and which warnings elders shout too late. The road ahead smells of iron and qi—yet your first lessons were patience and clean work.",
+  "starting_location_id": "hometown_herb_workshop",
+  "starting_location_name": "Green Ember Workshop",
+  "starting_money_copper": 40,
+  "history": {
+    "family_or_household": "Apprentice cot under Master Qu of the Green Ember Workshop.",
+    "hometown": "Ashridge, a hillside town known for herb growers.",
+    "upbringing": "Errands, sweeping ash, and watching the furnace without touching it.",
+    "education": "Basic materia names, safety habits, and label discipline.",
+    "former_occupation": "Workshop apprentice—preparation and scrubbing more than brewing.",
+    "memories": [
+      "A near-miss with a cracked flask; Master's silence afterward.",
+      "Dawn herb sorting until your fingers stained green."
+    ],
+    "existing_obligations": [
+      "Finish cataloguing the autumn herb cords before leaving cleanly."
+    ],
+    "favors": [
+      "A herb seller once slipped you usable scraps for free."
+    ]
+  },
+  "reputation_seeds": [
+    {
+      "scope_id": "ashridge_pill_herb_circle",
+      "scope_label": "Ashridge pill and herb circle",
+      "standing": "junior_trust",
+      "notes": "Known as Master Qu's junior pair of hands."
+    }
+  ],
+  "relationship_seeds": [
+    {
+      "seed_id": "rel_master_qu",
+      "label": "Master Qu",
+      "bond": "mentor",
+      "notes": "Stern, fair, intolerant of careless fire."
+    }
+  ],
+  "known_contacts": [
+    {
+      "contact_id": "contact_workshop_master",
+      "display_name": "Master Qu",
+      "role": "workshop_master",
+      "notes": "Teacher and household authority."
+    },
+    {
+      "contact_id": "contact_herb_seller",
+      "display_name": "Old Lian",
+      "role": "herb_seller",
+      "notes": "Sells roots at the lower market."
+    }
+  ],
+  "opportunities": [
+    {
+      "opportunity_id": "opp_herb_run",
+      "label": "Herb run",
+      "notes": "Trusted with short gathering errands."
+    },
+    {
+      "opportunity_id": "opp_workshop_errand",
+      "label": "Workshop errand",
+      "notes": "Deliveries between workshop and clinic."
+    }
+  ],
+  "starting_knowledge": [
+    "materia_medica_basics",
+    "workshop_safety"
+  ],
+  "starting_possessions": [
+    {
+      "item_code": "mortar_pestle",
+      "display_name": "Apprentice mortar and pestle",
+      "quantity": 1
+    },
+    {
+      "item_code": "leftover_herbs",
+      "display_name": "Leftover herb scraps",
+      "quantity": 2
+    }
+  ]
+}

@@ -38,6 +38,8 @@ ai_adventure = [
     "presentation/templates/*.html",
     "presentation/static/css/*.css",
     "presentation/static/js/*.js",
+    "data/backgrounds/*.json",
+    "data/identity/*.json",
 ]
 
 [tool.pytest.ini_options]

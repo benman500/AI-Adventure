@@ -45,6 +45,7 @@ Core and systems docs live under `docs/`. Start with [GAME_PRINCIPLES.md](docs/G
 | [COMBAT.md](docs/COMBAT.md) | Combat; hidden CPI |
 | [ECONOMY.md](docs/ECONOMY.md) | Markets and trade |
 | [AI_SYSTEM.md](docs/AI_SYSTEM.md) / [AI_BOUNDARIES.md](docs/AI_BOUNDARIES.md) | AI pipelines and hard limits |
+| [DECISIONS.md](docs/DECISIONS.md) | Locked implementation decisions |
 | [DATABASE.md](docs/DATABASE.md) | Persistence architecture |
 | [TECH_STACK.md](docs/TECH_STACK.md) | Locked language, backend, DB, frontend, AI |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Layered runtime flow and responsibilities |
@@ -53,7 +54,7 @@ Core and systems docs live under `docs/`. Start with [GAME_PRINCIPLES.md](docs/G
 
 ## Getting Started
 
-Requires **Python 3.14+**. Architecture scaffold is in place (no full gameplay yet).
+Requires **Python 3.14+**. Milestone 2: character creation + multi-save persistence (no gameplay loop yet).
 
 ```bash
 cd "AI- Adventure"
@@ -64,7 +65,7 @@ pytest
 uvicorn ai_adventure.main:app --reload
 ```
 
-Open http://127.0.0.1:8000 — home page uses engine → repository → stub narrator.
+Open http://127.0.0.1:8000 — use **New Game** / **Load Saves**.
 
 Default SQLite file: `saves/game.db`. Override with `AI_ADVENTURE_DATABASE_URL`.
 

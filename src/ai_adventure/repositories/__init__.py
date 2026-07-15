@@ -4,6 +4,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ai_adventure.db.models import MetaRecord
+from ai_adventure.repositories.saves import EventLogRepository, SaveRepository
+
+__all__ = [
+    "EventLogRepository",
+    "MetaRepository",
+    "SaveRepository",
+]
 
 
 class MetaRepository:

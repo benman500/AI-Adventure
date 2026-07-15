@@ -1,0 +1,74 @@
+{
+  "questions": [
+    {
+      "id": "q_duty_ambition",
+      "prompt": "Your household needs another season of your labor, but a rare chance to leave arrives tomorrow. What do you do?",
+      "answers": [
+        {
+          "id": "stay_for_duty",
+          "label": "Stay and honor the duty first."
+        },
+        {
+          "id": "seize_the_chance",
+          "label": "Seize the chance and accept the cost at home."
+        }
+      ]
+    },
+    {
+      "id": "q_mercy_necessity",
+      "prompt": "You catch a starving stranger stealing from your stores. What do you do?",
+      "answers": [
+        {
+          "id": "show_mercy",
+          "label": "Feed them once and warn them never to return."
+        },
+        {
+          "id": "harsh_necessity",
+          "label": "Drive them off hard so others learn the lesson."
+        }
+      ]
+    },
+    {
+      "id": "q_tradition_innovation",
+      "prompt": "An elder's method fails. A risky new approach might work. What do you choose?",
+      "answers": [
+        {
+          "id": "keep_custom",
+          "label": "Return to custom and patience."
+        },
+        {
+          "id": "try_new_way",
+          "label": "Try the new way despite the risk."
+        }
+      ]
+    },
+    {
+      "id": "q_coin_honor",
+      "prompt": "A partner cheats you by a small sum you can prove. What matters more?",
+      "answers": [
+        {
+          "id": "recover_coin",
+          "label": "Recover every coin, even if it burns the relationship."
+        },
+        {
+          "id": "keep_honor",
+          "label": "Keep your name clean and walk away with dignity."
+        }
+      ]
+    },
+    {
+      "id": "q_solitude_fellowship",
+      "prompt": "A difficult road lies ahead. Do you prefer to face it alone or bind allies early?",
+      "answers": [
+        {
+          "id": "walk_alone",
+          "label": "Walk alone—fewer debts, clearer mind."
+        },
+        {
+          "id": "seek_allies",
+          "label": "Seek trustworthy allies before the hard miles."
+        }
+      ]
+    }
+  ]
+}

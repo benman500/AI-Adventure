@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ save.character_name }} — {{ app_name }}</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+  <main class="shell">
+    <p class="breadcrumb"><a href="/">Home</a> / <a href="/saves">Saves</a> / Play</p>
+    <h1>{{ save.character_name }}</h1>
+    <p class="lede">{{ save.intro_flavor }}</p>
+
+    <section class="panel">
+      <h2>Status</h2>
+      <p><strong>Background:</strong> {{ save.background_display_name }}</p>
+      <p><strong>Location:</strong> {{ save.current_location_name }}</p>
+      <p><strong>Money:</strong> {{ save.money_copper }} copper</p>
+      <p><strong>Cultivation path:</strong> {{ save.cultivation_path }}</p>
+      <p><strong>Realm / stage:</strong> {{ save.realm_id }} / {{ save.stage_id }}</p>
+      <p><em>No gameplay systems are active in Milestone 2.</em></p>
+    </section>
+
+    <section class="panel">
+      <h2>Possessions</h2>
+      <ul>
+        {% for item in save.inventory %}
+        <li>{{ item.display_name }} × {{ item.quantity }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Identity answers (stored raw)</h2>
+      <ul>
+        {% for question_id, answer_id in save.identity_answers.items() %}
+        <li><code>{{ question_id }}</code> → <code>{{ answer_id }}</code></li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <p><a class="button secondary" href="/saves">Back to saves</a></p>
+  </main>
+</body>
+</html>
