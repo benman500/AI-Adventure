@@ -29,21 +29,27 @@ BREAKTHROUGH_ATTEMPTED = "attempted"
 CULTIVATION_PATH_ORDINARY = "ordinary"
 CULTIVATION_PATH_BOUNDLESS = "boundless"
 
-# Milestone 3 cultivation thresholds (deterministic; not session-count triggers).
+# Milestone 3 / Phase 1 cultivation thresholds (deterministic; not session-count triggers).
 STARTING_QI_RESERVE_MAX = 10
+STARTING_REALM_COMPREHENSION = 0
+STARTING_FOUNDATION_STABILITY = 50
 BREAKTHROUGH_QI_THRESHOLD = 10
 BREAKTHROUGH_PROGRESS_THRESHOLD = 70
 CULTIVATION_PROGRESS_MAX = 100
+REALM_COMPREHENSION_MAX = 100
+FOUNDATION_STABILITY_MAX = 100
+FOUNDATION_STABILITY_MIN = 0
 
-# Cultivation method yields (method_id -> (qi_gain, progress_gain)).
+# Cultivation method yields:
+# method_id -> (qi_gain, progress_gain, comprehension_gain, foundation_stability_delta)
 CULTIVATION_METHOD_ABSORB_QI = "absorb_qi"
 CULTIVATION_METHOD_STABILIZE_FOUNDATION = "stabilize_foundation"
 CULTIVATION_METHOD_CALM_MIND = "calm_mind"
 
-CULTIVATION_METHOD_YIELDS: dict[str, tuple[int, int]] = {
-    CULTIVATION_METHOD_ABSORB_QI: (4, 25),
-    CULTIVATION_METHOD_STABILIZE_FOUNDATION: (3, 27),
-    CULTIVATION_METHOD_CALM_MIND: (5, 22),
+CULTIVATION_METHOD_YIELDS: dict[str, tuple[int, int, int, int]] = {
+    CULTIVATION_METHOD_ABSORB_QI: (4, 25, 2, 0),
+    CULTIVATION_METHOD_STABILIZE_FOUNDATION: (3, 27, 1, 3),
+    CULTIVATION_METHOD_CALM_MIND: (5, 22, 4, 1),
 }
 
 # Post-path mechanical multipliers.
@@ -70,6 +76,13 @@ EVENT_TYPE_CULTIVATION_ANOMALY = "cultivation_anomaly_triggered"
 EVENT_TYPE_PATH_CHOICE_ORDINARY = "path_choice_ordinary"
 EVENT_TYPE_PATH_CHOICE_BOUNDLESS = "path_choice_boundless"
 EVENT_TYPE_BREAKTHROUGH_SUCCESS = "breakthrough_success"
+EVENT_TYPE_WORLD_EVENT_RESOLVED = "world_event_resolved"
+EVENT_TYPE_TRAVEL_RESOLVED = "travel_resolved"
+EVENT_TYPE_LOCATION_ACTION = "location_action_resolved"
+EVENT_TYPE_TECHNIQUE_LEARNED = "technique_learned"
+EVENT_TYPE_SPIRITUAL_ROOT_AWAKENED = "spiritual_root_awakened"
+EVENT_TYPE_ALCHEMY_RECIPE_AWAKENED = "alchemy_recipe_awakened"
+EVENT_TYPE_NPC_INTERACTION = "npc_interaction"
 
 # Story flags.
 FLAG_LESSON_COMPLETE = "lesson_complete"
@@ -86,17 +99,19 @@ RANK_OUTER_DISCIPLE = "outer_disciple"
 ACTIVE_SAVE_COOKIE = "active_save_id"
 DELETE_CONFIRMATION_VALUE = "DELETE"
 
-# Realm display names.
+# Realm display names (fallback; prefer engine.realms catalog).
 REALM_DISPLAY_NAMES: dict[str, str] = {
     "body_tempering": "Body Tempering",
-    "qi_condensation": "Qi Condensation",
+    "qi_gathering": "Qi Gathering",
+    "qi_condensation": "Qi Gathering",  # legacy alias from pre-Phase-1 docs
     "foundation_establishment": "Foundation Establishment",
     "core_formation": "Core Formation",
 }
 
 STAGE_DISPLAY_NAMES: dict[str, str] = {
     "early": "Early",
-    "mid": "Mid",
+    "middle": "Middle",
+    "mid": "Middle",  # legacy Milestone 3 id
     "late": "Late",
     "peak": "Peak",
 }

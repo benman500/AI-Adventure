@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "evt_explore_hall_echo",
+      "category": "exploration",
+      "label": "Hall Echo",
+      "enabled": true,
+      "weight": 10,
+      "cooldown_days": 3,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_explore"],
+        "chance": 0.55
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless", "provisional"],
+        "location_ids": [
+          "verdant_gate_cultivation_hall",
+          "verdant_gate_outer_quarters",
+          "verdant_gate_foundation_hall",
+          "verdant_gate_registration"
+        ],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["verdant_gate"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["sect", "indoor"]
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "realm_comprehension_delta": 1,
+            "cultivation_progress_delta": 0,
+            "qi_reserve_delta": 0,
+            "foundation_stability_delta": 0
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "While exploring the hall, a faint resonance in the stone clarifies a scrap of doctrine.",
+        "narration_keys": ["hall_echo"]
+      },
+      "ai_prompt_key": "evt_explore_hall_echo"
+    },
+    {
+      "id": "evt_explore_ridge_overlook",
+      "category": "exploration",
+      "label": "Ridge Overlook",
+      "enabled": true,
+      "weight": 8,
+      "cooldown_days": 5,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_explore"],
+        "chance": 0.45
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless", "provisional"],
+        "location_ids": [
+          "jade_ridge_approach",
+          "jade_ridge_verdant_gate",
+          "road_north_of_willowford",
+          "road_out_of_ashridge",
+          "road_from_pinehollow"
+        ],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["jade_ridge"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["mountain", "path"]
+      },
+      "effects": [
+        {
+          "type": "noop",
+          "payload": {}
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "From the ridge path you mark a quieter trail winding toward mist-cut pines.",
+        "narration_keys": ["ridge_overlook"]
+      },
+      "ai_prompt_key": "evt_explore_ridge_overlook"
+    },
+    {
+      "id": "evt_inspect_hall_inscription",
+      "category": "discovery",
+      "label": "Hall Inscription",
+      "enabled": true,
+      "weight": 10,
+      "cooldown_days": 2,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_inspect"],
+        "chance": 0.6
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless", "provisional"],
+        "location_ids": [
+          "verdant_gate_cultivation_hall",
+          "verdant_gate_foundation_hall"
+        ],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["verdant_gate"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["foundation"],
+        "npc_tags": [],
+        "environment_tags": ["sect", "indoor", "archive"]
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "realm_comprehension_delta": 1,
+            "cultivation_progress_delta": 0,
+            "qi_reserve_delta": 0,
+            "foundation_stability_delta": 0
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "An old inscription along the wall rewards a careful look with a single useful phrase.",
+        "narration_keys": ["hall_inscription"]
+      },
+      "ai_prompt_key": "evt_inspect_hall_inscription"
+    },
+    {
+      "id": "evt_inspect_approach_marker",
+      "category": "discovery",
+      "label": "Approach Marker",
+      "enabled": true,
+      "weight": 7,
+      "cooldown_days": 4,
+      "max_fires_per_save": 1,
+      "trigger": {
+        "kinds": ["after_inspect"],
+        "chance": 0.5
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless", "provisional"],
+        "location_ids": ["jade_ridge_approach"],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["jade_ridge"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["mountain", "road"]
+      },
+      "effects": [
+        {
+          "type": "noop",
+          "payload": {}
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "A weathered sect marker confirms you stand on Verdant Gate's approach.",
+        "narration_keys": ["approach_marker"]
+      },
+      "ai_prompt_key": "evt_inspect_approach_marker"
+    }
+  ]
+}

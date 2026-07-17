@@ -89,7 +89,7 @@ def test_ordinary_path_selection(tmp_path: Path) -> None:
     _reach_choice(service, save_id)
     scene = service.submit_story_action(save_id, "choose_ordinary")
     assert scene.cultivation["path_status"] == PATH_STATUS_CONFIRMED_ORDINARY
-    assert scene.cultivation["stage_id"] == "mid"
+    assert scene.cultivation["stage_id"] == "middle"
 
     events = service.list_events_for_save(save_id)
     assert any(e["event_type"] == EVENT_TYPE_PATH_CHOICE_ORDINARY for e in events)

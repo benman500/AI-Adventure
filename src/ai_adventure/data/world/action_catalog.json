@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "actions": [
+    {
+      "id": "explore",
+      "label": "Explore",
+      "description": "Spend time surveying this place for signs, paths, and lingering qi.",
+      "enabled": true,
+      "implemented": true,
+      "duration_days": 1,
+      "requirements": {},
+      "required_realm": null,
+      "required_technique_ids": [],
+      "required_items": [],
+      "required_reputation": {},
+      "cooldown_days": 0,
+      "stamina_cost": null,
+      "resource_costs": {},
+      "event_weight_modifiers": {},
+      "trigger_kind": "after_explore",
+      "presentation": {
+        "placeholder_summary": "You explore the area carefully."
+      }
+    },
+    {
+      "id": "inspect",
+      "label": "Inspect",
+      "description": "Look closely at what is immediately at hand without roaming far.",
+      "enabled": true,
+      "implemented": true,
+      "duration_days": 0,
+      "requirements": {},
+      "required_realm": null,
+      "required_technique_ids": [],
+      "required_items": [],
+      "required_reputation": {},
+      "cooldown_days": 0,
+      "stamina_cost": null,
+      "resource_costs": {},
+      "event_weight_modifiers": {},
+      "trigger_kind": "after_inspect",
+      "presentation": {
+        "placeholder_summary": "You inspect your surroundings."
+      }
+    },
+    {
+      "id": "cultivate",
+      "label": "Cultivate",
+      "description": "Practice cultivation methods available at this site.",
+      "enabled": true,
+      "implemented": false,
+      "duration_days": 1,
+      "requirements": {},
+      "required_realm": null,
+      "required_technique_ids": [],
+      "required_items": [],
+      "required_reputation": {},
+      "cooldown_days": 0,
+      "stamina_cost": null,
+      "resource_costs": {},
+      "event_weight_modifiers": {},
+      "trigger_kind": null,
+      "presentation": {
+        "placeholder_summary": "You settle into cultivation."
+      }
+    },
+    {
+      "id": "rest",
+      "label": "Rest",
+      "description": "Recover and let the day pass quietly.",
+      "enabled": true,
+      "implemented": false,
+      "duration_days": 1,
+      "requirements": {},
+      "required_realm": null,
+      "required_technique_ids": [],
+      "required_items": [],
+      "required_reputation": {},
+      "cooldown_days": 0,
+      "stamina_cost": null,
+      "resource_costs": {},
+      "event_weight_modifiers": {},
+      "trigger_kind": null,
+      "presentation": {
+        "placeholder_summary": "You rest."
+      }
+    },
+    {
+      "id": "talk",
+      "label": "Talk",
+      "description": "Speak with someone present at this location.",
+      "enabled": true,
+      "implemented": false,
+      "duration_days": 0,
+      "requirements": {},
+      "required_realm": null,
+      "required_technique_ids": [],
+      "required_items": [],
+      "required_reputation": {},
+      "cooldown_days": 0,
+      "stamina_cost": null,
+      "resource_costs": {},
+      "event_weight_modifiers": {},
+      "trigger_kind": null,
+      "presentation": {
+        "placeholder_summary": "You strike up a conversation."
+      }
+    },
+    {
+      "id": "train",
+      "label": "Train",
+      "description": "Drill techniques or physical forms.",
+      "enabled": true,
+      "implemented": false,
+      "duration_days": 1,
+      "requirements": {},
+      "required_realm": null,
+      "required_technique_ids": [],
+      "required_items": [],
+      "required_reputation": {},
+      "cooldown_days": 0,
+      "stamina_cost": null,
+      "resource_costs": {},
+      "event_weight_modifiers": {},
+      "trigger_kind": null,
+      "presentation": {
+        "placeholder_summary": "You train with focus."
+      }
+    },
+    {
+      "id": "leave",
+      "label": "Leave",
+      "description": "Depart along a known travel route.",
+      "enabled": true,
+      "implemented": false,
+      "duration_days": 0,
+      "requirements": {},
+      "required_realm": null,
+      "required_technique_ids": [],
+      "required_items": [],
+      "required_reputation": {},
+      "cooldown_days": 0,
+      "stamina_cost": null,
+      "resource_costs": {},
+      "event_weight_modifiers": {},
+      "trigger_kind": null,
+      "presentation": {
+        "placeholder_summary": "You prepare to leave."
+      }
+    },
+    {
+      "id": "travel",
+      "label": "Travel",
+      "description": "Take a catalogued travel edge from this place.",
+      "enabled": true,
+      "implemented": false,
+      "duration_days": 0,
+      "requirements": {},
+      "required_realm": null,
+      "required_technique_ids": [],
+      "required_items": [],
+      "required_reputation": {},
+      "cooldown_days": 0,
+      "stamina_cost": null,
+      "resource_costs": {},
+      "event_weight_modifiers": {},
+      "trigger_kind": null,
+      "presentation": {
+        "placeholder_summary": "You set out."
+      }
+    },
+    {
+      "id": "study",
+      "label": "Study",
+      "description": "Study manuscripts or teachings available here.",
+      "enabled": true,
+      "implemented": false,
+      "duration_days": 1,
+      "requirements": {},
+      "required_realm": null,
+      "required_technique_ids": [],
+      "required_items": [],
+      "required_reputation": {},
+      "cooldown_days": 0,
+      "stamina_cost": null,
+      "resource_costs": {},
+      "event_weight_modifiers": {},
+      "trigger_kind": null,
+      "presentation": {
+        "placeholder_summary": "You study in silence."
+      }
+    },
+    {
+      "id": "trade",
+      "label": "Trade",
+      "description": "Buy, sell, or barter at this site.",
+      "enabled": true,
+      "implemented": false,
+      "duration_days": 0,
+      "requirements": {},
+      "required_realm": null,
+      "required_technique_ids": [],
+      "required_items": [],
+      "required_reputation": {},
+      "cooldown_days": 0,
+      "stamina_cost": null,
+      "resource_costs": {},
+      "event_weight_modifiers": {},
+      "trigger_kind": null,
+      "presentation": {
+        "placeholder_summary": "You look for a trade."
+      }
+    }
+  ]
+}

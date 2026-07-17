@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "sects": [
+    {
+      "sect_id": "sect_verdant_gate",
+      "display_name": "Verdant Gate Sect",
+      "home_location_id": "jade_ridge_verdant_gate",
+      "description": "A modest orthodox sect on Jade Ridge. Known for disciplined outer disciples and a Foundation Hall that preserves incomplete ancient manuscripts—including fragments of the abandoned Boundless Foundation Path.",
+      "ranks": [
+        {
+          "rank_id": "outer_disciple",
+          "display_name": "Outer Disciple",
+          "order": 0
+        },
+        {
+          "rank_id": "inner_disciple",
+          "display_name": "Inner Disciple",
+          "order": 1
+        },
+        {
+          "rank_id": "elder",
+          "display_name": "Elder",
+          "order": 2
+        }
+      ]
+    }
+  ]
+}

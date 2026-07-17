@@ -51,6 +51,7 @@ Core and systems docs live under `docs/`. Start with [GAME_PRINCIPLES.md](docs/G
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Layered runtime flow and responsibilities |
 | [MVP_SCOPE.md](docs/MVP_SCOPE.md) | MVP vs architecture |
 | [OPENING_STORY.md](docs/OPENING_STORY.md) | Milestone 3 opening slice |
+| [LOCATIONS.md](docs/LOCATIONS.md) | Location packs, catalog, presence (Phase 5) |
 | [DEVELOPMENT_ROADMAP.md](docs/DEVELOPMENT_ROADMAP.md) | Phased delivery |
 
 ## Getting Started
@@ -72,6 +73,18 @@ Open http://127.0.0.1:8000 — **New Game**, then play through the opening (back
 Default SQLite file: `saves/game.db`. Override with `AI_ADVENTURE_DATABASE_URL`.
 
 Migrations: `alembic upgrade head` (after install; `alembic/env.py` reads the same settings). Schema is Alembic-owned — the app no longer auto-creates tables on startup.
+
+Event catalog tools (developer):
+
+```bash
+ai-adventure-events validate
+ai-adventure-events stats
+ai-adventure-events list --trigger after_cultivation_session
+ai-adventure-events inspect evt_quiet_breath_insight
+ai-adventure-events simulate after_cultivation_session --trials 1000 --seed 1
+```
+
+With `AI_ADVENTURE_DEBUG=true`, browse `/debug/events/stats` and related routes.
 
 ## Development Notes
 

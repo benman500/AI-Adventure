@@ -1,0 +1,10 @@
+{
+  "content_files": [
+    "cultivation_ambient.json",
+    "cultivation_ambient_phase4c.json",
+    "environment_ambient.json",
+    "encounters_and_discoveries.json",
+    "exploration_stub.json",
+    "location_actions.json"
+  ]
+}

@@ -51,15 +51,18 @@ Elder Yun Mei explains that the Boundless Foundation Path:
 
 Choosing Boundless is a **gamble on an abandoned path**, not a hidden overpowered class.
 
-### Cultivation methods (Milestone 3)
+### Cultivation methods (Milestone 3 + Phase 2)
 
-| Method id | Label | Role |
-|-----------|-------|------|
-| `absorb_qi` | Absorb Qi | Default qi/progress gains |
-| `stabilize_foundation` | Stabilize Foundation | Slightly more progress |
-| `calm_mind` | Calm the Mind | Slightly more qi |
+| Method id | Label | Notes |
+|-----------|-------|-------|
+| `cautious` | Cautious | Phase 2 careful session (UI) |
+| `balanced` | Balanced | Phase 2 moderate session (UI) |
+| `aggressive` | Aggressive | Phase 2 risky session (UI) |
+| `absorb_qi` | Absorb Qi | Legacy M3 method (engine/tests; not shown in UI) |
+| `stabilize_foundation` | Stabilize Foundation | Legacy M3 method |
+| `calm_mind` | Calm the Mind | Legacy M3 method |
 
-Mechanics are nearly identical in M3; the interface establishes architecture for future cultivation decisions.
+Phase 2 UI uses Cautious / Balanced / Aggressive. Legacy M3 methods remain for opening tests and engine compatibility.
 
 ### Content canon
 

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "npcs": [
+    {
+      "npc_id": "npc_passing_cultivator_001",
+      "display_name": "Disciple Lu Han",
+      "role_tags": ["disciple", "passing_cultivator"],
+      "home_location_id": "verdant_gate_outer_quarters",
+      "default_location_id": "jade_ridge_approach",
+      "sect_id": "sect_verdant_gate",
+      "cultivation_summary": {
+        "realm_id": "qi_gathering",
+        "stage_id": "early",
+        "path_tags": ["ordinary"]
+      },
+      "description": "Verdant Gate outer disciple on the recruitment circuit."
+    },
+    {
+      "npc_id": "npc_sect_examiner_001",
+      "display_name": "Elder Examiner Feng",
+      "role_tags": ["elder", "examiner", "sect_examiner"],
+      "home_location_id": "verdant_gate_registration",
+      "default_location_id": "verdant_gate_registration",
+      "sect_id": "sect_verdant_gate",
+      "cultivation_summary": {
+        "realm_id": "foundation_establishment",
+        "stage_id": "early",
+        "path_tags": ["ordinary"]
+      },
+      "description": "Verdant Gate elder who conducts talent examinations."
+    },
+    {
+      "npc_id": "npc_instructor_001",
+      "display_name": "Instructor Pei",
+      "role_tags": ["teacher", "instructor", "sect_instructor"],
+      "home_location_id": "verdant_gate_cultivation_hall",
+      "default_location_id": "verdant_gate_cultivation_hall",
+      "sect_id": "sect_verdant_gate",
+      "cultivation_summary": {
+        "realm_id": "qi_gathering",
+        "stage_id": "late",
+        "path_tags": ["ordinary"]
+      },
+      "description": "Verdant Gate instructor for foundational cultivation."
+    },
+    {
+      "npc_id": "npc_foundation_elder_001",
+      "display_name": "Elder Yun Mei",
+      "role_tags": ["elder", "foundation_elder", "teacher"],
+      "home_location_id": "verdant_gate_foundation_hall",
+      "default_location_id": "verdant_gate_foundation_hall",
+      "sect_id": "sect_verdant_gate",
+      "cultivation_summary": {
+        "realm_id": "foundation_establishment",
+        "stage_id": "middle",
+        "path_tags": ["ordinary", "boundless_aware"]
+      },
+      "description": "Foundation Hall elder; keeper of ancient foundation manuscripts."
+    }
+  ]
+}

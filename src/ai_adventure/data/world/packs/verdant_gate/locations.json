@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "locations": [
+    {
+      "id": "verdant_gate_registration",
+      "kind": "site",
+      "display_name": "Verdant Gate \u2014 Registration Hall",
+      "parent_id": "jade_ridge_verdant_gate",
+      "tags": [
+        "verdant_gate",
+        "sect",
+        "hall"
+      ],
+      "sect_id": "sect_verdant_gate",
+      "travel": [
+        {
+          "to": "verdant_gate_outer_quarters",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "jade_ridge_approach",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "jade_ridge_verdant_gate",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "inspect"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": "body_tempering",
+      "resources": [],
+      "npc_spawn_tags": [
+        "sect_examiner"
+      ],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "sect",
+        "indoor"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "verdant_gate_outer_quarters",
+      "kind": "site",
+      "display_name": "Verdant Gate \u2014 Outer Disciple Quarters",
+      "parent_id": "jade_ridge_verdant_gate",
+      "tags": [
+        "verdant_gate",
+        "sect",
+        "quarters"
+      ],
+      "sect_id": "sect_verdant_gate",
+      "travel": [
+        {
+          "to": "verdant_gate_cultivation_hall",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "verdant_gate_registration",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "verdant_gate_foundation_hall",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "rest",
+        "explore",
+        "inspect"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": "body_tempering",
+      "resources": [],
+      "npc_spawn_tags": [
+        "outer_disciple"
+      ],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "sect",
+        "quarters"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "verdant_gate_cultivation_hall",
+      "kind": "site",
+      "display_name": "Verdant Gate \u2014 Cultivation Hall",
+      "parent_id": "jade_ridge_verdant_gate",
+      "tags": [
+        "verdant_gate",
+        "sect",
+        "cultivation"
+      ],
+      "sect_id": "sect_verdant_gate",
+      "travel": [
+        {
+          "to": "verdant_gate_foundation_hall",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "verdant_gate_outer_quarters",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "cultivate",
+        "explore",
+        "inspect",
+        "rest"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": "body_tempering",
+      "resources": [],
+      "npc_spawn_tags": [
+        "instructor"
+      ],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [
+        "practice_hall"
+      ],
+      "environment_tags": [
+        "sect",
+        "indoor",
+        "cultivation"
+      ],
+      "technique_tags": [
+        "basic_cultivation"
+      ],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "verdant_gate_foundation_hall",
+      "kind": "site",
+      "display_name": "Verdant Gate \u2014 Foundation Hall",
+      "parent_id": "jade_ridge_verdant_gate",
+      "tags": [
+        "verdant_gate",
+        "sect",
+        "foundation",
+        "manuscripts"
+      ],
+      "sect_id": "sect_verdant_gate",
+      "travel": [
+        {
+          "to": "verdant_gate_cultivation_hall",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "verdant_gate_outer_quarters",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "inspect",
+        "explore",
+        "study"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": "body_tempering",
+      "resources": [],
+      "npc_spawn_tags": [
+        "elder"
+      ],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [
+        "foundation"
+      ],
+      "environment_tags": [
+        "sect",
+        "indoor",
+        "archive"
+      ],
+      "technique_tags": [
+        "foundation",
+        "boundless_lore"
+      ],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    }
+  ]
+}

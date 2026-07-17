@@ -36,7 +36,7 @@ These four are **permanent** first-ladder design (not placeholders):
 | Order | Realm |
 |------:|-------|
 | 1 | Body Tempering |
-| 2 | Qi Condensation |
+| 2 | Qi Gathering |
 | 3 | Foundation Establishment |
 | 4 | Core Formation |
 
@@ -97,7 +97,7 @@ The world includes a balancing system (**Heaven's Will**) that reacts to major e
 
 ### Techniques
 
-Enormous permanent encyclopedia; MVP ships few records on scalable schema. AI drafts commit only via engine ([TECHNIQUES.md](TECHNIQUES.md)).
+Enormous permanent encyclopedia; MVP ships few records on scalable schema. Mechanical effects use the shared [Modifier Framework](MODIFIER_FRAMEWORK.md). AI drafts commit only via engine ([TECHNIQUES.md](TECHNIQUES.md)).
 
 ---
 
@@ -152,9 +152,41 @@ Qualitative bands for presentation (exact numeric internals hidden): fragmented 
 - Post-choice mechanical divergence (progress multiplier, resource cost, breakthrough thresholds).
 - Details: [OPENING_STORY.md](OPENING_STORY.md).
 
-### Minor stages (proposed)
+### Phase 1 cultivation framework (implementation)
 
-`early` / `mid` / `late` / `peak` on the locked early realms ([REALMS.md](REALMS.md)).
+- Data-driven realm/stage catalog (`data/cultivation/realms.json`, `engine/realms.py`).
+- Per-stage meters on the player: realm, stage, Qi / max Qi, cultivation progress (0–100), realm comprehension (0–100), foundation stability (0–100).
+- Playable realms: Body Tempering, Qi Gathering. Later realms are placeholders.
+- **No major realm advancement** yet (`attempt_realm_breakthrough` remains blocked).
+- Stage advances within a realm remain limited to existing Milestone 3 opening outcomes.
+- Legacy axis `foundation_quality` (1–6 Boundless/story tier) is retained beside `foundation_stability` (0–100 play meter). Stability is authoritative for sessions; quality is `max(tier_from_stability, stored)` so Boundless bumps are preserved.
+
+### Phase 2 active cultivation sessions (implementation)
+
+- Methods: **Cautious**, **Balanced**, **Aggressive** (`data/cultivation/session_methods.json`).
+- Engine module `cultivation_sessions.py` computes outcomes; `CultivationService` persists them.
+- Milestone 3 anomaly/path logic lives in `cultivation_path.py`, separate from the reusable framework.
+- Each session consumes `time_cost_days` on `world_day` and `playtime_seconds` on the save.
+- RNG is injectable (`random.Random`) for deterministic tests; saves store an RNG counter.
+- Progress/comprehension/stability clamp to 0–100; Qi clamps to `qi_reserve_max` (floor = realm `base_qi_max`).
+- At 100 progress, further sessions may still raise Qi/comprehension; no stage/realm advance.
+- Minor setbacks only (Qi loss, reduced progress, small stability dips)—no death, regression, or injuries.
+- Legacy M3 methods Absorb Qi / Stabilize / Calm Mind remain callable for opening tests; UI surfaces only the three Phase 2 methods.
+
+### Phase 3 breakthroughs (implementation)
+
+- Catalog: `data/cultivation/breakthroughs.json` — Early→Middle, Middle→Late, Late→Peak, Peak→next playable realm.
+- Engine: `engine/breakthroughs.py` — readiness object, success chance, attempt result.
+- Comprehension carryover on success: retain `comprehension_carry_ratio` (default 50%) of current comprehension.
+- Qi max on advance: `new_realm.base_qi_max + max(0, old_max - old_realm.base_qi_max)`.
+- Failure: partial Qi spend, small stability loss, progress loss, attempt counter++; no death/regression/injuries.
+- **Milestone 3 compatibility:** provisional first attempt still triggers the opening anomaly (no stage advance). Ordinary path commit still story-sets Middle. Boundless stays Early until Phase 3 stage breakthroughs.
+- Highest implemented point: **Qi Gathering Peak** (no Foundation Establishment advance yet).
+- Hooks: spiritual roots (Phase **7** — [SPIRITUAL_ROOTS.md](SPIRITUAL_ROOTS.md)), pills, tribulations, techniques (Phase **6c**), environment, AI breakthrough scenes.
+
+### Minor stages (Phase 1)
+
+`early` / `middle` / `late` / `peak` on the locked early realms ([REALMS.md](REALMS.md)). Legacy Milestone 3 id `mid` migrates to `middle`.
 
 ---
 

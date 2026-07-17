@@ -38,6 +38,8 @@ def _base_cultivation(**overrides: object) -> CultivationState:
         qi_reserve_current=0,
         qi_reserve_max=10,
         cultivation_progress=0,
+        realm_comprehension=0,
+        foundation_stability=50,
         practice_sessions=0,
         anomaly_state=ANOMALY_STATE_NONE,
         breakthrough_readiness=BREAKTHROUGH_NOT_READY,

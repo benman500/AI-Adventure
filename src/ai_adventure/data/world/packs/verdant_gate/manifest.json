@@ -1,0 +1,10 @@
+{
+  "pack_id": "verdant_gate",
+  "display_name": "Verdant Gate Sect Grounds",
+  "depends_on": ["jade_ridge"],
+  "content_files": {
+    "locations": "locations.json",
+    "npcs": "npcs.json",
+    "sects": "sects.json"
+  }
+}

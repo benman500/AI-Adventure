@@ -26,7 +26,70 @@ Owns persistence expectations for the world simulation: what must be stored, how
 | `inventory_items` | Starting / owned item stacks |
 | `event_log` | Append-only events (`character_created`, …) |
 
-Migrations: `0001_initial`, `0002_character_saves`, `0003_opening_story_cultivation`.
+Migrations: `0001_initial`, `0002_character_saves`, `0003_opening_story_cultivation`, `0004_cultivation_phase1_meters`, `0005_cultivation_sessions`, `0006_cultivation_breakthroughs`, `0007_event_engine`, `0008_locations`, `0009_technique_mastery`, `0010_spiritual_roots`, `0011_alchemy_recipe_ownership`, `0012_npc_world_state`.
+
+### Phase 1 cultivation schema additions
+
+| Column | Role |
+|--------|------|
+| `players.realm_comprehension` | 0–100 realm understanding meter |
+| `players.foundation_stability` | 0–100 foundation stability meter |
+| Data migration | `stage_id` `mid` → `middle` |
+
+### Phase 2 cultivation session schema additions
+
+| Column | Role |
+|--------|------|
+| `players.last_cultivation_result_json` | Structured result of the most recent active session |
+| `players.cultivation_rng_counter` | Deterministic RNG counter for session rolls |
+| Data migration | `realm_id` `qi_condensation` → `qi_gathering` |
+
+### Phase 3 breakthrough schema additions
+
+| Column | Role |
+|--------|------|
+| `players.breakthrough_attempts_current_stage` | Failed attempts on the current stage (resets on success) |
+| `players.last_breakthrough_result_json` | Structured last breakthrough outcome |
+
+### Phase 4a event engine schema additions
+
+| Table / column | Role |
+|----------------|------|
+| `players.actor_id` | Opaque actor UUID (backfilled from `players.id`; unique). Future NPCs use their own ids as actor ids. |
+| `game_saves.world_rng_counter` | Deterministic RNG stream for world events (separate from cultivation RNG). |
+| `event_cooldowns` | Mutable cooldown / fire-count state per `(save, template, subject_actor)`. History stays in `event_log`. |
+
+### Phase 5a location presence schema additions
+
+| Table / column | Role |
+|----------------|------|
+| `location_presence` | Per-save mutable discovery / visit state for catalog `location_id` values. Catalog remains authoritative for existence and display names. |
+
+Authored location definitions live in modular packs under `src/ai_adventure/data/world/` — not duplicated as DB gazetteer rows. See [LOCATIONS.md](LOCATIONS.md).
+
+### Phase 6c technique mastery schema additions
+
+| Table / column | Role |
+|----------------|------|
+| `technique_mastery` | Per-save / actor known, equipped, mastery rank/progress, learned world day. Technique catalog + effect bundles remain content authority. |
+
+Technique definitions live under `src/ai_adventure/data/techniques/`. Mechanical effects flow through [MODIFIER_FRAMEWORK.md](MODIFIER_FRAMEWORK.md).
+
+### Phase 7 spiritual root ownership schema additions
+
+| Table / column | Role |
+|----------------|------|
+| `spiritual_root_ownership` | Per-save / actor awakened roots + grade. Root catalog + effect bundles remain content authority. |
+
+Root definitions live under `src/ai_adventure/data/cultivation/spiritual_roots.json`. See [SPIRITUAL_ROOTS.md](SPIRITUAL_ROOTS.md).
+
+### Phase 9b NPC world state schema additions
+
+| Table / column | Role |
+|----------------|------|
+| `npc_world_state` | Per-save mutable NPC instance: `npc_id` (catalog ref), location, status, discovered/met, relationship_score, optional sect override, flags, last interaction day. Row `id` = opaque actor_id. |
+
+NPC/sect definitions live in world packs (`npcs.json` / `sects.json`). Legacy `npc_records` is superseded for new writes. See [NPCS.md](NPCS.md).
 
 ### Milestone 3 schema additions
 

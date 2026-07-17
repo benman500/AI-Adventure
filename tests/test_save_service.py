@@ -6,7 +6,11 @@ import pytest
 
 from ai_adventure.db import create_db_engine, create_session_factory
 from ai_adventure.engine import EngineValidationError
-from ai_adventure.engine.constants import DELETE_CONFIRMATION_VALUE, EVENT_TYPE_CHARACTER_CREATED
+from ai_adventure.engine.constants import (
+    DELETE_CONFIRMATION_VALUE,
+    EVENT_TYPE_CHARACTER_CREATED,
+    EVENT_TYPE_SPIRITUAL_ROOT_AWAKENED,
+)
 from ai_adventure.repositories import EventLogRepository, SaveRepository
 from tests.conftest_helpers import VALID_IDENTITY_ANSWERS, make_service
 
@@ -28,8 +32,9 @@ def test_new_game_persists_save_player_inventory_and_event(tmp_path: Path) -> No
     assert loaded.identity_answers == VALID_IDENTITY_ANSWERS
 
     events = service.list_events_for_save(loaded.save_id)
-    assert len(events) == 1
+    assert len(events) == 2
     assert events[0]["event_type"] == EVENT_TYPE_CHARACTER_CREATED
+    assert events[1]["event_type"] == EVENT_TYPE_SPIRITUAL_ROOT_AWAKENED
 
     listed = service.list_saves()
     assert len(listed) == 1

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
@@ -42,6 +42,7 @@ from ai_adventure.repositories import (
     SectRepository,
     StoryRepository,
 )
+from ai_adventure.services.locations import LocationService
 
 
 @dataclass(frozen=True, slots=True)
@@ -122,10 +123,20 @@ class PlaySceneModel:
     title: str
     narrative: str
     actions: list[dict[str, str]]
-    cultivation_methods: list[dict[str, str]]
+    cultivation_methods: list[dict[str, Any]]
     cultivation: dict[str, Any]
+    location_actions: list[dict[str, Any]]
+    techniques: list[dict[str, Any]]
+    spiritual_roots: list[dict[str, Any]] = field(default_factory=list)
+    present_npcs: list[dict[str, Any]] = field(default_factory=list)
     message: str | None = None
     opening_complete: bool = False
+    cultivation_available: bool = True
+    cultivation_blocked_reason: str | None = None
+    last_cultivation_result: dict[str, Any] | None = None
+    breakthrough_readiness: dict[str, Any] | None = None
+    last_breakthrough_result: dict[str, Any] | None = None
+    breakthrough_can_attempt: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -221,9 +232,26 @@ class GameAppService:
         with self._session_factory() as session:
             repo = SaveRepository(session)
             save = repo.create_from_character_state(state)
+            session.flush()
+            loaded = repo.get_with_player(save.id)
+            if loaded is None or loaded.player is None:
+                raise EngineValidationError("Failed to create save player")
+            LocationService(session).establish_starting_presence(
+                loaded,
+                loaded.player,
+                state.current_location_id,
+            )
+            from ai_adventure.services.spiritual_roots import SpiritualRootService
+
+            SpiritualRootService(self._session_factory).grant_starter_root(
+                session,
+                save_id=loaded.id,
+                actor_id=str(getattr(loaded.player, "actor_id")),
+                world_day=int(loaded.world_day),
+            )
             session.commit()
             return self._loaded_model_from_state(
-                save_id=save.id,
+                save_id=loaded.id,
                 state=state,
                 background_display_name=state.background_display_name,
                 narration=narration.text,
@@ -332,8 +360,17 @@ class GameAppService:
                 save_repo.mark_story_started(save)
 
             player = save.player
-            context = self._story_context(save, player, progress)
+            # Persist realm catalog qi floor + normalized realm/stage ids on load.
+            synced = cultivation_state_from_player(player)
+            if (
+                synced.qi_reserve_max != player.qi_reserve_max
+                or synced.realm_id != player.realm_id
+                or synced.stage_id != getattr(player, "stage_id", synced.stage_id)
+            ):
+                save_repo.apply_player_cultivation(player, synced)
+            context = self._story_context(session, save, player, progress)
             scene = build_scene_view(context)
+            techniques = self._technique_cards(session, save, player)
             save_repo.touch_last_played(save)
             session.commit()
             return self._play_scene_model(
@@ -341,6 +378,8 @@ class GameAppService:
                 player=player,
                 scene=scene,
                 message=message,
+                techniques=techniques,
+                breakthrough_modifiers=context.breakthrough_modifiers,
             )
 
     def submit_story_action(
@@ -364,10 +403,11 @@ class GameAppService:
                 raise EngineValidationError("Story progress not initialized")
 
             player = save.player
-            context = self._story_context(save, player, progress)
+            context = self._story_context(session, save, player, progress)
             result = apply_story_action(context, action_id)
 
-            self._persist_story_result(
+            travel_event_message = self._persist_story_result(
+                session=session,
                 save_repo=save_repo,
                 story_repo=story_repo,
                 npc_repo=npc_repo,
@@ -377,31 +417,172 @@ class GameAppService:
                 progress=progress,
                 result=result,
             )
+
+            event_message: str | None = None
+            if getattr(result, "last_cultivation_result", None) is not None:
+                from ai_adventure.services.events import EventService
+
+                event_outcome = EventService(session).run_after_cultivation_session(
+                    save=save,
+                    player=player,
+                    progress=progress,
+                    cultivation=result.cultivation,
+                )
+                event_message = event_outcome.presentation_message
+
             save_repo.touch_last_played(save)
             session.commit()
 
             progress.current_node_id = result.next_node_id
-            context = self._story_context(save, player, progress)
+            context = self._story_context(session, save, player, progress)
             scene = build_scene_view(context)
+            techniques = self._technique_cards(session, save, player)
+            message = result.summary
+            if travel_event_message:
+                message = f"{message} {travel_event_message}".strip()
+            if event_message:
+                message = f"{message} {event_message}".strip()
             return self._play_scene_model(
                 save=save,
                 player=player,
                 scene=scene,
-                message=result.summary,
+                message=message,
+                techniques=techniques,
+                breakthrough_modifiers=context.breakthrough_modifiers,
             )
 
-    def _story_context(self, save: object, player: object, progress: object) -> StoryContext:
+    def perform_location_action(self, save_id: str, action_id: str) -> PlaySceneModel:
+        """Execute a location action through LocationService (Phase 5c)."""
+
+        with self._session_factory() as session:
+            save_repo = SaveRepository(session)
+            save = save_repo.get_with_player(save_id)
+            if save is None or save.player is None:
+                raise EngineValidationError("Save not found")
+            progress = save.story_progress
+            if progress is None:
+                raise EngineValidationError("Story progress not initialized")
+
+            result = LocationService(session).perform_action(
+                save=save,
+                player=save.player,
+                progress=progress,
+                action_id=action_id,
+            )
+            save_repo.touch_last_played(save)
+            session.commit()
+
+            context = self._story_context(session, save, save.player, progress)
+            scene = build_scene_view(context)
+            techniques = self._technique_cards(session, save, save.player)
+            message = result.presentation_message or result.resolution.summary
+            if result.event_message:
+                message = f"{message} {result.event_message}".strip()
+            return self._play_scene_model(
+                save=save,
+                player=save.player,
+                scene=scene,
+                message=message,
+                techniques=techniques,
+                breakthrough_modifiers=context.breakthrough_modifiers,
+            )
+
+    def _story_context(
+        self,
+        session: Session,
+        save: object,
+        player: object,
+        progress: object,
+    ) -> StoryContext:
+        from ai_adventure.services.techniques import (
+            build_breakthrough_snapshot,
+            build_cultivate_session_snapshot,
+        )
+
+        save_id = str(getattr(save, "id"))
+        actor_id = str(getattr(player, "actor_id"))
+        world_day = int(getattr(save, "world_day"))
+        session_modifiers = build_cultivate_session_snapshot(
+            session,
+            save_id=save_id,
+            actor_id=actor_id,
+            world_day=world_day,
+        )
+        breakthrough_modifiers = build_breakthrough_snapshot(
+            session,
+            save_id=save_id,
+            actor_id=actor_id,
+            world_day=world_day,
+        )
         return StoryContext(
             background_id=getattr(save, "background_id"),
             current_node_id=getattr(progress, "current_node_id"),
             flags=parse_flags(getattr(progress, "flags_json")),
             cultivation=cultivation_state_from_player(player),
             world_day=getattr(save, "world_day"),
+            session_modifiers=session_modifiers,
+            breakthrough_modifiers=breakthrough_modifiers,
+        )
+
+    def _technique_cards(
+        self,
+        session: Session,
+        save: object,
+        player: object,
+    ) -> list[dict[str, Any]]:
+        from ai_adventure.engine.techniques import can_learn_technique, list_techniques
+        from ai_adventure.repositories import TechniqueMasteryRepository
+
+        rows = TechniqueMasteryRepository(session).list_for_actor(
+            str(getattr(save, "id")),
+            str(getattr(player, "actor_id")),
+        )
+        by_id = {row.technique_id: row for row in rows}
+        cards: list[dict[str, Any]] = []
+        for tech in list_techniques():
+            row = by_id.get(tech.id)
+            cards.append(
+                {
+                    "id": tech.id,
+                    "display_name": tech.display_name,
+                    "description": tech.description,
+                    "known": bool(row.known) if row else False,
+                    "equipped": bool(row.equipped) if row else False,
+                    "mastery_rank": row.mastery_rank if row else 0,
+                    "learnable": can_learn_technique(
+                        tech,
+                        realm_id=str(getattr(player, "realm_id")),
+                    )[0],
+                }
+            )
+        return cards
+
+    def learn_technique(self, save_id: str, technique_id: str) -> PlaySceneModel:
+        """Learn a starter technique and return the refreshed play scene."""
+
+        from ai_adventure.services.techniques import TechniqueService
+
+        learned = TechniqueService(self._session_factory).learn(save_id, technique_id)
+        return self.get_play_scene(
+            save_id,
+            message=f"You learn {learned['display_name']}.",
+        )
+
+    def greet_npc(self, save_id: str, npc_id: str) -> PlaySceneModel:
+        """Greet an NPC at the player's current location (Phase 9b vertical slice)."""
+
+        from ai_adventure.services.npcs import NpcService
+
+        outcome = NpcService(self._session_factory).greet(save_id, npc_id)
+        return self.get_play_scene(
+            save_id,
+            message=outcome["presentation_text"],
         )
 
     def _persist_story_result(
         self,
         *,
+        session: Session,
         save_repo: SaveRepository,
         story_repo: StoryRepository,
         npc_repo: NpcRepository,
@@ -410,7 +591,9 @@ class GameAppService:
         player: object,
         progress: object,
         result: object,
-    ) -> None:
+    ) -> str | None:
+        """Persist story engine outcome. Location/day changes go through LocationService."""
+
         story_repo.update(
             progress,
             current_node_id=result.next_node_id,
@@ -424,21 +607,36 @@ class GameAppService:
         ):
             save_repo.mark_path_confirmed(player)
 
-        if result.location_id and result.location_name:
-            save_repo.update_locations(
-                save,
-                player,
-                location_id=result.location_id,
-                location_name=result.location_name,
+        location_result = LocationService(session).apply_story_transition(
+            save=save,  # type: ignore[arg-type]
+            player=player,  # type: ignore[arg-type]
+            progress=progress,  # type: ignore[arg-type]
+            result_location_id=result.location_id,
+            result_world_day=int(result.world_day),
+        )
+        travel_event_message = (
+            None if location_result is None else location_result.event_message
+        )
+
+        playtime_delta = int(getattr(result, "playtime_seconds", 0) or 0)
+        if playtime_delta:
+            save_repo.add_playtime(save, playtime_delta)
+        last_result = getattr(result, "last_cultivation_result", None)
+        if last_result is not None:
+            player.last_cultivation_result_json = json.dumps(last_result, sort_keys=True)
+            player.cultivation_rng_counter = (
+                int(getattr(player, "cultivation_rng_counter", 0) or 0) + 1
             )
-        if result.world_day != getattr(save, "world_day"):
-            save_repo.set_world_day(save, result.world_day)
+        last_bt = getattr(result, "last_breakthrough_result", None)
+        if last_bt is not None:
+            player.last_breakthrough_result_json = json.dumps(last_bt, sort_keys=True)
         for npc in result.spawned_npcs:
-            npc_repo.spawn_if_absent(
+            from ai_adventure.services.npcs import NpcService
+
+            NpcService(self._session_factory).ensure_spawned(
+                session,
                 save_id=getattr(save, "id"),
-                template_id=npc["template_id"],
-                display_name=npc["display_name"],
-                role=npc["role"],
+                npc_id=str(npc["npc_id"]),
             )
         if result.sect_id and result.sect_rank:
             sect_repo.upsert(
@@ -452,6 +650,7 @@ class GameAppService:
                 event_type=str(event["event_type"]),
                 payload=dict(event.get("payload", {})),
             )
+        return travel_event_message
 
     def _play_scene_model(
         self,
@@ -460,12 +659,76 @@ class GameAppService:
         player: object,
         scene: object,
         message: str | None,
+        techniques: list[dict[str, Any]] | None = None,
+        breakthrough_modifiers: object | None = None,
     ) -> PlaySceneModel:
         cultivation = cultivation_view(cultivation_state_from_player(player))
         opening_complete = cultivation["path_status"] in (
             PATH_STATUS_CONFIRMED_ORDINARY,
             PATH_STATUS_CONFIRMED_BOUNDLESS,
         ) and scene.node_id in {"shared_post_ordinary_02", "shared_post_boundless_02"}
+
+        last_result: dict[str, Any] | None = None
+        raw_last = getattr(player, "last_cultivation_result_json", None)
+        if raw_last:
+            try:
+                parsed = json.loads(raw_last)
+                if isinstance(parsed, dict):
+                    last_result = parsed
+            except json.JSONDecodeError:
+                last_result = None
+
+        last_bt: dict[str, Any] | None = None
+        raw_bt = getattr(player, "last_breakthrough_result_json", None)
+        if raw_bt:
+            try:
+                parsed_bt = json.loads(raw_bt)
+                if isinstance(parsed_bt, dict):
+                    last_bt = parsed_bt
+            except json.JSONDecodeError:
+                last_bt = None
+
+        from ai_adventure.engine.breakthroughs import (
+            evaluate_breakthrough_readiness,
+            readiness_to_dict,
+        )
+        from ai_adventure.engine.modifiers import ModifierSnapshot
+
+        state = cultivation_state_from_player(player)
+        bt_mods = breakthrough_modifiers if isinstance(breakthrough_modifiers, ModifierSnapshot) else None
+        readiness = readiness_to_dict(
+            evaluate_breakthrough_readiness(state, modifiers=bt_mods)
+        )
+
+        from ai_adventure.engine.location_actions import list_available_location_actions
+
+        location_actions = [
+            {
+                "id": item.id,
+                "label": item.label,
+                "description": item.description,
+                "duration_days": item.duration_days,
+                "implemented": item.implemented,
+                "available": item.available,
+                "blocked_reason": item.blocked_reason,
+            }
+            for item in list_available_location_actions(str(getattr(player, "current_location_id")))
+        ]
+
+        from ai_adventure.services.spiritual_roots import SpiritualRootService
+        from ai_adventure.services.npcs import NpcService
+
+        with self._session_factory() as root_session:
+            spiritual_roots = SpiritualRootService(self._session_factory).list_root_cards(
+                root_session,
+                str(getattr(save, "id")),
+                str(getattr(player, "actor_id")),
+            )
+            present_npcs = NpcService(self._session_factory).list_present_cards(
+                root_session,
+                save_id=str(getattr(save, "id")),
+                location_id=str(getattr(player, "current_location_id")),
+            )
 
         return PlaySceneModel(
             app_name=self._settings.app_name,
@@ -480,8 +743,18 @@ class GameAppService:
             actions=list(scene.actions),
             cultivation_methods=list(scene.cultivation_methods),
             cultivation=cultivation,
+            location_actions=location_actions,
+            techniques=list(techniques or []),
+            spiritual_roots=spiritual_roots,
+            present_npcs=present_npcs,
             message=message,
             opening_complete=opening_complete,
+            cultivation_available=bool(getattr(scene, "cultivation_available", True)),
+            cultivation_blocked_reason=getattr(scene, "cultivation_blocked_reason", None),
+            last_cultivation_result=last_result,
+            breakthrough_readiness=readiness,
+            last_breakthrough_result=last_bt,
+            breakthrough_can_attempt=bool(getattr(scene, "breakthrough_can_attempt", False)),
         )
 
     def _loaded_model_from_state(

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "roots": [
+    {
+      "id": "root_wood_steady",
+      "display_name": "Steady Wood Root",
+      "element": "wood",
+      "grade_rank": 1,
+      "effect_bundle_id": "bundle_root_wood_steady",
+      "description": "A common wood-aligned root that slightly steadies cultivation session progress."
+    },
+    {
+      "id": "root_fire_qi",
+      "display_name": "Fire Qi Root",
+      "element": "fire",
+      "grade_rank": 1,
+      "effect_bundle_id": "bundle_root_fire_qi",
+      "description": "A fire-aligned root that slightly increases Qi gained during practice."
+    },
+    {
+      "id": "root_earth_attunement",
+      "display_name": "Earth Attunement Root",
+      "element": "earth",
+      "grade_rank": 1,
+      "effect_bundle_id": "bundle_root_earth_attunement",
+      "description": "An earth-aligned root that slightly biases cultivation-world omens toward the practitioner."
+    }
+  ]
+}

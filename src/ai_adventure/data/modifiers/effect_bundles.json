@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "bundles": [
+    {
+      "id": "bundle_fixture_quiet_breath",
+      "schema_version": 1,
+      "effects": [
+        {
+          "type": "session_progress_mult",
+          "params": { "mult": 1.05 },
+          "applies_to": ["cultivate_session"]
+        },
+        {
+          "type": "comprehension_gain_mult",
+          "params": { "mult": 1.05 },
+          "applies_to": ["cultivate_session"]
+        }
+      ]
+    },
+    {
+      "id": "bundle_tech_steady_practice",
+      "schema_version": 1,
+      "effects": [
+        {
+          "type": "session_progress_mult",
+          "params": { "mult": 1.10 },
+          "applies_to": ["cultivate_session"]
+        }
+      ]
+    },
+    {
+      "id": "bundle_tech_qi_absorption",
+      "schema_version": 1,
+      "effects": [
+        {
+          "type": "session_qi_gain_mult",
+          "params": { "mult": 1.25 },
+          "applies_to": ["cultivate_session"]
+        }
+      ]
+    },
+    {
+      "id": "bundle_tech_foundation_guard",
+      "schema_version": 1,
+      "effects": [
+        {
+          "type": "session_stability_flat",
+          "params": { "flat": 2 },
+          "applies_to": ["cultivate_session"]
+        }
+      ]
+    },
+    {
+      "id": "bundle_tech_threshold_focus",
+      "schema_version": 1,
+      "effects": [
+        {
+          "type": "breakthrough_chance_flat",
+          "params": { "flat": 0.03 },
+          "applies_to": ["breakthrough"]
+        }
+      ]
+    },
+    {
+      "id": "bundle_tech_omen_attunement",
+      "schema_version": 1,
+      "effects": [
+        {
+          "type": "weight_mult",
+          "params": { "mult": 1.15 },
+          "applies_to": ["world_event"],
+          "category": "cultivation"
+        },
+        {
+          "type": "chance_flat",
+          "params": { "flat": 0.03 },
+          "applies_to": ["world_event"],
+          "category": "cultivation"
+        }
+      ]
+    },
+    {
+      "id": "bundle_root_wood_steady",
+      "schema_version": 1,
+      "effects": [
+        {
+          "type": "session_progress_mult",
+          "params": { "mult": 1.05 },
+          "applies_to": ["cultivate_session"]
+        }
+      ]
+    },
+    {
+      "id": "bundle_root_fire_qi",
+      "schema_version": 1,
+      "effects": [
+        {
+          "type": "session_qi_gain_mult",
+          "params": { "mult": 1.08 },
+          "applies_to": ["cultivate_session"]
+        }
+      ]
+    },
+    {
+      "id": "bundle_root_earth_attunement",
+      "schema_version": 1,
+      "effects": [
+        {
+          "type": "weight_mult",
+          "params": { "mult": 1.10 },
+          "applies_to": ["world_event"],
+          "category": "cultivation"
+        }
+      ]
+    },
+    {
+      "id": "bundle_alchemy_calming_draught",
+      "schema_version": 1,
+      "effects": [
+        {
+          "type": "session_stability_flat",
+          "params": { "flat": 2 },
+          "applies_to": ["cultivate_session"]
+        },
+        {
+          "type": "weight_mult",
+          "params": { "mult": 1.05 },
+          "applies_to": ["world_event"],
+          "category": "cultivation"
+        },
+        {
+          "type": "chance_flat",
+          "params": { "flat": 0.02 },
+          "applies_to": ["world_event"],
+          "category": "cultivation"
+        }
+      ]
+    }
+  ]
+}

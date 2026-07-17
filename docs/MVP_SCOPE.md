@@ -21,7 +21,7 @@ See also: [GAME_PRINCIPLES.md](GAME_PRINCIPLES.md), [GAME_VISION.md](GAME_VISION
 - **Creation is backgrounds + identity, not path.** The Boundless Foundation Path is introduced by a **mandatory story event in the first ~30 minutes**—part of the MVP story spine—available regardless of background ([BOUNDLESS_FOUNDATION.md](BOUNDLESS_FOUNDATION.md)).
 - Backgrounds remain non-class upbringing packages (not reincarnation).
 - Technique encyclopedia is a **core long-term feature**; MVP ships a **tiny** technique set on **scalable** data structures.
-- Early major realms are **locked**: Body Tempering, Qi Condensation, Foundation Establishment, Core Formation.
+- Early major realms are **locked**: Body Tempering, Qi Gathering, Foundation Establishment, Core Formation.
 - Cultivation schema includes **Body, Qi, Soul, Dao, Foundation Quality** for every cultivator.
 - **No unique player cultivation rules**; NPCs share the same systems (even if sparsely simulated in MVP).
 - Breakthrough outcome vocabulary includes success, failure, partial success, damaged foundations, unique tribulations.

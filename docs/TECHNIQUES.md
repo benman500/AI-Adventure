@@ -4,6 +4,8 @@
 
 Detailed design of the **permanent technique encyclopedia**: catalog scale, categories, metadata, learning/mastery, effects bounds relative to realms, acquisition, evolution graphs, and AI-assisted creation under engine authority.
 
+**Mechanical effects** from techniques flow through the shared [Modifier Framework](MODIFIER_FRAMEWORK.md). Phase **6c** ships a tiny starter catalog + mastery persistence; cultivation sessions and breakthroughs consume `ModifierSnapshot` only (never technique tables). Phase **6d** adds Event Selection Bias as a third consumer (generic `weight_mult` / `chance_flat` with category metadata).
+
 Complements [CULTIVATION_SYSTEM.md](CULTIVATION_SYSTEM.md) and [REALMS.md](REALMS.md). Profession manuals that are techniques still live here as records; profession *ranks* live in [PROFESSIONS.md](PROFESSIONS.md).
 
 ---
@@ -109,20 +111,22 @@ Confirmed-oriented primary categories (extensible enum/table—not a closed hard
 
 **Proposal:** Prefer **join tables** for prerequisites, evolutions, and known users rather than huge embedded arrays that are hard to query at scale.
 
-### 5. Effects are data bundles, not per-technique code
+### 5. Effects are data bundles via the Modifier Framework
 
-**Proposal:** Techniques reference an **effect bundle**: typed modifiers the engine understands (practice-speed, CPI side multipliers, profession craft bonuses, movement flags, etc.).
+**Confirmed direction (Phase 6):** Techniques reference an **effect bundle** of allowlisted modifier types. Aggregation, caps, context filtering, and stacking are owned by [MODIFIER_FRAMEWORK.md](MODIFIER_FRAMEWORK.md)—not by per-technique code or private bonus fields.
 
 - New effect *types* are engine version upgrades.
 - New techniques mostly reuse existing effect types with parameters.
 - Hard rule: **effect magnitude caps** so no technique alone approximates +1 major realm for ordinary cultivators.
+- Consumers (cultivation sessions, breakthroughs, event selection bias, later combat) ask for a `ModifierSnapshot`; they do not read technique tables for math.
+- Intent / modifier / mutation stay separate: learning a technique is mastery state; using it biases calculations; granting an item or meter change remains a mutation elsewhere.
 
 **Tradeoff — scripted techniques vs parametric effects**
 
 | Approach | Pros | Cons |
 |----------|------|------|
 | Arbitrary scripts per art | Expressive | Unauditable at thousands; AI-generated danger |
-| **Parametric effect bundles (proposed)** | Safe scale; testable; AI can fill params into known types | Caps creativity unless new types are added carefully |
+| **Parametric effect bundles + shared Modifier Framework (locked)** | Safe scale; testable; reusable by roots/gear/statuses; AI can fill params into known types | Caps creativity unless new types are added carefully |
 
 ### 6. Learning and mastery
 
@@ -179,14 +183,16 @@ Requirements should prefer locked realm ids (`body_tempering` … `core_formatio
 
 ### 10. MVP vs long-term architecture
 
-| Concern | MVP implementation | Long-term architecture |
-|---------|--------------------|------------------------|
+| Concern | MVP implementation (Phase 6c) | Long-term architecture |
+|---------|-------------------------------|------------------------|
 | Catalog size | Handful of records | Thousands |
 | Metadata fill | Mostly empty lore OK | Dense provenance |
-| Effects | 1–2 simple modifiers | Rich typed bundles |
+| Effects | 1–2 simple modifiers via shared bundles / Modifier Framework | Rich typed bundles; more sources |
 | Graph edges | Optional | Prerequisites + evolutions |
 | AI commit | Not required | Full proposal pipeline |
 | Mastery | Binary known + crude progress OK | Multi-rank mastery |
+
+**Delivery order:** Phase **6a** modifier contract (docs) → **6b** engine stub → **6c** this catalog + mastery + session wiring ([DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md)).
 
 ---
 
@@ -195,7 +201,7 @@ Requirements should prefer locked realm ids (`body_tempering` … `core_formatio
 1. **Catalog + mastery** over per-actor copies → thousands of arts.  
 2. **Primary category + tags** over tag chaos → usable encyclopedia UI.  
 3. **Numeric grade_rank** over named-only grades → insertible ranking.  
-4. **Parametric effects** over scripts → safe AI + testability.  
+4. **Parametric effects via Modifier Framework** over scripts / private technique bonuses → safe AI + testability + reuse by later sources.  
 5. **Hard CPI-adjacent caps** over “legendary art wins realms” → preserves exponential cultivation.
 
 ---
@@ -227,4 +233,4 @@ Requirements should prefer locked realm ids (`body_tempering` … `core_formatio
 
 - Index catalog by `primary_category`, `grade_rank`, `min_realm_order`, tags for encyclopedia queries.
 - Sect libraries and auctions reference `technique_id` ([SECTS.md](SECTS.md), [ECONOMY.md](ECONOMY.md)).
-- Related: [DATABASE.md](DATABASE.md), [AI_SYSTEM.md](AI_SYSTEM.md), [COMBAT.md](COMBAT.md), [PROFESSIONS.md](PROFESSIONS.md), [REALMS.md](REALMS.md).
+- Related: [MODIFIER_FRAMEWORK.md](MODIFIER_FRAMEWORK.md), [DATABASE.md](DATABASE.md), [AI_SYSTEM.md](AI_SYSTEM.md), [COMBAT.md](COMBAT.md), [PROFESSIONS.md](PROFESSIONS.md), [REALMS.md](REALMS.md).

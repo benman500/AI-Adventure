@@ -1,0 +1,51 @@
+{
+  "stage_scheme_id": "standard_4",
+  "stages": [
+    { "id": "early", "display_name": "Early", "order_index": 1 },
+    { "id": "middle", "display_name": "Middle", "order_index": 2 },
+    { "id": "late", "display_name": "Late", "order_index": 3 },
+    { "id": "peak", "display_name": "Peak", "order_index": 4 }
+  ],
+  "realms": [
+    {
+      "id": "body_tempering",
+      "display_name": "Body Tempering",
+      "order_index": 1,
+      "status": "playable",
+      "cosmology_layer": "lower_world",
+      "stage_scheme_id": "standard_4",
+      "base_qi_max": 10,
+      "notes": "First playable major realm (Phase 1)."
+    },
+    {
+      "id": "qi_gathering",
+      "display_name": "Qi Gathering",
+      "order_index": 2,
+      "status": "playable",
+      "cosmology_layer": "lower_world",
+      "stage_scheme_id": "standard_4",
+      "base_qi_max": 20,
+      "notes": "Second playable major realm (Phase 1). Previously documented as Qi Condensation; Phase 1 overhaul name."
+    },
+    {
+      "id": "foundation_establishment",
+      "display_name": "Foundation Establishment",
+      "order_index": 3,
+      "status": "placeholder",
+      "cosmology_layer": "lower_world",
+      "stage_scheme_id": "standard_4",
+      "base_qi_max": 40,
+      "notes": "Placeholder — not implemented in Phase 1."
+    },
+    {
+      "id": "core_formation",
+      "display_name": "Core Formation",
+      "order_index": 4,
+      "status": "placeholder",
+      "cosmology_layer": "lower_world",
+      "stage_scheme_id": "standard_4",
+      "base_qi_max": 80,
+      "notes": "Placeholder — not implemented in Phase 1."
+    }
+  ]
+}

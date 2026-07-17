@@ -159,12 +159,13 @@ These attach **without** collapsing layers:
 |-----------|-------------------|
 | Living sects / sect life ticks | Engine scheduling + services for “world tick”; repos for sect aggregates |
 | Heaven's Will / tribulations | Engine modules; outcome events for Narrator |
-| Technique encyclopedia at scale | Repos + indexed SQLite tables; engine effect bundles |
+| Technique encyclopedia at scale | Repos + indexed SQLite tables; techniques emit modifiers via [MODIFIER_FRAMEWORK.md](MODIFIER_FRAMEWORK.md) effect bundles |
+| Modifier Framework | Engine module: sources → aggregate → ephemeral snapshot → consumers (sessions, breakthroughs, event selection bias, later combat) |
 | Boundless story event | Application service orchestrates scripted beats; engine applies path commit |
 | Local reputation graph | Engine + repos; never a global karma table as authority |
 | Ollama / OpenAI-compatible APIs | New Narrator implementations only |
 | Auctions, caravans, trade routes | Engine economy + repos; routes/services for UI |
-| Procedural locations | Worldgen service → engine commit → repos |
+| Procedural locations | Worldgen service → engine commit → repos; authored packs under `data/world/packs/` |
 | Optional later Docker / multiplayer | Outside MVP; would wrap same layering, not replace engine authority |
 | Read-only admin/debug views | Routes + services querying repos; still no AI writes |
 
@@ -214,4 +215,4 @@ saves/           # SQLite DB path (default: saves/game.db)
 
 ## Expansion notes
 
-- Related: [TECH_STACK.md](TECH_STACK.md), [AI_BOUNDARIES.md](AI_BOUNDARIES.md), [AI_SYSTEM.md](AI_SYSTEM.md), [DATABASE.md](DATABASE.md), [MVP_SCOPE.md](MVP_SCOPE.md), [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md), [DECISIONS.md](DECISIONS.md).
+- Related: [TECH_STACK.md](TECH_STACK.md), [AI_BOUNDARIES.md](AI_BOUNDARIES.md), [AI_SYSTEM.md](AI_SYSTEM.md), [DATABASE.md](DATABASE.md), [MVP_SCOPE.md](MVP_SCOPE.md), [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md), [MODIFIER_FRAMEWORK.md](MODIFIER_FRAMEWORK.md), [DECISIONS.md](DECISIONS.md).

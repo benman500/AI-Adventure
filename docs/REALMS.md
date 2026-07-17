@@ -22,14 +22,16 @@ Permanent design of the cultivation **major realm / minor stage** ladder, locked
 
 ### Locked early major realms (permanent)
 
-| order_index | realm_id (stable) | display_name |
-|------------:|-------------------|--------------|
-| 1 | `body_tempering` | Body Tempering |
-| 2 | `qi_condensation` | Qi Condensation |
-| 3 | `foundation_establishment` | Foundation Establishment |
-| 4 | `core_formation` | Core Formation |
+| order_index | realm_id (stable) | display_name | Phase 1 status |
+|------------:|-------------------|--------------|----------------|
+| 1 | `body_tempering` | Body Tempering | Playable |
+| 2 | `qi_gathering` | Qi Gathering | Playable |
+| 3 | `foundation_establishment` | Foundation Establishment | Placeholder |
+| 4 | `core_formation` | Core Formation | Placeholder |
 
-These four are **confirmed permanent content**. They are no longer placeholders. Future realms append **above** `core_formation` (or reserve gaps in `order_index` only for deliberate inserts that do not rename these four).
+These four are **confirmed permanent content**. Phase 1 playable ladder is Body Tempering → Qi Gathering. **Naming note:** earlier docs used `qi_condensation` / “Qi Condensation”; the cultivation overhaul Phase 1 renames this realm to **Qi Gathering** (`qi_gathering`). Future realms append **above** `core_formation`.
+
+Catalog source of truth for implementation: `src/ai_adventure/data/cultivation/realms.json`.
 
 ---
 
@@ -41,7 +43,7 @@ Each realm: `realm_id`, `order_index`, `display_name`, `cosmology_layer`, `stage
 
 ### Uniform minor stages (proposed)
 
-Default scheme `standard_4`: **early / mid / late / peak**. Applies to the locked early four; expected default for later realms unless an alternate scheme is explicitly added.
+Default scheme `standard_4`: **early / middle / late / peak**. Applies to the locked early four; expected default for later realms unless an alternate scheme is explicitly added.
 
 ### Power model and hidden CPI
 
@@ -70,8 +72,8 @@ Major breakthroughs use the confirmed outcome vocabulary: success, failure, part
 
 ```mermaid
 flowchart LR
-  bt[BodyTempering] --> qc[QiCondensation]
-  qc --> fe[FoundationEstablishment]
+  bt[BodyTempering] --> qg[QiGathering]
+  qg --> fe[FoundationEstablishment]
   fe --> cf[CoreFormation]
   cf --> later[LaterRealms]
 ```

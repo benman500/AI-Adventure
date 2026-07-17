@@ -21,6 +21,7 @@ from ai_adventure.engine.constants import (
 )
 from ai_adventure.engine.errors import EngineValidationError
 from ai_adventure.engine.identity import validate_identity_answers
+from ai_adventure.engine.locations import require_known_location, resolve_location_display_name
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,11 +100,13 @@ def create_character(
     )
 
     history = background.history_payload()
+    location_id = require_known_location(background.starting_location_id)
+    location_name = resolve_location_display_name(location_id)
     event_payload = {
         "character_name": name,
         "background_id": background.id,
         "background_display_name": background.display_name,
-        "location_id": background.starting_location_id,
+        "location_id": location_id,
         "cultivation_path": STARTING_CULTIVATION_PATH,
     }
 
@@ -112,8 +115,8 @@ def create_character(
         background_id=background.id,
         background_display_name=background.display_name,
         intro_flavor=background.intro_flavor,
-        current_location_id=background.starting_location_id,
-        current_location_name=background.starting_location_name,
+        current_location_id=location_id,
+        current_location_name=location_name,
         money_copper=background.starting_money_copper,
         cultivation_path=STARTING_CULTIVATION_PATH,
         realm_id=STARTING_REALM_ID,

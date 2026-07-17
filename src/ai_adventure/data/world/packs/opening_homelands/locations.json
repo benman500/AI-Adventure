@@ -1,0 +1,422 @@
+{
+  "schema_version": 1,
+  "locations": [
+    {
+      "id": "settlement_willowford",
+      "kind": "settlement",
+      "display_name": "Willowford",
+      "parent_id": null,
+      "tags": [
+        "hometown",
+        "merchant"
+      ],
+      "sect_id": null,
+      "travel": [],
+      "actions": [],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": null,
+      "resources": [],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "town"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "hometown_market_lane",
+      "kind": "site",
+      "display_name": "Market Lane of Willowford",
+      "parent_id": "settlement_willowford",
+      "tags": [
+        "hometown",
+        "merchant",
+        "starting"
+      ],
+      "sect_id": null,
+      "travel": [
+        {
+          "to": "road_north_of_willowford",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "inspect"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": null,
+      "resources": [],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "town",
+        "market"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "road_north_of_willowford",
+      "kind": "site",
+      "display_name": "North Road out of Willowford",
+      "parent_id": "settlement_willowford",
+      "tags": [
+        "road",
+        "travel"
+      ],
+      "sect_id": null,
+      "travel": [
+        {
+          "to": "jade_ridge_approach",
+          "days": 1,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "hometown_market_lane",
+          "days": 1,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "explore",
+        "inspect"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": null,
+      "resources": [],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "road"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "settlement_ashridge",
+      "kind": "settlement",
+      "display_name": "Ashridge",
+      "parent_id": null,
+      "tags": [
+        "hometown",
+        "alchemy"
+      ],
+      "sect_id": null,
+      "travel": [],
+      "actions": [],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": null,
+      "resources": [],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "town"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "hometown_herb_workshop",
+      "kind": "site",
+      "display_name": "Green Ember Workshop",
+      "parent_id": "settlement_ashridge",
+      "tags": [
+        "hometown",
+        "alchemy",
+        "starting"
+      ],
+      "sect_id": null,
+      "travel": [
+        {
+          "to": "road_out_of_ashridge",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "inspect"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": null,
+      "resources": [
+        "herbs"
+      ],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "workshop"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "road_out_of_ashridge",
+      "kind": "site",
+      "display_name": "Hillside Road out of Ashridge",
+      "parent_id": "settlement_ashridge",
+      "tags": [
+        "road",
+        "travel"
+      ],
+      "sect_id": null,
+      "travel": [
+        {
+          "to": "jade_ridge_approach",
+          "days": 1,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "hometown_herb_workshop",
+          "days": 1,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "explore",
+        "inspect"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": null,
+      "resources": [],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "road"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "settlement_pinehollow",
+      "kind": "settlement",
+      "display_name": "Pinehollow",
+      "parent_id": null,
+      "tags": [
+        "hometown",
+        "hunter"
+      ],
+      "sect_id": null,
+      "travel": [],
+      "actions": [],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": null,
+      "resources": [],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "frontier"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "hometown_wild_edge",
+      "kind": "site",
+      "display_name": "Wild Edge Camp outside Pinehollow",
+      "parent_id": "settlement_pinehollow",
+      "tags": [
+        "hometown",
+        "hunter",
+        "starting"
+      ],
+      "sect_id": null,
+      "travel": [
+        {
+          "to": "road_from_pinehollow",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "explore",
+        "inspect"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": null,
+      "resources": [],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "wilderness",
+        "camp"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "road_from_pinehollow",
+      "kind": "site",
+      "display_name": "Forest Road from Pinehollow",
+      "parent_id": "settlement_pinehollow",
+      "tags": [
+        "road",
+        "travel"
+      ],
+      "sect_id": null,
+      "travel": [
+        {
+          "to": "jade_ridge_approach",
+          "days": 1,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "hometown_wild_edge",
+          "days": 1,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "explore",
+        "inspect"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": null,
+      "resources": [],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "road",
+        "forest"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    }
+  ]
+}

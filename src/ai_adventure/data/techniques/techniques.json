@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "techniques": [
+    {
+      "id": "tech_steady_practice",
+      "display_name": "Steady Practice Method",
+      "primary_category": "cultivation",
+      "tags": ["practice", "progress"],
+      "grade_rank": 1,
+      "min_realm_order": 1,
+      "effect_bundle_id": "bundle_tech_steady_practice",
+      "description": "A basic circulation drill that improves cultivation session progress."
+    },
+    {
+      "id": "tech_qi_absorption",
+      "display_name": "Qi Absorption Art",
+      "primary_category": "cultivation",
+      "tags": ["qi", "absorption"],
+      "grade_rank": 1,
+      "min_realm_order": 1,
+      "effect_bundle_id": "bundle_tech_qi_absorption",
+      "description": "A beginner breathing art that increases Qi gained during practice."
+    },
+    {
+      "id": "tech_foundation_guard",
+      "display_name": "Foundation Guard Mantra",
+      "primary_category": "cultivation",
+      "tags": ["foundation", "stability"],
+      "grade_rank": 1,
+      "min_realm_order": 1,
+      "effect_bundle_id": "bundle_tech_foundation_guard",
+      "description": "A stabilizing mantra that reinforces foundation stability while cultivating."
+    },
+    {
+      "id": "tech_threshold_focus",
+      "display_name": "Threshold Focus Sutra",
+      "primary_category": "cultivation",
+      "tags": ["breakthrough", "focus"],
+      "grade_rank": 1,
+      "min_realm_order": 1,
+      "effect_bundle_id": "bundle_tech_threshold_focus",
+      "description": "A short sutra that slightly steadies the mind at the brink of breakthrough."
+    },
+    {
+      "id": "tech_omen_attunement",
+      "display_name": "Omen Attunement",
+      "primary_category": "cultivation",
+      "tags": ["insight", "omen", "ambient"],
+      "grade_rank": 1,
+      "min_realm_order": 1,
+      "effect_bundle_id": "bundle_tech_omen_attunement",
+      "description": "A quiet listening art that slightly biases cultivation-world omens toward the practitioner."
+    }
+  ]
+}

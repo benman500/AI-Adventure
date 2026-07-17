@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "evt_exploration_stub_ridge_path",
+      "category": "exploration",
+      "label": "Ridge Path Whisper",
+      "enabled": true,
+      "weight": 5,
+      "cooldown_days": 7,
+      "max_fires_per_save": 1,
+      "trigger": {
+        "kinds": ["after_story_travel"],
+        "chance": 0.3
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless", "provisional"],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["jade_ridge"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["path", "wilderness"]
+      },
+      "effects": [
+        {
+          "type": "noop",
+          "payload": {}
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "Along the ridge path, something stirs beyond the mist—then falls still.",
+        "narration_keys": ["ridge_path_whisper"]
+      },
+      "ai_prompt_key": "evt_exploration_stub_ridge_path"
+    }
+  ]
+}

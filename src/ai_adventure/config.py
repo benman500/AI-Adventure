@@ -21,6 +21,8 @@ class Settings(BaseSettings):
 
     app_name: str = "AI Adventure"
     debug: bool = False
+    validate_event_catalog_on_startup: bool = True
+    validate_location_catalog_on_startup: bool = True
     database_url: str = Field(
         default_factory=lambda: f"sqlite:///{(_PROJECT_ROOT / 'saves' / 'game.db').as_posix()}"
     )

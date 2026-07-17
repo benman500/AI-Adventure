@@ -56,6 +56,9 @@ Influence day-one module and data design:
 | Minimal clock / persistence | Full world history and NPC memories |
 | Few techniques | Thousands of techniques with provenance |
 | Stub economy | Dynamic economies, auctions, caravans, trade routes |
+| Modular location packs (Phase 5a+) | Pack-local NPCs/events/quests; procedural fill |
+
+**Location packs:** Authored world content is organized as modular packs under `data/world/packs/` and merged into one catalog ([LOCATIONS.md](LOCATIONS.md)). Saves store presence only.
 
 ## Proposed details
 

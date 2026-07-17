@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "evt_quiet_breath_insight",
+      "category": "cultivation",
+      "label": "Quiet Breath Insight",
+      "enabled": true,
+      "weight": 10,
+      "cooldown_days": 2,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.45
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": [],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["session_ambient"],
+        "npc_tags": [],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "realm_comprehension_delta": 2,
+            "cultivation_progress_delta": 1
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "In the stillness after practice, a quiet insight settles into your breath.",
+        "narration_keys": ["quiet_breath_insight"]
+      },
+      "ai_prompt_key": "evt_quiet_breath_insight"
+    },
+    {
+      "id": "evt_meridian_warmth",
+      "category": "cultivation",
+      "label": "Meridian Warmth",
+      "enabled": true,
+      "weight": 8,
+      "cooldown_days": 3,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.4
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": [],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["session_ambient", "qi_flow"],
+        "npc_tags": [],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "qi_reserve_delta": 1,
+            "foundation_stability_delta": 1
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "Warmth threads through your meridians, leaving your qi a shade denser than before.",
+        "narration_keys": ["meridian_warmth"]
+      },
+      "ai_prompt_key": "evt_meridian_warmth"
+    },
+    {
+      "id": "evt_sect_courtyard_focus",
+      "category": "cultivation",
+      "label": "Courtyard Focus",
+      "enabled": true,
+      "weight": 7,
+      "cooldown_days": 2,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.35
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["sect_grounds"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["session_ambient"],
+        "npc_tags": [],
+        "environment_tags": ["courtyard"]
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "cultivation_progress_delta": 2
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "Distant courtyard drills fade into rhythm. Your focus sharpens for a few precious breaths.",
+        "narration_keys": ["courtyard_focus"]
+      },
+      "ai_prompt_key": "evt_sect_courtyard_focus"
+    },
+    {
+      "id": "evt_distracted_circulation",
+      "category": "cultivation",
+      "label": "Distracted Circulation",
+      "enabled": true,
+      "weight": 4,
+      "cooldown_days": 4,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.25
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": [],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["session_setback"],
+        "npc_tags": [],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "cultivation_progress_delta": -3,
+            "foundation_stability_delta": -1
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "A stray thought snags your circulation. Progress slips; the foundation trembles, then steadies.",
+        "narration_keys": ["distracted_circulation"]
+      },
+      "ai_prompt_key": "evt_distracted_circulation"
+    },
+    {
+      "id": "evt_attuned_stillness",
+      "category": "cultivation",
+      "label": "Attuned Stillness",
+      "enabled": true,
+      "weight": 6,
+      "cooldown_days": 4,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.35
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": [],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["session_ambient", "omen"],
+        "npc_tags": [],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "realm_comprehension_delta": 1,
+            "foundation_stability_delta": 1
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "The world falls briefly quiet. An omen of stillness settles into your foundation.",
+        "narration_keys": ["attuned_stillness"]
+      },
+      "ai_prompt_key": "evt_attuned_stillness"
+    }
+  ]
+}

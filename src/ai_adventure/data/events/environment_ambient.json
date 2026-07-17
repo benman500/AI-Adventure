@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "evt_spirit_mist_drift",
+      "category": "environment",
+      "label": "Spirit Mist Drift",
+      "enabled": true,
+      "weight": 6,
+      "cooldown_days": 4,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.3
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["sect_grounds"],
+        "weather_tags": ["mist"],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["spiritual_density"]
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "qi_reserve_delta": 1,
+            "realm_comprehension_delta": 1
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "A thin spirit mist drifts across the courtyard. Breathing it in leaves a faint aftertaste of mountain qi.",
+        "narration_keys": ["spirit_mist_drift"]
+      },
+      "ai_prompt_key": "evt_spirit_mist_drift"
+    },
+    {
+      "id": "evt_hall_bell_resonance",
+      "category": "environment",
+      "label": "Hall Bell Resonance",
+      "enabled": true,
+      "weight": 5,
+      "cooldown_days": 5,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.25
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["sect_grounds"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["bell", "formation"]
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "foundation_stability_delta": 1,
+            "cultivation_progress_delta": 1
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "The Foundation Hall bell tolls once. Its resonance steadies your posture without conscious effort.",
+        "narration_keys": ["hall_bell_resonance"]
+      },
+      "ai_prompt_key": "evt_hall_bell_resonance"
+    },
+    {
+      "id": "evt_storm_pressure_front",
+      "category": "environment",
+      "label": "Storm Pressure Front",
+      "enabled": true,
+      "weight": 4,
+      "cooldown_days": 5,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.2
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": [],
+        "weather_tags": ["storm"],
+        "time_tags": [],
+        "cultivation_tags": ["session_setback"],
+        "npc_tags": [],
+        "environment_tags": ["pressure"]
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "foundation_stability_delta": -2,
+            "qi_reserve_delta": -1
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "A distant storm front presses on the spiritual air. Your foundation holds, but it costs a measure of ease.",
+        "narration_keys": ["storm_pressure_front"]
+      },
+      "ai_prompt_key": "evt_storm_pressure_front"
+    }
+  ]
+}

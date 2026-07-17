@@ -1,0 +1,55 @@
+{
+  "methods": [
+    {
+      "id": "cautious",
+      "label": "Cautious",
+      "description": "Slow, careful circulation. Low gains, slight chance to firm your foundation, and no serious setbacks.",
+      "qi_gain": 2,
+      "progress_gain": 12,
+      "comprehension_gain": 2,
+      "stability_delta": 1,
+      "stability_improve_chance": 0.35,
+      "setback_chance": 0.0,
+      "setback_qi_loss": 0,
+      "setback_progress_penalty": 0,
+      "setback_stability_loss": 0,
+      "risk_level": "none",
+      "time_cost_days": 1,
+      "playtime_seconds": 3600
+    },
+    {
+      "id": "balanced",
+      "label": "Balanced",
+      "description": "Steady practice. Moderate Qi, progress, and comprehension. Small risk of a minor setback.",
+      "qi_gain": 4,
+      "progress_gain": 25,
+      "comprehension_gain": 3,
+      "stability_delta": 0,
+      "stability_improve_chance": 0.0,
+      "setback_chance": 0.15,
+      "setback_qi_loss": 1,
+      "setback_progress_penalty": 5,
+      "setback_stability_loss": 1,
+      "risk_level": "low",
+      "time_cost_days": 1,
+      "playtime_seconds": 3600
+    },
+    {
+      "id": "aggressive",
+      "label": "Aggressive",
+      "description": "Forceful absorption. High Qi and progress, but stability often dips and setbacks are common.",
+      "qi_gain": 6,
+      "progress_gain": 35,
+      "comprehension_gain": 2,
+      "stability_delta": -2,
+      "stability_improve_chance": 0.0,
+      "setback_chance": 0.4,
+      "setback_qi_loss": 3,
+      "setback_progress_penalty": 10,
+      "setback_stability_loss": 3,
+      "risk_level": "moderate",
+      "time_cost_days": 1,
+      "playtime_seconds": 3600
+    }
+  ]
+}

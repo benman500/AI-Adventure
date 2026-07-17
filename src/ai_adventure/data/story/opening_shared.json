@@ -33,9 +33,7 @@
         {
           "type": "spawn_npc",
           "payload": {
-            "template_id": "npc_passing_cultivator_001",
-            "display_name": "Disciple Lu Han",
-            "role": "passing_cultivator"
+            "npc_id": "npc_passing_cultivator_001"
           }
         }
       ],
@@ -110,9 +108,7 @@
         {
           "type": "spawn_npc",
           "payload": {
-            "template_id": "npc_sect_examiner_001",
-            "display_name": "Elder Examiner Feng",
-            "role": "sect_examiner"
+            "npc_id": "npc_sect_examiner_001"
           }
         },
         {
@@ -158,9 +154,7 @@
         {
           "type": "spawn_npc",
           "payload": {
-            "template_id": "npc_instructor_001",
-            "display_name": "Instructor Pei",
-            "role": "sect_instructor"
+            "npc_id": "npc_instructor_001"
           }
         },
         { "type": "mark_lesson_complete" }
@@ -272,9 +266,7 @@
         {
           "type": "spawn_npc",
           "payload": {
-            "template_id": "npc_foundation_elder_001",
-            "display_name": "Elder Yun Mei",
-            "role": "foundation_elder"
+            "npc_id": "npc_foundation_elder_001"
           }
         },
         { "type": "mark_revelation_seen" }
@@ -310,7 +302,7 @@
     {
       "id": "shared_post_ordinary_01",
       "title": "The Correction",
-      "narrative": "Elder Yun Mei guides a corrective circulation—subtle, precise. The blocked step unlocks. You advance to Body Tempering's mid stage as if a door finally opens. Instructor Pei exhales in relief. 'A rare qi-lock,' he tells the hall. 'Resolved.' You are no longer a mystery—you are a disciple who overcame an obstacle.",
+      "narrative": "Elder Yun Mei guides a corrective circulation—subtle, precise. The blocked step unlocks. You advance to Body Tempering's Middle stage as if a door finally opens. Instructor Pei exhales in relief. 'A rare qi-lock,' he tells the hall. 'Resolved.' You are no longer a mystery—you are a disciple who overcame an obstacle.",
       "requirements": { "path_status": "confirmed_ordinary" },
       "actions": [
         {

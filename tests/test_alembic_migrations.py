@@ -72,14 +72,26 @@ def test_migration_0003_is_idempotent_when_schema_already_present(tmp_path: Path
 
     with sqlite3.connect(db_path) as conn:
         version = conn.execute("SELECT version_num FROM alembic_version").fetchone()
-        assert version == ("0003_opening_story_cultivation",)
+        assert version == ("0012_npc_world_state",)
         save_cols = {row[1] for row in conn.execute("PRAGMA table_info(game_saves)")}
         assert "world_day" in save_cols
+        player_cols = {row[1] for row in conn.execute("PRAGMA table_info(players)")}
+        assert "realm_comprehension" in player_cols
+        assert "foundation_stability" in player_cols
+        assert "last_cultivation_result_json" in player_cols
+        assert "cultivation_rng_counter" in player_cols
+        assert "breakthrough_attempts_current_stage" in player_cols
+        assert "last_breakthrough_result_json" in player_cols
+        assert "actor_id" in player_cols
+        assert "world_rng_counter" in save_cols
         tables = {
             row[0]
             for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
         }
         assert "story_progress" in tables
+        assert "event_cooldowns" in tables
+        assert "location_presence" in tables
+        assert "spiritual_root_ownership" in tables
 
     # Second upgrade must remain a no-op.
     command.upgrade(cfg, "head")

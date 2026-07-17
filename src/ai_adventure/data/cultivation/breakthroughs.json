@@ -1,0 +1,71 @@
+{
+  "chance_clamp_min": 0.05,
+  "chance_clamp_max": 0.95,
+  "comprehension_carry_ratio": 0.5,
+  "failure_qi_cost_ratio": 0.5,
+  "failure_stability_loss": 3,
+  "failure_progress_loss": 15,
+  "failed_attempt_chance_penalty": 0.05,
+  "excess_comprehension_bonus_per_point": 0.002,
+  "stability_bonus_per_point_from_50": 0.003,
+  "qi_surplus_bonus_cap": 0.05,
+  "boundless_chance_multiplier": 0.85,
+  "transitions": [
+    {
+      "id": "early_to_middle",
+      "from_stage_id": "early",
+      "to_stage_id": "middle",
+      "to_realm_id": null,
+      "progress_required": 100,
+      "comprehension_required": 25,
+      "stability_recommended": 40,
+      "qi_cost_percent_of_max": 25,
+      "base_success_chance": 0.7,
+      "base_difficulty": "low",
+      "stability_strongly_affects": false,
+      "allows_realm_change": false
+    },
+    {
+      "id": "middle_to_late",
+      "from_stage_id": "middle",
+      "to_stage_id": "late",
+      "to_realm_id": null,
+      "progress_required": 100,
+      "comprehension_required": 45,
+      "stability_recommended": 50,
+      "qi_cost_percent_of_max": 35,
+      "base_success_chance": 0.55,
+      "base_difficulty": "moderate",
+      "stability_strongly_affects": false,
+      "allows_realm_change": false
+    },
+    {
+      "id": "late_to_peak",
+      "from_stage_id": "late",
+      "to_stage_id": "peak",
+      "to_realm_id": null,
+      "progress_required": 100,
+      "comprehension_required": 65,
+      "stability_recommended": 60,
+      "qi_cost_percent_of_max": 50,
+      "base_success_chance": 0.4,
+      "base_difficulty": "high",
+      "stability_strongly_affects": false,
+      "allows_realm_change": false
+    },
+    {
+      "id": "peak_to_next_realm",
+      "from_stage_id": "peak",
+      "to_stage_id": "early",
+      "to_realm_id": "next_playable",
+      "progress_required": 100,
+      "comprehension_required": 80,
+      "stability_recommended": 70,
+      "qi_cost_percent_of_max": 75,
+      "base_success_chance": 0.28,
+      "base_difficulty": "very_high",
+      "stability_strongly_affects": true,
+      "allows_realm_change": true
+    }
+  ]
+}

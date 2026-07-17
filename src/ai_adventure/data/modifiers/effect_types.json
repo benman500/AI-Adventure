@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "effect_types": [
+    {
+      "id": "session_progress_mult",
+      "value_type": "number",
+      "aggregation": "multiply",
+      "param_key": "mult",
+      "identity": 1.0,
+      "cap_min": null,
+      "cap_max": 1.25,
+      "allowed_contexts": ["cultivate_session"],
+      "description": "Multiplies cultivation session progress gains."
+    },
+    {
+      "id": "session_qi_gain_mult",
+      "value_type": "number",
+      "aggregation": "multiply",
+      "param_key": "mult",
+      "identity": 1.0,
+      "cap_min": null,
+      "cap_max": 1.25,
+      "allowed_contexts": ["cultivate_session"],
+      "description": "Multiplies cultivation session Qi gains."
+    },
+    {
+      "id": "session_stability_flat",
+      "value_type": "number",
+      "aggregation": "sum",
+      "param_key": "flat",
+      "identity": 0.0,
+      "cap_min": -5.0,
+      "cap_max": 5.0,
+      "allowed_contexts": ["cultivate_session"],
+      "description": "Flat foundation stability bias for cultivation sessions."
+    },
+    {
+      "id": "comprehension_gain_mult",
+      "value_type": "number",
+      "aggregation": "multiply",
+      "param_key": "mult",
+      "identity": 1.0,
+      "cap_min": null,
+      "cap_max": 1.25,
+      "allowed_contexts": ["cultivate_session"],
+      "description": "Multiplies cultivation session comprehension gains."
+    },
+    {
+      "id": "breakthrough_chance_flat",
+      "value_type": "number",
+      "aggregation": "sum",
+      "param_key": "flat",
+      "identity": 0.0,
+      "cap_min": -0.05,
+      "cap_max": 0.05,
+      "allowed_contexts": ["breakthrough"],
+      "description": "Flat breakthrough success chance points (hard-capped)."
+    },
+    {
+      "id": "weight_mult",
+      "value_type": "number",
+      "aggregation": "multiply",
+      "param_key": "mult",
+      "identity": 1.0,
+      "cap_min": null,
+      "cap_max": 1.25,
+      "allowed_contexts": ["world_event"],
+      "description": "Generic weighted-selection multiplier; scope via applies_to and optional category."
+    },
+    {
+      "id": "chance_flat",
+      "value_type": "number",
+      "aggregation": "sum",
+      "param_key": "flat",
+      "identity": 0.0,
+      "cap_min": -0.05,
+      "cap_max": 0.05,
+      "allowed_contexts": ["world_event"],
+      "description": "Generic activation/success chance flat bias; scope via applies_to and optional category."
+    },
+    {
+      "id": "flag",
+      "value_type": "boolean",
+      "aggregation": "or",
+      "param_key": "flag",
+      "identity": false,
+      "cap_min": null,
+      "cap_max": null,
+      "allowed_contexts": [
+        "cultivate_session",
+        "breakthrough",
+        "world_event",
+        "travel",
+        "combat"
+      ],
+      "description": "Boolean capability flag; OR across sources per flag id."
+    }
+  ]
+}

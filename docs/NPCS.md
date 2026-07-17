@@ -2,63 +2,103 @@
 
 ## Purpose
 
-Owns non-player characters as persistent simulation agents with goals, memories, and relationships—not disposable dialogue props.
+Owns non-player characters as persistent, authored world entities—not disposable dialogue props.
 
-## Confirmed design
+**Status:** Phase **9a–9b vertical slice** shipped: pack-local NPC catalogs, `npc_world_state` mutable save rows, story spawn by `npc_id`, one deterministic interaction (`greet`), relationship score, presentation from catalog + save.
 
-- **Every NPC has goals** (engine-owned) ([GAME_PRINCIPLES.md](GAME_PRINCIPLES.md)).
-- The world continues **without the player**; NPCs act on schedules/goals.
-- **NPC memories**, **relationships**, and **world history** are long-term architecture goals ([GAME_VISION.md](GAME_VISION.md)).
-- AI may voice NPCs from engine-known facts; AI does not invent durable memories into saves without engine commit.
-- Tone: serious xianxia—rivalry, betrayal, ambition, occasional non-parodic humor.
-- **NPCs and players use exactly the same cultivation systems** (realms, stages, Body/Qi/Soul/Dao/Foundation Quality, Boundless Foundation Path, breakthroughs, tribulations, Heaven's Will). No NPC-only soft math and no player-only cultivation rules.
-- Important NPCs may attempt Boundless Foundation Path, suffer damaged foundations, and face unique tribulations under the shared outcome vocabulary.
-- **MVP implementation:** few NPCs, thin goal/memory fields; cultivation fields still use the shared schema even if sparsely simulated.
-- **Long-term architecture:** scalable NPC records, memory logs, faction membership, off-screen breakthroughs/tribulations, and Heaven's Will attention.
+Related: [SECTS.md](SECTS.md), [LOCATIONS.md](LOCATIONS.md), [WORLD_MODEL.md](WORLD_MODEL.md), [REPUTATION.md](REPUTATION.md), [DECISIONS.md](DECISIONS.md), [DATABASE.md](DATABASE.md), [AI_BOUNDARIES.md](AI_BOUNDARIES.md).
 
-## Proposed details
+---
 
-### NPC record (conceptual)
+## Confirmed design (Phase 9)
 
-| Field group | Examples |
-|-------------|----------|
-| Identity | Name, upbringing flavor, cultivation realm/stage, path type |
-| Cultivation axes | Body, Qi, Soul, Dao, Foundation Quality (same as player) |
-| Goals | Short- and long-term engine goals |
-| Social | Relationships, reputation toward player/factions |
-| Memory | Durable events that affect future decisions and heart demons |
-| Capabilities | Professions, known techniques |
-| Location | Where they are; travel intents |
-| Heaven's Will | Attention/pressure references when relevant |
+| Rule | Detail |
+|------|--------|
+| Catalog authority | Pack `npcs.json` defines identity, roles, home/default locations, optional sect, cultivation **summary** |
+| Saves = mutable only | `npc_world_state` stores location, status, discovered/met, relationship, flags, last interaction day |
+| Stable ids | Catalog `npc_id` is permanent content id; save row UUID is the opaque `actor_id` for that instance |
+| Story spawn | `spawn_npc` payload is `{ "npc_id": "…" }` only — no embedded display names |
+| AI | May narrate; never invents NPC ids, standing, or mechanical outcomes |
+| Modifier Framework | Unchanged; NPCs are **not** a modifier source in Phase 9 |
+| Player Actor migration | Not required; NPCs use instance UUID as `actor_id` without shared cultivation Actor ORM |
 
-### Behavior principles (proposed)
+Long-term vision (goals, memories, full cultivation parity, schedules) remains architecture — not implemented in 9b.
 
-- Rivalries and betrayals emerge from goals + resources + fear/ambition—not random evil switches.
-- Romance may exist under tone and content toggle rules ([GAME_VISION.md](GAME_VISION.md)).
-- Important NPCs can learn techniques, hold offices, breakthrough, fail tribulations, and die; consequences persist.
-- Simulation tiers may reduce tick rate for minor NPCs, but must not invent alternate cultivation formulas.
+---
 
-### MVP vs architecture
+## Content packs
 
-| MVP implementation | Long-term architecture |
-|--------------------|------------------------|
-| Handful of stub NPCs | Thousands of agents with sparse simulation tiers |
-| Goals as simple tags | Full planners / need systems |
-| No deep memory | Memory queries for dialogue and decisions |
+NPCs live in world packs (same merge rules as locations):
 
-## Out of scope / non-goals
+```text
+data/world/packs/<pack>/
+  manifest.json          # optional content_files.npcs
+  locations.json
+  npcs.json              # optional
+  sects.json             # optional
+```
 
-- Full AI autonomy over NPC numerical cultivation outcomes.
-- Writing a cast list of named legends in this pass.
+Global uniqueness of `npc_id` across packs. Location and sect references must resolve in the merged catalogs. Pack `depends_on` must be satisfied before load.
 
-## Unresolved design questions
+---
 
-- Simulation tiers (hero NPCs full fidelity vs background population aggregates)?
-- How often off-screen NPCs breakthrough or die?
-- Memory decay vs permanent critical memories?
-- Player-killable major figures in MVP?
+## Catalog schema
+
+| Field | Role |
+|-------|------|
+| `npc_id` | Permanent catalog id |
+| `display_name` | Authoritative label |
+| `role_tags` | e.g. `elder`, `disciple`, `teacher`, `rival`, `merchant` |
+| `home_location_id` | Catalog location |
+| `default_location_id` | Initial `current_location_id` on spawn |
+| `sect_id` | Optional; must exist in sect catalog |
+| `cultivation_summary` | `realm_id`, `stage_id`, `path_tags` — summary only, not full sim |
+| `description` | Presentation |
+
+---
+
+## Mutable save state (`npc_world_state`)
+
+| Column | Role |
+|--------|------|
+| `id` | UUID PK = opaque `actor_id` for this save instance |
+| `save_id` + `npc_id` | Unique ownership of catalog NPC in a save |
+| `current_location_id` | Where they are |
+| `status` | `active` \| `dead` \| `absent` |
+| `discovered` / `met` | Player awareness |
+| `relationship_score` | Bounded int (−100…100); single facet for 9b |
+| `sect_id_override` | Nullable; null → use catalog `sect_id` |
+| `state_flags_json` | Small allowlisted flag map (not free scripting) |
+| `last_interaction_world_day` | Last greet / interact day |
+
+Legacy `npc_records` (display_name/role on save) is superseded; do not write new rows there.
+
+---
+
+## Vertical slice (9b)
+
+1. Story ensures world state for `npc_id` (catalog lookup).
+2. At matching location, player may **greet**.
+3. Engine applies deterministic relationship delta; marks `met`.
+4. UI shows catalog name + save relationship/met state.
+5. Save/reload preserves mutable fields.
+
+---
+
+## Non-goals (Phase 9b)
+
+- AI dialogue, free-form chat
+- NPC cultivation simulation
+- Schedules / off-screen ticks
+- Combat opponents
+- Full reputation opinion graph
+- Additional ModifierSnapshot sources
+- Expanded interaction set (Phase 9c)
+
+---
 
 ## Expansion notes
 
-- Link NPCs to sects, techniques (known users), and economy roles.
-- Related: [SECTS.md](SECTS.md), [ECONOMY.md](ECONOMY.md), [CULTIVATION_SYSTEM.md](CULTIVATION_SYSTEM.md), [TRIBULATIONS.md](TRIBULATIONS.md), [HEAVENS_WILL.md](HEAVENS_WILL.md), [AI_SYSTEM.md](AI_SYSTEM.md), [WORLD_GENERATION.md](WORLD_GENERATION.md).
+- Phase **9c**: more interactions (`inspect`, `ask_guidance`), Event Engine hooks.
+- Phase **9d**: sect standing / join eligibility.
+- Later: NPC → ModifierSnapshot actors via instance `actor_id`.

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "recipes": [
+    {
+      "id": "alchemy_calming_draught",
+      "display_name": "Calming Draught",
+      "grade_rank": 1,
+      "effect_bundle_id": "bundle_alchemy_calming_draught",
+      "description": "A simple herb preparation that steadies breath and subtly aligns the practitioner's sense of timing."
+    }
+  ]
+}
+

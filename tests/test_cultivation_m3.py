@@ -45,6 +45,8 @@ def _ready_state(*, sessions: int = 3) -> CultivationState:
         qi_reserve_current=BREAKTHROUGH_QI_THRESHOLD,
         qi_reserve_max=10,
         cultivation_progress=BREAKTHROUGH_PROGRESS_THRESHOLD,
+        realm_comprehension=0,
+        foundation_stability=50,
         practice_sessions=sessions,
         anomaly_state=ANOMALY_STATE_NONE,
         breakthrough_readiness=BREAKTHROUGH_READY,
@@ -89,6 +91,8 @@ def test_breakthrough_readiness_from_thresholds_not_session_count() -> None:
         qi_reserve_current=BREAKTHROUGH_QI_THRESHOLD,
         qi_reserve_max=10,
         cultivation_progress=BREAKTHROUGH_PROGRESS_THRESHOLD,
+        realm_comprehension=0,
+        foundation_stability=50,
         practice_sessions=99,
         anomaly_state=ANOMALY_STATE_NONE,
         breakthrough_readiness=BREAKTHROUGH_NOT_READY,
@@ -125,6 +129,8 @@ def test_anomaly_not_triggered_by_practice_alone() -> None:
         qi_reserve_current=0,
         qi_reserve_max=10,
         cultivation_progress=0,
+        realm_comprehension=0,
+        foundation_stability=50,
         practice_sessions=0,
         anomaly_state=ANOMALY_STATE_NONE,
         breakthrough_readiness=BREAKTHROUGH_NOT_READY,
@@ -146,7 +152,7 @@ def test_ordinary_path_commit() -> None:
     result = commit_path_choice(state, choose_boundless=False)
     assert result.state.path_status == PATH_STATUS_CONFIRMED_ORDINARY
     assert result.state.anomaly_state == ANOMALY_STATE_RESOLVED
-    assert result.state.stage_id == "mid"
+    assert result.state.stage_id == "middle"
 
 
 def test_boundless_path_commit() -> None:
@@ -161,7 +167,10 @@ def test_boundless_path_commit() -> None:
     assert result.state.path_status == PATH_STATUS_CONFIRMED_BOUNDLESS
     assert result.state.cultivation_path == CULTIVATION_PATH_BOUNDLESS
     assert result.state.stage_id == STARTING_STAGE_ID
-    assert result.state.foundation_quality == 2
+    # Boundless bumps stability (+5) and quality (+1), then quality is synced
+    # upward from stability so both meters stay coherent.
+    assert result.state.foundation_stability == 55
+    assert result.state.foundation_quality == 3
 
 
 def test_path_choice_is_permanent() -> None:
@@ -183,7 +192,7 @@ def test_boundless_practice_slower_than_ordinary() -> None:
         cultivation_path=CULTIVATION_PATH_ORDINARY,
         path_status=PATH_STATUS_CONFIRMED_ORDINARY,
         realm_id=STARTING_REALM_ID,
-        stage_id="mid",
+        stage_id="middle",
         body=1,
         qi=1,
         soul=1,
@@ -192,6 +201,8 @@ def test_boundless_practice_slower_than_ordinary() -> None:
         qi_reserve_current=0,
         qi_reserve_max=10,
         cultivation_progress=0,
+        realm_comprehension=0,
+        foundation_stability=50,
         practice_sessions=0,
         anomaly_state=ANOMALY_STATE_RESOLVED,
         breakthrough_readiness=BREAKTHROUGH_NOT_READY,

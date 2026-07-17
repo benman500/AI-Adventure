@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "evt_discovery_jade_chip",
+      "category": "discovery",
+      "label": "Jade Chip Fragment",
+      "enabled": true,
+      "weight": 4,
+      "cooldown_days": 8,
+      "max_fires_per_save": 1,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.15
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["sect_grounds"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["courtyard"]
+      },
+      "effects": [
+        {
+          "type": "grant_item",
+          "payload": {
+            "item_code": "jade_chip_fragment",
+            "display_name": "Jade Chip Fragment",
+            "quantity": 1
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "Between floor stones you notice a pale jade chip—too worn to be a full token, but not worthless.",
+        "narration_keys": ["jade_chip_fragment"]
+      },
+      "ai_prompt_key": "evt_discovery_jade_chip"
+    },
+    {
+      "id": "evt_discovery_herb_scrap",
+      "category": "discovery",
+      "label": "Dried Herb Scrap",
+      "enabled": true,
+      "weight": 5,
+      "cooldown_days": 6,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.2
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["sect_grounds"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["garden"]
+      },
+      "effects": [
+        {
+          "type": "grant_item",
+          "payload": {
+            "item_code": "dried_herb_scrap",
+            "display_name": "Dried Herb Scrap",
+            "quantity": 1
+          }
+        },
+        {
+          "type": "modify_money",
+          "payload": {
+            "copper_delta": 2
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "A discarded herb scrap still holds a whisper of potency. Someone will pay a copper or two for it.",
+        "narration_keys": ["dried_herb_scrap"]
+      },
+      "ai_prompt_key": "evt_discovery_herb_scrap"
+    },
+    {
+      "id": "evt_npc_passing_nod",
+      "category": "npc_encounter",
+      "label": "Passing Disciple Nod",
+      "enabled": true,
+      "weight": 6,
+      "cooldown_days": 3,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.28
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["sect_grounds"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": ["outer_disciple"],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "noop",
+          "payload": {}
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "An outer disciple passes, nods once in recognition of shared effort, and continues without a word.",
+        "narration_keys": ["passing_disciple_nod"]
+      },
+      "ai_prompt_key": "evt_npc_passing_nod"
+    },
+    {
+      "id": "evt_combat_stub_spar_echo",
+      "category": "combat",
+      "label": "Sparring Echo (Stub)",
+      "enabled": true,
+      "weight": 2,
+      "cooldown_days": 10,
+      "max_fires_per_save": 1,
+      "trigger": {
+        "kinds": ["manual_debug"],
+        "chance": 1.0
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["training_grounds"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": ["sparring_partner"],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "noop",
+          "payload": {}
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "You recall a brief sparring exchange—combat resolution is not wired live yet.",
+        "narration_keys": ["spar_echo_stub"]
+      },
+      "ai_prompt_key": "evt_combat_stub_spar_echo"
+    }
+  ]
+}

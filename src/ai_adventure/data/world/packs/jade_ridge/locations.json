@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "locations": [
+    {
+      "id": "region_jade_ridge",
+      "kind": "region",
+      "display_name": "Jade Ridge",
+      "parent_id": null,
+      "tags": [
+        "jade_ridge",
+        "cultivation_lands"
+      ],
+      "sect_id": null,
+      "travel": [],
+      "actions": [],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": "body_tempering",
+      "resources": [],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [
+        "mountain"
+      ],
+      "environment_tags": [
+        "mountain"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "jade_ridge_approach",
+      "kind": "site",
+      "display_name": "Approach to Jade Ridge",
+      "parent_id": "region_jade_ridge",
+      "tags": [
+        "jade_ridge",
+        "travel",
+        "approach"
+      ],
+      "sect_id": null,
+      "travel": [
+        {
+          "to": "verdant_gate_registration",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "jade_ridge_verdant_gate",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "road_north_of_willowford",
+          "days": 1,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "road_out_of_ashridge",
+          "days": 1,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "road_from_pinehollow",
+          "days": 1,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "explore",
+        "inspect"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": "body_tempering",
+      "resources": [],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "mountain",
+        "road"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "jade_ridge_verdant_gate",
+      "kind": "settlement",
+      "display_name": "Jade Ridge \u2014 Verdant Gate Sect",
+      "parent_id": "region_jade_ridge",
+      "tags": [
+        "jade_ridge",
+        "sect_grounds"
+      ],
+      "sect_id": "sect_verdant_gate",
+      "travel": [
+        {
+          "to": "verdant_gate_registration",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "jade_ridge_approach",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "explore",
+        "inspect"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": "body_tempering",
+      "resources": [],
+      "npc_spawn_tags": [
+        "sect_disciple"
+      ],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [
+        "sect"
+      ],
+      "environment_tags": [
+        "sect",
+        "mountain"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    }
+  ]
+}

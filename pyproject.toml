@@ -29,6 +29,7 @@ dev = [
 
 [project.scripts]
 ai-adventure = "ai_adventure.main:run"
+ai-adventure-events = "ai_adventure.cli.events:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -43,6 +44,10 @@ ai_adventure = [
     "data/story/*.json",
     "data/npcs/*.json",
     "data/sects/*.json",
+    "data/cultivation/*.json",
+    "data/events/*.json",
+    "data/modifiers/*.json",
+    "data/techniques/*.json",
 ]
 
 [tool.pytest.ini_options]

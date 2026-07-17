@@ -1,0 +1,289 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "evt_dawn_qi_clarity",
+      "category": "cultivation",
+      "label": "Dawn Qi Clarity",
+      "enabled": true,
+      "weight": 9,
+      "cooldown_days": 3,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.38
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": [],
+        "weather_tags": [],
+        "time_tags": ["dawn"],
+        "cultivation_tags": ["session_ambient"],
+        "npc_tags": [],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "realm_comprehension_delta": 3
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "Dawn light cuts through the hall shutters. For a moment your qi runs with unusual clarity.",
+        "narration_keys": ["dawn_qi_clarity"]
+      },
+      "ai_prompt_key": "evt_dawn_qi_clarity"
+    },
+    {
+      "id": "evt_bone_tempering_echo",
+      "category": "cultivation",
+      "label": "Bone Tempering Echo",
+      "enabled": true,
+      "weight": 6,
+      "cooldown_days": 4,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.32
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 1,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": [],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["session_ambient", "body"],
+        "npc_tags": [],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "cultivation_progress_delta": 3,
+            "foundation_stability_delta": 1
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "An old Body Tempering cadence echoes in your marrow. Progress settles deeper than expected.",
+        "narration_keys": ["bone_tempering_echo"]
+      },
+      "ai_prompt_key": "evt_bone_tempering_echo"
+    },
+    {
+      "id": "evt_qi_tide_surge",
+      "category": "cultivation",
+      "label": "Qi Tide Surge",
+      "enabled": true,
+      "weight": 7,
+      "cooldown_days": 3,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.36
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 2,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": [],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["session_ambient", "qi_flow"],
+        "npc_tags": [],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "qi_reserve_delta": 2,
+            "cultivation_progress_delta": 1
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "A brief qi tide rises through your channels, filling what practice left empty.",
+        "narration_keys": ["qi_tide_surge"]
+      },
+      "ai_prompt_key": "evt_qi_tide_surge"
+    },
+    {
+      "id": "evt_steady_heartbeat",
+      "category": "cultivation",
+      "label": "Steady Heartbeat",
+      "enabled": true,
+      "weight": 8,
+      "cooldown_days": 2,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.4
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": [],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["session_ambient", "stability"],
+        "npc_tags": [],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "foundation_stability_delta": 2
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "Your heartbeat slows into a cultivator's cadence. The foundation feels a little more settled.",
+        "narration_keys": ["steady_heartbeat"]
+      },
+      "ai_prompt_key": "evt_steady_heartbeat"
+    },
+    {
+      "id": "evt_manual_margin_note",
+      "category": "cultivation",
+      "label": "Manual Margin Note",
+      "enabled": true,
+      "weight": 5,
+      "cooldown_days": 5,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.28
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["sect_grounds"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["session_ambient", "study"],
+        "npc_tags": [],
+        "environment_tags": ["library"]
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "realm_comprehension_delta": 2,
+            "cultivation_progress_delta": 2
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "A faded margin note in an old manual suddenly makes sense. Practice and understanding move together.",
+        "narration_keys": ["manual_margin_note"]
+      },
+      "ai_prompt_key": "evt_manual_margin_note"
+    },
+    {
+      "id": "evt_scattered_breath",
+      "category": "cultivation",
+      "label": "Scattered Breath",
+      "enabled": true,
+      "weight": 4,
+      "cooldown_days": 3,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.22
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": [],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["session_setback"],
+        "npc_tags": [],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "qi_reserve_delta": -2,
+            "cultivation_progress_delta": -2
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "Your breath scatters at the last circulation. Qi thins; progress slips a half-step back.",
+        "narration_keys": ["scattered_breath"]
+      },
+      "ai_prompt_key": "evt_scattered_breath"
+    },
+    {
+      "id": "evt_foundation_microfracture",
+      "category": "cultivation",
+      "label": "Foundation Microfracture",
+      "enabled": true,
+      "weight": 3,
+      "cooldown_days": 6,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_cultivation_session"],
+        "chance": 0.18
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "min_realm_order": 1,
+        "max_realm_order": 2,
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": [],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": ["session_setback", "stability"],
+        "npc_tags": [],
+        "environment_tags": []
+      },
+      "effects": [
+        {
+          "type": "modify_cultivation",
+          "payload": {
+            "foundation_stability_delta": -3
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "A hairline tremor runs through your foundation—nothing ruined, but the warning is clear.",
+        "narration_keys": ["foundation_microfracture"]
+      },
+      "ai_prompt_key": "evt_foundation_microfracture"
+    }
+  ]
+}

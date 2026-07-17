@@ -225,6 +225,138 @@ async def play_action(
     )
 
 
+@router.post("/play/{save_id}/techniques/learn")
+async def play_learn_technique(
+    request: Request,
+    save_id: str,
+    service: GameAppService = Depends(get_game_app_service),
+) -> Response:
+    """Learn a catalog technique for the active save."""
+
+    form = await request.form()
+    technique_id = str(form.get("technique_id", "")).strip()
+    if not technique_id:
+        try:
+            scene = service.get_play_scene(save_id, message="No technique selected")
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    try:
+        scene = service.learn_technique(save_id, technique_id)
+    except EngineValidationError as exc:
+        try:
+            scene = service.get_play_scene(save_id, message=exc.message)
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    return templates.TemplateResponse(
+        request,
+        "play_scene.html",
+        {"app_name": scene.app_name, "scene": scene},
+    )
+
+
+@router.post("/play/{save_id}/npcs/greet")
+async def play_greet_npc(
+    request: Request,
+    save_id: str,
+    service: GameAppService = Depends(get_game_app_service),
+) -> Response:
+    """Greet an NPC present at the player's location."""
+
+    form = await request.form()
+    npc_id = str(form.get("npc_id", "")).strip()
+    if not npc_id:
+        try:
+            scene = service.get_play_scene(save_id, message="No NPC selected")
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    try:
+        scene = service.greet_npc(save_id, npc_id)
+    except EngineValidationError as exc:
+        try:
+            scene = service.get_play_scene(save_id, message=exc.message)
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    return templates.TemplateResponse(
+        request,
+        "play_scene.html",
+        {"app_name": scene.app_name, "scene": scene},
+    )
+
+
+@router.post("/play/{save_id}/location-action")
+async def play_location_action(
+    request: Request,
+    save_id: str,
+    service: GameAppService = Depends(get_game_app_service),
+) -> Response:
+    """Submit a location action (explore, inspect, …) through LocationService."""
+
+    form = await request.form()
+    action_id = str(form.get("action_id", "")).strip()
+    if not action_id:
+        try:
+            scene = service.get_play_scene(save_id, message="No location action selected")
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    try:
+        scene = service.perform_location_action(save_id, action_id)
+    except EngineValidationError as exc:
+        try:
+            scene = service.get_play_scene(save_id, message=exc.message)
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    return templates.TemplateResponse(
+        request,
+        "play_scene.html",
+        {
+            "app_name": scene.app_name,
+            "scene": scene,
+        },
+    )
+
+
 @router.get("/play/{save_id}/status", response_class=HTMLResponse)
 def play_status(
     request: Request,

@@ -4,11 +4,17 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
+from uuid import uuid4
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from ai_adventure.db.models import EventLogEntry, GameSave, InventoryItem, Player
+from ai_adventure.engine.constants import (
+    STARTING_FOUNDATION_STABILITY,
+    STARTING_REALM_COMPREHENSION,
+)
+from ai_adventure.engine.realms import get_realm, normalize_realm_id
 from ai_adventure.engine.character_creation import CreatedCharacterState
 
 
@@ -79,7 +85,11 @@ class SaveRepository:
         self._session.add(save)
         self._session.flush()
 
+        realm_qi_max = get_realm(normalize_realm_id(state.realm_id)).base_qi_max
+        player_id = str(uuid4())
         player = Player(
+            id=player_id,
+            actor_id=player_id,
             save_id=save.id,
             character_name=state.character_name,
             background_id=state.background_id,
@@ -95,6 +105,10 @@ class SaveRepository:
             soul=state.soul,
             foundation_quality=state.foundation_quality,
             dao=state.dao,
+            qi_reserve_max=realm_qi_max,
+            qi_reserve_current=0,
+            realm_comprehension=STARTING_REALM_COMPREHENSION,
+            foundation_stability=STARTING_FOUNDATION_STABILITY,
             identity_answers_json=json.dumps(state.identity_answers, sort_keys=True),
             background_history_json=json.dumps(state.background_history, sort_keys=True),
         )
@@ -157,9 +171,17 @@ class SaveRepository:
         player.qi_reserve_current = cultivation.qi_reserve_current
         player.qi_reserve_max = cultivation.qi_reserve_max
         player.cultivation_progress = cultivation.cultivation_progress
+        player.realm_comprehension = cultivation.realm_comprehension
+        player.foundation_stability = cultivation.foundation_stability
         player.practice_sessions = cultivation.practice_sessions
+        if hasattr(cultivation, "foundation_quality"):
+            player.foundation_quality = cultivation.foundation_quality
         player.anomaly_state = cultivation.anomaly_state
         player.breakthrough_readiness = cultivation.breakthrough_readiness
+        if hasattr(cultivation, "breakthrough_attempts_current_stage"):
+            player.breakthrough_attempts_current_stage = (
+                cultivation.breakthrough_attempts_current_stage
+            )
         self._session.add(player)
         return player
 
@@ -188,9 +210,35 @@ class SaveRepository:
         self._session.add(player)
 
     def set_world_day(self, save: GameSave, world_day: int) -> None:
-        """Update world day counter."""
+        """Update world day counter (prefer WorldClock advance helpers)."""
 
         save.world_day = world_day
+        self._session.add(save)
+
+    def advance_world_day(self, save: GameSave, days: int) -> int:
+        """Advance simulation day via the centralized clock helper."""
+
+        from ai_adventure.engine.time import advance_world_days
+
+        new_day = advance_world_days(int(save.world_day), days)
+        save.world_day = new_day
+        self._session.add(save)
+        return new_day
+
+    def bump_world_rng_counter(self, save: GameSave) -> int:
+        """Increment save-level world RNG counter; return previous value."""
+
+        previous = int(getattr(save, "world_rng_counter", 0) or 0)
+        save.world_rng_counter = previous + 1
+        self._session.add(save)
+        return previous
+
+    def add_playtime(self, save: GameSave, seconds: int) -> None:
+        """Accumulate playtime from a completed action (e.g. cultivation)."""
+
+        if seconds <= 0:
+            return
+        save.playtime_seconds = int(save.playtime_seconds or 0) + seconds
         self._session.add(save)
 
     def mark_story_started(self, save: GameSave) -> None:

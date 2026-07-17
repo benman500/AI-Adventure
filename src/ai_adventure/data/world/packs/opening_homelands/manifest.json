@@ -1,0 +1,8 @@
+{
+  "pack_id": "opening_homelands",
+  "display_name": "Opening Homelands",
+  "depends_on": [],
+  "content_files": {
+    "locations": "locations.json"
+  }
+}
