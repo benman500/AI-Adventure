@@ -32,6 +32,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         assert_location_catalog_valid()
         assert_sect_catalog_valid()
         assert_npc_catalog_valid()
+        from ai_adventure.engine.aspirations import assert_aspiration_catalog_valid
+
+        assert_aspiration_catalog_valid()
 
     db_engine = create_db_engine(cfg)
     session_factory = create_session_factory(cfg, engine=db_engine)

@@ -315,12 +315,12 @@
     {
       "id": "shared_post_ordinary_02",
       "title": "Keeping Pace",
-      "narrative": "Ordinary cultivation feels clean and responsive. Qi fills your reserve; progress accumulates at the pace Instructor Pei promised. You are not ahead of your peers—but you are firmly among them. Use a cultivation method to continue building your foundation.",
+      "narrative": "Ordinary cultivation feels clean and responsive. Qi fills your reserve; progress accumulates at the pace Instructor Pei promised. You are no longer a mystery—but belonging is still thin. Speak with Elder Yun Mei about the path you chose. Seek Pei in the Cultivation Hall. Learn what outer disciples are expected to hold. The sect will notice when you stop floating and start standing.",
       "requirements": { "path_status": "confirmed_ordinary" },
       "actions": [
         {
           "id": "rest",
-          "label": "Rest for now — opening complete",
+          "label": "Rest for now",
           "next_node": "shared_post_ordinary_02"
         }
       ]
@@ -341,12 +341,12 @@
     {
       "id": "shared_post_boundless_02",
       "title": "Slow and Heavy",
-      "narrative": "Boundless cultivation feels different immediately—each cycle of qi heavier, each increment of progress hard-won. Your foundation quality shifts subtly, like stone settling deeper into bedrock. You are slower than peers, but not helpless. Use a cultivation method to feel the new rhythm.",
+      "narrative": "Boundless cultivation feels different immediately—each cycle of qi heavier, each increment of progress hard-won. Your foundation quality shifts subtly, like stone settling deeper into bedrock. You are slower than peers, but not helpless. Elder Yun Mei still watches. Instructor Pei still teaches those who earn his patience. Speak of the path you chose, learn the hall's stabilizing mantra, and prove the sect did not shelter a ghost.",
       "requirements": { "path_status": "confirmed_boundless" },
       "actions": [
         {
           "id": "rest",
-          "label": "Rest for now — opening complete",
+          "label": "Rest for now",
           "next_node": "shared_post_boundless_02"
         }
       ]

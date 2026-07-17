@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 from ai_adventure.db.models import MetaRecord
 from ai_adventure.repositories.events import EventCooldownRepository
 from ai_adventure.repositories.locations import LocationPresenceRepository
-from ai_adventure.repositories.npcs import NpcRepository, SectRepository
+from ai_adventure.repositories.npcs import NpcRepository
+from ai_adventure.repositories.sects import SectRepository, SectStandingRepository
 from ai_adventure.repositories.saves import EventLogRepository, SaveRepository
 from ai_adventure.repositories.story import StoryRepository
 from ai_adventure.repositories.spiritual_roots import SpiritualRootOwnershipRepository
@@ -23,6 +24,7 @@ __all__ = [
     "NpcWorldStateRepository",
     "SaveRepository",
     "SectRepository",
+    "SectStandingRepository",
     "SpiritualRootOwnershipRepository",
     "AlchemyRecipeOwnershipRepository",
     "StoryRepository",

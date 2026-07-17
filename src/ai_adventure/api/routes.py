@@ -268,13 +268,57 @@ async def play_learn_technique(
     )
 
 
+@router.post("/play/{save_id}/npcs/interact")
+async def play_npc_interact(
+    request: Request,
+    save_id: str,
+    service: GameAppService = Depends(get_game_app_service),
+) -> Response:
+    """Run a catalog NPC interaction (inspect / greet / ask_guidance)."""
+
+    form = await request.form()
+    npc_id = str(form.get("npc_id", "")).strip()
+    action_id = str(form.get("action_id", "")).strip()
+    if not npc_id or not action_id:
+        try:
+            scene = service.get_play_scene(save_id, message="No NPC action selected")
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    try:
+        scene = service.interact_with_npc(save_id, npc_id, action_id)
+    except EngineValidationError as exc:
+        try:
+            scene = service.get_play_scene(save_id, message=exc.message)
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    return templates.TemplateResponse(
+        request,
+        "play_scene.html",
+        {"app_name": scene.app_name, "scene": scene},
+    )
+
+
 @router.post("/play/{save_id}/npcs/greet")
 async def play_greet_npc(
     request: Request,
     save_id: str,
     service: GameAppService = Depends(get_game_app_service),
 ) -> Response:
-    """Greet an NPC present at the player's location."""
+    """Compatibility greet route (delegates to interact)."""
 
     form = await request.form()
     npc_id = str(form.get("npc_id", "")).strip()
@@ -291,7 +335,7 @@ async def play_greet_npc(
         )
 
     try:
-        scene = service.greet_npc(save_id, npc_id)
+        scene = service.interact_with_npc(save_id, npc_id, "greet")
     except EngineValidationError as exc:
         try:
             scene = service.get_play_scene(save_id, message=exc.message)
@@ -335,6 +379,52 @@ async def play_location_action(
 
     try:
         scene = service.perform_location_action(save_id, action_id)
+    except EngineValidationError as exc:
+        try:
+            scene = service.get_play_scene(save_id, message=exc.message)
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    return templates.TemplateResponse(
+        request,
+        "play_scene.html",
+        {
+            "app_name": scene.app_name,
+            "scene": scene,
+        },
+    )
+
+
+@router.post("/play/{save_id}/travel")
+async def play_travel(
+    request: Request,
+    save_id: str,
+    service: GameAppService = Depends(get_game_app_service),
+) -> Response:
+    """Travel along a catalog edge through LocationService."""
+
+    form = await request.form()
+    to_location_id = str(form.get("to_location_id", "")).strip()
+    if not to_location_id:
+        try:
+            scene = service.get_play_scene(save_id, message="No destination selected")
+        except EngineValidationError:
+            return RedirectResponse(url="/saves", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "play_scene.html",
+            {"app_name": scene.app_name, "scene": scene},
+            status_code=400,
+        )
+
+    try:
+        scene = service.travel_to(save_id, to_location_id)
     except EngineValidationError as exc:
         try:
             scene = service.get_play_scene(save_id, message=exc.message)

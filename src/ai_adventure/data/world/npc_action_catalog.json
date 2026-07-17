@@ -1,0 +1,253 @@
+{
+
+  "schema_version": 1,
+
+  "actions": [
+
+    {
+
+      "id": "inspect",
+
+      "label": "Inspect",
+
+      "description": "Observe the person carefully without pressing conversation.",
+
+      "duration_days": 0,
+
+      "marks_met": true,
+
+      "requirements": {},
+
+      "rewards": [
+
+        { "type": "adjust_relationship", "delta": 1 },
+
+        { "type": "emit_trigger", "trigger_kind": "after_npc_interact" }
+
+      ],
+
+      "presentation_template": "You study {display_name}. {description} Cultivation impression: {realm_id} ({stage_id})."
+
+    },
+
+    {
+
+      "id": "greet",
+
+      "label": "Greet",
+
+      "description": "Offer a measured greeting.",
+
+      "duration_days": 0,
+
+      "marks_met": true,
+
+      "requirements": {},
+
+      "rewards": [
+
+        { "type": "adjust_relationship", "delta": 5 },
+
+        { "type": "adjust_sect_standing", "delta": 1 },
+
+        { "type": "emit_trigger", "trigger_kind": "after_npc_interact" }
+
+      ],
+
+      "presentation_template": "You greet {display_name}. They acknowledge you with a measured nod."
+
+    },
+
+    {
+
+      "id": "ask_guidance",
+
+      "label": "Ask Guidance",
+
+      "description": "Spend time seeking counsel on cultivation.",
+
+      "duration_days": 1,
+
+      "marks_met": true,
+
+      "requirements": {
+
+        "min_sect_standing_by_role": {
+
+          "elder": 7,
+
+          "foundation_elder": 7,
+
+          "sect_examiner": 7
+
+        }
+
+      },
+
+      "rewards": [
+
+        { "type": "adjust_relationship", "delta": 3 },
+
+        { "type": "adjust_sect_standing", "delta": 2 },
+
+        { "type": "emit_trigger", "trigger_kind": "after_npc_interact" }
+
+      ],
+
+      "presentation_template": "{display_name} offers a few careful words of guidance. The counsel is practical, not mystical: steady breath, honest work, and patience with the foundation."
+
+    },
+
+    {
+
+      "id": "request_instruction",
+
+      "label": "Request Instruction",
+
+      "description": "Ask for formal technique instruction.",
+
+      "duration_days": 1,
+
+      "marks_met": true,
+
+      "requirements": {
+
+        "allowed_npc_ids": ["npc_instructor_001"],
+
+        "required_sect_id": "sect_verdant_gate",
+
+        "min_relationship": 8,
+
+        "min_sect_standing": 7,
+
+        "flags_none": ["taught_foundation_guard_pei"]
+
+      },
+
+      "rewards": [
+
+        { "type": "learn_technique", "technique_id": "tech_foundation_guard" },
+
+        { "type": "adjust_relationship", "delta": 3 },
+
+        { "type": "adjust_sect_standing", "delta": 1 },
+
+        { "type": "set_flag", "flag": "taught_foundation_guard_pei", "value": true },
+
+        { "type": "emit_trigger", "trigger_kind": "after_npc_interact" }
+
+      ],
+
+      "presentation_template": "{display_name} agrees to formal instruction. After careful drilling, you grasp the Foundation Guard Mantra."
+
+    },
+
+    {
+
+      "id": "acknowledge_path",
+
+      "label": "Speak of Your Path",
+
+      "description": "Ask Elder Yun Mei to record the cultivation path you chose.",
+
+      "duration_days": 0,
+
+      "marks_met": true,
+
+      "requirements": {
+
+        "allowed_npc_ids": ["npc_foundation_elder_001"],
+
+        "required_sect_id": "sect_verdant_gate",
+
+        "flags_all": ["path_confirmed"],
+
+        "flags_none": ["yun_mei_acknowledged_path"]
+
+      },
+
+      "rewards": [
+
+        { "type": "set_flag", "flag": "yun_mei_acknowledged_path", "value": true },
+
+        { "type": "adjust_relationship", "delta": 4 },
+
+        { "type": "adjust_sect_standing", "delta": 2 },
+
+        { "type": "emit_trigger", "trigger_kind": "after_npc_interact" }
+
+      ],
+
+      "presentation_template": "Elder Yun Mei listens without interrupting. She notes your choice in a private ledger and meets your eyes. 'The sect will remember what you chose—and what you refused. Walk carefully.'"
+
+    },
+
+    {
+
+      "id": "request_recommendation",
+
+      "label": "Request Recommendation",
+
+      "description": "Ask Elder Yun Mei to formally recommend you toward the Inner Disciple Trial.",
+
+      "duration_days": 1,
+
+      "marks_met": true,
+
+      "requirements": {
+
+        "allowed_npc_ids": ["npc_foundation_elder_001"],
+
+        "required_sect_id": "sect_verdant_gate",
+
+        "min_relationship": 12,
+
+        "min_sect_standing": 12,
+
+        "flags_all": ["yun_mei_acknowledged_path", "taught_foundation_guard_pei"],
+
+        "flags_none": ["elder_recommendation_yun_mei"]
+
+      },
+
+      "rewards": [
+
+        { "type": "set_flag", "flag": "elder_recommendation_yun_mei", "value": true },
+
+        { "type": "adjust_relationship", "delta": 2 },
+
+        { "type": "adjust_sect_standing", "delta": 3 },
+
+        { "type": "emit_trigger", "trigger_kind": "after_npc_interact" }
+
+      ],
+
+      "presentation_template": "Elder Yun Mei considers you for a long breath. Then she writes a short recommendation in the Foundation Hall's hand. 'This is my name beside yours. Do not make me regret it.'"
+
+    },
+    {
+      "id": "ask_misty_path",
+      "label": "Ask About the Misty Path",
+      "description": "Ask Herb Steward Qian whether any closed herb paths are ready to walk.",
+      "duration_days": 0,
+      "marks_met": true,
+      "requirements": {
+        "allowed_npc_ids": ["npc_herb_steward_001"],
+        "required_sect_id": "sect_verdant_gate",
+        "min_relationship": 3,
+        "flags_all": ["path_confirmed"],
+        "flags_none": ["unlocked_verdant_gate_misty_grove"]
+      },
+      "rewards": [
+        { "type": "unlock_location", "location_id": "verdant_gate_misty_grove" },
+        { "type": "adjust_relationship", "delta": 2 },
+        { "type": "adjust_sect_standing", "delta": 1 },
+        { "type": "emit_trigger", "trigger_kind": "after_npc_interact" }
+      ],
+      "presentation_template": "Qian studies you, then points toward a pale seam of mist beyond the garden fence. 'The Misty Herb Grove opens only for those who keep the ledgers honest. Don't waste what grows there.'"
+    }
+
+  ]
+
+}
+

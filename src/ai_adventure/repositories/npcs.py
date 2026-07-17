@@ -1,18 +1,16 @@
-"""NPC and sect membership persistence."""
+"""NPC persistence (legacy npc_records).
+
+Sect membership / standing live in ``repositories.sects``.
+"""
 
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ai_adventure.db.models import NpcRecord, SectMembership
-
-
-def _utcnow() -> datetime:
-    return datetime.now(UTC)
+from ai_adventure.db.models import NpcRecord
 
 
 class NpcRepository:
@@ -50,40 +48,6 @@ class NpcRepository:
             display_name=display_name,
             role=role,
             metadata_json=json.dumps(metadata or {}, sort_keys=True),
-        )
-        self._session.add(row)
-        self._session.flush()
-        return row
-
-
-class SectRepository:
-    """Sect membership persistence."""
-
-    def __init__(self, session: Session) -> None:
-        self._session = session
-
-    def get_for_save(self, save_id: str) -> SectMembership | None:
-        statement = select(SectMembership).where(SectMembership.save_id == save_id)
-        return self._session.scalar(statement)
-
-    def upsert(
-        self,
-        *,
-        save_id: str,
-        sect_id: str,
-        rank_id: str,
-    ) -> SectMembership:
-        existing = self.get_for_save(save_id)
-        if existing is not None:
-            existing.sect_id = sect_id
-            existing.rank_id = rank_id
-            self._session.add(existing)
-            return existing
-        row = SectMembership(
-            save_id=save_id,
-            sect_id=sect_id,
-            rank_id=rank_id,
-            joined_at=_utcnow(),
         )
         self._session.add(row)
         self._session.flush()

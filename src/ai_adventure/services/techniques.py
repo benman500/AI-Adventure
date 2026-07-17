@@ -206,47 +206,73 @@ class TechniqueService:
 
         with self._session_factory() as session:
             save_repo = SaveRepository(session)
-            mastery_repo = TechniqueMasteryRepository(session)
             save = save_repo.get_with_player(save_id)
             if save is None or save.player is None:
                 raise EngineValidationError("Save not found")
-
-            technique = get_technique(technique_id)
-            allowed, reason = can_learn_technique(
-                technique,
-                realm_id=save.player.realm_id,
-            )
-            if not allowed:
-                raise EngineValidationError(reason or "Cannot learn technique")
-
-            existing = mastery_repo.get(save.id, save.player.actor_id, technique_id)
-            if existing is not None and existing.known:
-                raise EngineValidationError("Technique already known")
-
-            row = mastery_repo.upsert_learned(
-                save_id=save.id,
-                actor_id=save.player.actor_id,
+            result = self.learn_in_session(
+                session,
+                save=save,
+                player=save.player,
                 technique_id=technique_id,
-                world_day=save.world_day,
                 equipped=equipped,
             )
+            save_repo.touch_last_played(save)
+            session.commit()
+            return result
+
+    def learn_in_session(
+        self,
+        session: Session,
+        *,
+        save: Any,
+        player: Any,
+        technique_id: str,
+        equipped: bool = True,
+        append_event: bool = True,
+    ) -> dict[str, Any]:
+        """Learn a technique inside an open session (caller commits).
+
+        Used by NPC interaction rewards so teaching stays in one transaction.
+        """
+
+        save_repo = SaveRepository(session)
+        mastery_repo = TechniqueMasteryRepository(session)
+        technique = get_technique(technique_id)
+        allowed, reason = can_learn_technique(
+            technique,
+            realm_id=str(player.realm_id),
+        )
+        if not allowed:
+            raise EngineValidationError(reason or "Cannot learn technique")
+
+        existing = mastery_repo.get(save.id, player.actor_id, technique_id)
+        if existing is not None and existing.known:
+            raise EngineValidationError("Technique already known")
+
+        row = mastery_repo.upsert_learned(
+            save_id=save.id,
+            actor_id=str(player.actor_id),
+            technique_id=technique_id,
+            world_day=int(save.world_day),
+            equipped=equipped,
+        )
+        if append_event:
             save_repo.append_event(
                 save.id,
                 event_type=EVENT_TYPE_TECHNIQUE_LEARNED,
                 payload={
                     "technique_id": technique_id,
-                    "actor_id": save.player.actor_id,
+                    "actor_id": str(player.actor_id),
                     "equipped": bool(row.equipped),
                     "mastery_rank": row.mastery_rank,
-                    "world_day": save.world_day,
+                    "world_day": int(save.world_day),
+                    "source": "technique_service",
                 },
             )
-            save_repo.touch_last_played(save)
-            session.commit()
-            return {
-                "technique_id": technique_id,
-                "display_name": technique.display_name,
-                "known": True,
-                "equipped": bool(row.equipped),
-                "mastery_rank": row.mastery_rank,
-            }
+        return {
+            "technique_id": technique_id,
+            "display_name": technique.display_name,
+            "known": True,
+            "equipped": bool(row.equipped),
+            "mastery_rank": row.mastery_rank,
+        }

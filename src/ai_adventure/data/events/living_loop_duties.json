@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "evt_duty_elder_notice",
+      "category": "npc_encounter",
+      "label": "Elder Notice",
+      "enabled": true,
+      "weight": 6,
+      "cooldown_days": 5,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_duty"],
+        "chance": 0.35
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "flags_all": ["path_confirmed"],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["verdant_gate"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["sect"]
+      },
+      "effects": [
+        {
+          "type": "set_flag",
+          "payload": { "flag": "elder_noticed_diligence", "value": true }
+        },
+        {
+          "type": "emit_log",
+          "payload": { "note": "An elder noticed diligent outer work." }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "A Foundation Hall attendant pauses as you finish. 'Elder Yun keeps quiet ledgers,' they murmur. 'She notices those who do not shirk.'",
+        "narration_keys": ["duty_elder_notice"]
+      },
+      "ai_prompt_key": "evt_duty_elder_notice"
+    },
+    {
+      "id": "evt_duty_shirker",
+      "category": "npc_encounter",
+      "label": "Shirking Disciple",
+      "enabled": true,
+      "weight": 5,
+      "cooldown_days": 4,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_duty"],
+        "chance": 0.25
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["verdant_gate"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["sect"]
+      },
+      "effects": [
+        {
+          "type": "modify_money",
+          "payload": { "copper_delta": 3 }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "Another outer disciple slips away from unfinished work. You finish what they left; a few copper find your hand as quiet apology—or bribe.",
+        "narration_keys": ["duty_shirker"]
+      },
+      "ai_prompt_key": "evt_duty_shirker"
+    },
+    {
+      "id": "evt_herb_unusual_bloom",
+      "category": "discovery",
+      "label": "Unusual Herb Bloom",
+      "enabled": true,
+      "weight": 7,
+      "cooldown_days": 6,
+      "max_fires_per_save": 2,
+      "trigger": {
+        "kinds": ["after_explore", "after_duty"],
+        "chance": 0.3
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "location_ids": ["verdant_gate_herb_garden", "verdant_gate_misty_grove"],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["herbs"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["garden"]
+      },
+      "effects": [
+        {
+          "type": "grant_item",
+          "payload": {
+            "item_code": "unusual_herb_bloom",
+            "display_name": "Unusual Herb Bloom",
+            "quantity": 1
+          }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "Among ordinary stems, one bloom carries a faint spiritual sheen. You cut it carefully—worth more than scraps.",
+        "narration_keys": ["unusual_herb_bloom"]
+      },
+      "ai_prompt_key": "evt_herb_unusual_bloom"
+    },
+    {
+      "id": "evt_rumor_misty_grove",
+      "category": "discovery",
+      "label": "Rumor of Misty Grove",
+      "enabled": true,
+      "weight": 8,
+      "cooldown_days": 10,
+      "max_fires_per_save": 1,
+      "trigger": {
+        "kinds": ["after_explore", "after_duty"],
+        "chance": 0.4
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "location_ids": ["verdant_gate_herb_garden"],
+        "flags_none": ["unlocked_verdant_gate_misty_grove"],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["herbs"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": [],
+        "environment_tags": ["garden"]
+      },
+      "effects": [
+        {
+          "type": "set_flag",
+          "payload": { "flag": "heard_misty_grove_rumor", "value": true }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "A gardener whispers that beyond the fence, mist hides a grove of richer herbs—opened only when Steward Qian trusts your hands.",
+        "narration_keys": ["rumor_misty_grove"]
+      },
+      "ai_prompt_key": "evt_rumor_misty_grove"
+    },
+    {
+      "id": "evt_misty_grove_inspect_cache",
+      "category": "discovery",
+      "label": "Misty Grove Cache",
+      "enabled": true,
+      "weight": 10,
+      "cooldown_days": 3,
+      "max_fires_per_save": 3,
+      "trigger": {
+        "kinds": ["after_inspect", "after_explore"],
+        "chance": 0.55
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless"],
+        "location_ids": ["verdant_gate_misty_grove"],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["hidden"],
+        "weather_tags": ["mist"],
+        "time_tags": [],
+        "cultivation_tags": ["quiet_qi"],
+        "npc_tags": [],
+        "environment_tags": ["mist"]
+      },
+      "effects": [
+        {
+          "type": "grant_item",
+          "payload": {
+            "item_code": "mist_veiled_root",
+            "display_name": "Mist-Veiled Root",
+            "quantity": 1
+          }
+        },
+        {
+          "type": "modify_money",
+          "payload": { "copper_delta": 5 }
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "In the mist you find a pale root tucked beneath moss—cool to the touch, faintly qi-rich. A few copper coins lie beside it, as if left by a prior gatherer.",
+        "narration_keys": ["misty_grove_cache"]
+      },
+      "ai_prompt_key": "evt_misty_grove_inspect_cache"
+    }
+  ]
+}

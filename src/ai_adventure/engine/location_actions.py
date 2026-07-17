@@ -8,12 +8,12 @@ Only actions marked ``implemented`` may be executed via LocationService.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from ai_adventure.engine.constants import EVENT_TYPE_LOCATION_ACTION
 from ai_adventure.engine.errors import EngineValidationError
@@ -32,6 +32,72 @@ class ActionPresentation(BaseModel):
     placeholder_summary: str = Field(min_length=1)
 
 
+class LocationActionRequirements(BaseModel):
+    """Allowlisted player gates for an authored location action."""
+
+    flags_all: list[str] = Field(default_factory=list)
+    flags_none: list[str] = Field(default_factory=list)
+    required_sect_id: str | None = None
+    min_sect_standing: int | None = None
+    min_realm_order: int | None = Field(default=None, ge=1)
+    required_location_ids: list[str] = Field(default_factory=list)
+
+    model_config = {"extra": "forbid"}
+
+
+class LocationActionReward(BaseModel):
+    """One allowlisted mutation produced by a location action."""
+
+    type: str = Field(min_length=1)
+    delta: int | None = None
+    copper_delta: int | None = None
+    item_code: str | None = None
+    quantity: int | None = Field(default=None, ge=1)
+    display_name: str | None = None
+    flag: str | None = None
+    value: bool | None = None
+    location_id: str | None = None
+    trigger_kind: str | None = None
+    npc_id: str | None = None
+
+    @field_validator("type")
+    @classmethod
+    def _known_type(cls, value: str) -> str:
+        allowed = {
+            "adjust_sect_standing",
+            "modify_money",
+            "grant_money",
+            "grant_item",
+            "set_flag",
+            "unlock_location",
+            "emit_trigger",
+            "adjust_relationship",
+        }
+        if value not in allowed:
+            raise ValueError(f"unknown location action reward type: {value!r}")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_payload(self) -> LocationActionReward:
+        if self.type == "adjust_sect_standing" and self.delta is None:
+            raise ValueError("adjust_sect_standing requires delta")
+        if self.type in {"modify_money", "grant_money"} and (
+            self.copper_delta is None and self.delta is None
+        ):
+            raise ValueError(f"{self.type} requires copper_delta")
+        if self.type == "grant_item" and (not self.item_code or self.quantity is None):
+            raise ValueError("grant_item requires item_code and quantity")
+        if self.type == "set_flag" and not self.flag:
+            raise ValueError("set_flag requires flag")
+        if self.type == "unlock_location" and not self.location_id:
+            raise ValueError("unlock_location requires location_id")
+        if self.type == "emit_trigger" and not self.trigger_kind:
+            raise ValueError("emit_trigger requires trigger_kind")
+        if self.type == "adjust_relationship" and (not self.npc_id or self.delta is None):
+            raise ValueError("adjust_relationship requires npc_id and delta")
+        return self
+
+
 class LocationActionDefinition(BaseModel):
     """One global location action template."""
 
@@ -41,7 +107,10 @@ class LocationActionDefinition(BaseModel):
     enabled: bool = True
     implemented: bool = False
     duration_days: int = Field(default=0, ge=0)
-    requirements: dict[str, Any] = Field(default_factory=dict)
+    requirements: LocationActionRequirements = Field(default_factory=LocationActionRequirements)
+    rewards: list[LocationActionReward] = Field(default_factory=list)
+    supports_facets: list[str] = Field(default_factory=list)
+    background_money_bonus: dict[str, int] = Field(default_factory=dict)
     required_realm: str | None = None
     required_technique_ids: list[str] = Field(default_factory=list)
     required_items: list[str] = Field(default_factory=list)
@@ -107,6 +176,20 @@ class LocationActionPlan:
     world_day_before: int
     world_day_after: int
     summary: str
+    planned_rewards: tuple[LocationActionReward, ...] = ()
+    background_money_bonus: dict[str, int] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class LocationActionPlayerContext:
+    """Player facts used by the pure location-action planner."""
+
+    sect_id: str | None
+    sect_standing: int | None
+    story_flags: dict[str, bool]
+    realm_order: int
+    background_id: str
+    money_copper: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -213,11 +296,41 @@ def list_available_location_actions(
     return offered
 
 
+def _validate_requirements(
+    *,
+    action: LocationActionDefinition,
+    location_id: str,
+    player: LocationActionPlayerContext | None = None,
+) -> None:
+    """Raise a clear error when an allowlisted action gate is unmet."""
+
+    req = action.requirements
+    if req.required_location_ids and location_id not in req.required_location_ids:
+        raise EngineValidationError(f"{action.label} is not permitted at this location.")
+    if req.required_sect_id is not None and player.sect_id != req.required_sect_id:
+        raise EngineValidationError(f"You must belong to {req.required_sect_id}.")
+    if req.min_sect_standing is not None:
+        standing = 0 if player.sect_standing is None else int(player.sect_standing)
+        if standing < req.min_sect_standing:
+            raise EngineValidationError(
+                f"Sect standing {standing} is below the requirement {req.min_sect_standing}."
+            )
+    if req.min_realm_order is not None and player.realm_order < int(req.min_realm_order):
+        raise EngineValidationError("Your realm is too low for this action.")
+    for flag in req.flags_all:
+        if not player.story_flags.get(flag, False):
+            raise EngineValidationError("A required progress flag is missing.")
+    for flag in req.flags_none:
+        if player.story_flags.get(flag, False):
+            raise EngineValidationError("This action has already been completed.")
+
+
 def plan_location_action(
     *,
     location_id: str,
     action_id: str,
     world_day: int,
+    player: LocationActionPlayerContext | None = None,
     catalog: LocationActionCatalog | None = None,
 ) -> LocationActionResolution:
     """Validate a location action without persistence."""
@@ -225,6 +338,14 @@ def plan_location_action(
     current_world_day(world_day)
     location = get_location(location_id)
     action = get_location_action(action_id, catalog=catalog)
+    player_context = player or LocationActionPlayerContext(
+        sect_id=None,
+        sect_standing=None,
+        story_flags={},
+        realm_order=1,
+        background_id="",
+        money_copper=0,
+    )
 
     if action_id not in location.actions:
         return LocationActionResolution(
@@ -248,12 +369,13 @@ def plan_location_action(
             blocked_reason="not_implemented",
         )
 
-    # Reserved gates: fail closed if content authors fill them early.
-    if action.requirements:
+    try:
+        _validate_requirements(action=action, location_id=location_id, player=player_context)
+    except EngineValidationError as exc:
         return LocationActionResolution(
             outcome_type="blocked",
             plan=None,
-            summary="Action requirements are not satisfied.",
+            summary=str(exc),
             blocked_reason="requirements_unmet",
         )
     if action.required_realm is not None:
@@ -287,6 +409,8 @@ def plan_location_action(
         world_day_before=world_day,
         world_day_after=world_day_after,
         summary=action.presentation.placeholder_summary,
+        planned_rewards=tuple(action.rewards),
+        background_money_bonus=dict(action.background_money_bonus),
     )
     return LocationActionResolution(
         outcome_type="success",

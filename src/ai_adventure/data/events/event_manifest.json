@@ -5,6 +5,8 @@
     "environment_ambient.json",
     "encounters_and_discoveries.json",
     "exploration_stub.json",
-    "location_actions.json"
+    "location_actions.json",
+    "npc_interactions.json",
+    "living_loop_duties.json"
   ]
 }

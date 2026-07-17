@@ -72,7 +72,7 @@ def test_duplicate_npc_id_fails_validation(tmp_path: Path) -> None:
     )
     (packs / "sects.json").write_text(
         '{"schema_version":1,"sects":[{"sect_id":"sect_a","display_name":"A",'
-        '"home_location_id":"loc_a","description":"d",'
+        '"home_location_id":"loc_a","description":"d","initial_standing":0,'
         '"ranks":[{"rank_id":"r1","display_name":"R","order":0}]}]}',
         encoding="utf-8",
     )
@@ -228,7 +228,7 @@ def test_migration_0012_creates_npc_world_state(
 
     with create_engine(url, future=True).connect() as conn:
         version = conn.execute(text("SELECT version_num FROM alembic_version")).fetchone()
-        assert version == ("0012_npc_world_state",)
+        assert version == ("0013_sect_standing",)
         tables = {
             row[0]
             for row in conn.execute(

@@ -4,7 +4,7 @@
 
 Defines the **location substrate**: modular world content packs, authoritative location catalog, and per-save presence (mutable visit/discovery state), plus travel and location actions.
 
-**Status:** Phase 5a–5c implemented (catalog, packs, presence, travel, **location actions**). Modifier Framework **6a–6c** shipped; **6d** Event Selection Bias. Reserved `event_weight_modifiers` fields must **not** become a parallel bias path — future location auras emit generic Modifier Framework types (`weight_mult` / `chance_flat`).
+**Status:** Phase 5a–5c implemented (catalog, packs, presence, travel, **location actions**). Phase 11b adds allowlisted requirements and rewards to authored location actions. Modifier Framework **6a–6c** shipped; **6d** Event Selection Bias. Reserved `event_weight_modifiers` fields must **not** become a parallel bias path — future location auras emit generic Modifier Framework types (`weight_mult` / `chance_flat`).
 
 Related: [WORLD_MODEL.md](WORLD_MODEL.md), [WORLD_GENERATION.md](WORLD_GENERATION.md), [EVENT_ENGINE.md](EVENT_ENGINE.md), [MODIFIER_FRAMEWORK.md](MODIFIER_FRAMEWORK.md), [DATABASE.md](DATABASE.md), [DECISIONS.md](DECISIONS.md), [ARCHITECTURE.md](ARCHITECTURE.md).
 
@@ -178,6 +178,12 @@ Travel remains independent (`LocationService.travel` / story relocate). Cultivat
 ### Action reserved metadata
 
 requirements, required_realm, required_technique_ids, required_items, required_reputation, cooldown_days, duration_days, stamina_cost, resource_costs, event_weight_modifiers.
+
+### Phase 11b requirements and rewards
+
+Allowlisted action requirements are `flags_all`, `flags_none`, `required_sect_id`, `min_sect_standing`, `min_realm_order`, and `required_location_ids`; unknown keys fail catalog validation. Rewards may adjust sect standing or money, grant items, set flags, unlock/discover locations, emit triggers, or adjust an NPC relationship. `supports_facets` is presentation metadata, while `background_money_bonus` augments an authored money reward for a matching background.
+
+Hidden travel edges are included and usable only when all `unlock_requirements.flags_all` story flags are true. Hidden edges with no such requirements remain blocked.
 
 ---
 

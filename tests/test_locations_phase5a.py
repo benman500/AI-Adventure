@@ -219,7 +219,7 @@ def test_migration_0008_creates_location_presence(tmp_path: Path, monkeypatch) -
 
     with create_engine(url, future=True).connect() as conn:
         version = conn.execute(text("SELECT version_num FROM alembic_version")).fetchone()
-        assert version == ("0012_npc_world_state",)
+        assert version == ("0013_sect_standing",)
         tables = {
             row[0]
             for row in conn.execute(text("SELECT name FROM sqlite_master WHERE type='table'"))

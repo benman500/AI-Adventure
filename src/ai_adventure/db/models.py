@@ -55,6 +55,7 @@ class GameSave(EntityMixin, Base):
         back_populates="save",
         uselist=False,
     )
+    sect_standing: Mapped[list["SectStanding"]] = relationship(back_populates="save")
     npc_records: Mapped[list["NpcRecord"]] = relationship(back_populates="save")
     npc_world_state: Mapped[list["NpcWorldState"]] = relationship(back_populates="save")
 
@@ -299,6 +300,27 @@ class SectMembership(EntityMixin, Base):
     joined_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     save: Mapped[GameSave] = relationship(back_populates="sect_membership")
+
+
+class SectStanding(EntityMixin, Base):
+    """Institutional standing between a save's player and one catalog sect."""
+
+    __tablename__ = "sect_standing"
+    __table_args__ = (
+        UniqueConstraint("save_id", "sect_id", name="uq_sect_standing_save_sect"),
+    )
+
+    save_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("game_saves.id"),
+        nullable=False,
+        index=True,
+    )
+    sect_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    standing_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    updated_world_day: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    save: Mapped[GameSave] = relationship(back_populates="sect_standing")
 
 
 class NpcRecord(EntityMixin, Base):

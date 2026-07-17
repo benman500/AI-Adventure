@@ -72,7 +72,7 @@ def test_migration_0003_is_idempotent_when_schema_already_present(tmp_path: Path
 
     with sqlite3.connect(db_path) as conn:
         version = conn.execute("SELECT version_num FROM alembic_version").fetchone()
-        assert version == ("0012_npc_world_state",)
+        assert version == ("0013_sect_standing",)
         save_cols = {row[1] for row in conn.execute("PRAGMA table_info(game_saves)")}
         assert "world_day" in save_cols
         player_cols = {row[1] for row in conn.execute("PRAGMA table_info(players)")}

@@ -1,12 +1,14 @@
-"""Sect catalog (Phase 9a) — pack-local authored factions.
+"""Sect catalog + membership / standing rules (Phase 9a / 9d).
 
-Player membership remains on ``sect_membership``. This module is catalog
-authority for sect identity and rank ladders; NPC ``sect_id`` refs validate here.
+Catalog authority for sect identity, ranks, and authored standing parameters.
+Player membership persists on ``sect_membership``; institutional standing on
+``sect_standing``. NPC ``sect_id`` refs validate here.
 """
 
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
@@ -21,6 +23,9 @@ from ai_adventure.engine.locations import (
     _WORLD_MANIFEST_PATH,
     load_location_catalog,
 )
+
+STANDING_SCORE_MIN = -100
+STANDING_SCORE_MAX = 100
 
 
 class SectRankDefinition(BaseModel):
@@ -39,6 +44,12 @@ class SectDefinition(BaseModel):
     home_location_id: str = Field(min_length=1)
     description: str = Field(min_length=1)
     ranks: list[SectRankDefinition] = Field(min_length=1)
+    initial_standing: int = Field(ge=STANDING_SCORE_MIN, le=STANDING_SCORE_MAX)
+    min_standing_to_join: int = Field(
+        default=0,
+        ge=STANDING_SCORE_MIN,
+        le=STANDING_SCORE_MAX,
+    )
     pack_id: str = Field(default="", min_length=0)
 
     @field_validator("ranks")
@@ -48,6 +59,12 @@ class SectDefinition(BaseModel):
         if len(ids) != len(set(ids)):
             raise ValueError("duplicate rank_id values")
         return value
+
+    @property
+    def ranks_by_id(self) -> dict[str, SectRankDefinition]:
+        """Index ranks by stable id."""
+
+        return {item.rank_id: item for item in self.ranks}
 
 
 class SectFile(BaseModel):
@@ -68,6 +85,17 @@ class SectCatalog(BaseModel):
         """Index sects by stable id."""
 
         return {item.sect_id: item for item in self.sects}
+
+
+@dataclass(frozen=True, slots=True)
+class SectJoinPlan:
+    """Pure result of validating a player sect join."""
+
+    sect_id: str
+    rank_id: str
+    standing_score: int
+    seeded_standing: bool
+    is_rank_change: bool
 
 
 def clear_sect_catalog_cache() -> None:
@@ -116,6 +144,100 @@ def get_sect(sect_id: str, *, catalog: SectCatalog | None = None) -> SectDefinit
     return sect
 
 
+def clamp_standing_score(score: int) -> int:
+    """Clamp institutional standing into the allowed band."""
+
+    return max(STANDING_SCORE_MIN, min(STANDING_SCORE_MAX, int(score)))
+
+
+def apply_standing_delta(*, current: int, delta: int) -> int:
+    """Apply an authored standing delta and clamp."""
+
+    return clamp_standing_score(int(current) + int(delta))
+
+
+def required_standing_for_npc_action(
+    *,
+    action_min_sect_standing: int | None,
+    min_sect_standing_by_role: dict[str, int],
+    npc_role_tags: list[str],
+) -> int | None:
+    """Resolve the highest authored standing floor for this NPC/action pair."""
+
+    floors: list[int] = []
+    if action_min_sect_standing is not None:
+        floors.append(int(action_min_sect_standing))
+    for tag in npc_role_tags:
+        if tag in min_sect_standing_by_role:
+            floors.append(int(min_sect_standing_by_role[tag]))
+    if not floors:
+        return None
+    return max(floors)
+
+
+def plan_sect_join(
+    *,
+    sect_id: str,
+    rank_id: str,
+    current_membership_sect_id: str | None,
+    current_membership_rank_id: str | None,
+    current_standing: int | None,
+    waive_standing_gate: bool = False,
+    catalog: SectCatalog | None = None,
+) -> SectJoinPlan:
+    """Validate join eligibility and compute standing seed / preservation.
+
+    First affiliation for a save always seeds catalog ``initial_standing``
+    (authored probation / recruit value). Later rank changes on the same sect
+    preserve existing standing.
+    """
+
+    sect = get_sect(sect_id, catalog=catalog)
+    if rank_id not in sect.ranks_by_id:
+        raise EngineValidationError(
+            f"Unknown rank {rank_id!r} for sect {sect_id!r}"
+        )
+
+    if (
+        current_membership_sect_id is not None
+        and current_membership_sect_id != sect_id
+    ):
+        raise EngineValidationError(
+            f"Already a member of {current_membership_sect_id!r}; "
+            "multi-sect membership is not supported"
+        )
+
+    is_first_membership = current_membership_sect_id is None
+    if is_first_membership:
+        standing_value = clamp_standing_score(int(sect.initial_standing))
+        seeded = True
+    elif current_standing is not None:
+        standing_value = clamp_standing_score(int(current_standing))
+        seeded = False
+    else:
+        standing_value = clamp_standing_score(int(sect.initial_standing))
+        seeded = True
+
+    if not waive_standing_gate and standing_value < int(sect.min_standing_to_join):
+        raise EngineValidationError(
+            f"Standing {standing_value} is below join requirement "
+            f"{sect.min_standing_to_join} for {sect_id!r}"
+        )
+
+    is_rank_change = (
+        current_membership_sect_id == sect_id
+        and current_membership_rank_id is not None
+        and current_membership_rank_id != rank_id
+    )
+    return SectJoinPlan(
+        sect_id=sect.sect_id,
+        rank_id=rank_id,
+        standing_score=standing_value,
+        seeded_standing=seeded,
+        is_rank_change=is_rank_change,
+    )
+
+
 def _load_sect_catalog_unchecked(root: Path) -> tuple[SectCatalog, list[str]]:
     errors: list[str] = []
     manifest_path = root / "world_manifest.json" if root != _WORLD_DIR else _WORLD_MANIFEST_PATH
@@ -131,7 +253,7 @@ def _load_sect_catalog_unchecked(root: Path) -> tuple[SectCatalog, list[str]]:
     locations = load_location_catalog(str(root) if root != _WORLD_DIR else None)
 
     merged: list[SectDefinition] = []
-    seen_ids: set[str] = set()
+    seen_set: set[str] = set()
     loaded_packs: list[str] = []
 
     for pack_id in world.packs:
@@ -169,10 +291,10 @@ def _load_sect_catalog_unchecked(root: Path) -> tuple[SectCatalog, list[str]]:
             continue
 
         for sect in sect_file.sects:
-            if sect.sect_id in seen_ids:
+            if sect.sect_id in seen_set:
                 errors.append(f"duplicate sect_id {sect.sect_id!r}")
                 continue
-            seen_ids.add(sect.sect_id)
+            seen_set.add(sect.sect_id)
             if sect.home_location_id not in locations.by_id:
                 errors.append(
                     f"sect {sect.sect_id!r}: unknown home_location_id {sect.home_location_id!r}"
@@ -184,13 +306,20 @@ def _load_sect_catalog_unchecked(root: Path) -> tuple[SectCatalog, list[str]]:
 
 
 __all__ = [
+    "STANDING_SCORE_MAX",
+    "STANDING_SCORE_MIN",
     "SectCatalog",
     "SectDefinition",
     "SectFile",
+    "SectJoinPlan",
     "SectRankDefinition",
+    "apply_standing_delta",
     "assert_sect_catalog_valid",
+    "clamp_standing_score",
     "clear_sect_catalog_cache",
     "get_sect",
     "load_sect_catalog",
+    "plan_sect_join",
+    "required_standing_for_npc_action",
     "validate_sect_catalog",
 ]

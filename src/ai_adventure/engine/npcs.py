@@ -1,7 +1,7 @@
-"""NPC catalog + interaction rules (Phase 9a–9b).
+"""NPC catalog + interaction rules (Phase 9a–9c).
 
 Catalogs define identity. Saves store mutable ``npc_world_state`` only.
-Story spawns by ``npc_id``. Consumers of presentation read catalog names.
+Story spawns by ``npc_id``. Interactions are data-driven and deterministic.
 """
 
 from __future__ import annotations
@@ -16,7 +16,6 @@ from pydantic import BaseModel, Field, field_validator
 
 from ai_adventure.engine.errors import EngineValidationError
 from ai_adventure.engine.locations import (
-    LocationCatalog,
     WorldManifest,
     WorldPackManifest,
     _WORLD_DIR,
@@ -24,13 +23,20 @@ from ai_adventure.engine.locations import (
     _WORLD_MANIFEST_PATH,
     load_location_catalog,
 )
-from ai_adventure.engine.sects import SectCatalog, load_sect_catalog
+from ai_adventure.engine.sects import (
+    apply_standing_delta,
+    load_sect_catalog,
+    required_standing_for_npc_action,
+)
 
 NpcStatus = Literal["active", "dead", "absent"]
 
 RELATIONSHIP_SCORE_MIN = -100
 RELATIONSHIP_SCORE_MAX = 100
+# Compatibility alias — authoritative deltas live in npc_action_catalog.json rewards.
 GREET_RELATIONSHIP_DELTA = 5
+
+_NPC_ACTION_CATALOG_PATH = _WORLD_DIR / "npc_action_catalog.json"
 
 KNOWN_NPC_ROLE_TAGS: frozenset[str] = frozenset(
     {
@@ -45,7 +51,37 @@ KNOWN_NPC_ROLE_TAGS: frozenset[str] = frozenset(
         "foundation_elder",
         "sect_examiner",
         "sect_instructor",
+        "herb_steward",
     }
+)
+
+# Implemented reward types only — catalogs may not use reserved types yet.
+IMPLEMENTED_NPC_REWARD_TYPES: frozenset[str] = frozenset(
+    {
+        "adjust_relationship",
+        "adjust_sect_standing",
+        "learn_technique",
+        "set_flag",
+        "grant_item",
+        "emit_trigger",
+        "unlock_location",
+    }
+)
+
+# Extension points: reject if authored until a later phase wires them.
+RESERVED_NPC_REWARD_TYPES: frozenset[str] = frozenset(
+    {
+        "unlock_dialogue",
+        "start_story",
+        "grant_reputation",
+        "modify_modifier_source",
+        "begin_mission",
+    }
+)
+
+# Legacy alias — action ids are catalog-driven; this set is informational only.
+KNOWN_NPC_ACTION_IDS: frozenset[str] = frozenset(
+    {"inspect", "greet", "ask_guidance", "request_instruction"}
 )
 
 
@@ -120,23 +156,266 @@ class NpcWorldStateRecord:
     last_interaction_world_day: int | None
 
 
+class NpcInteractionRequirements(BaseModel):
+    """Allowlisted gates for one authored NPC interaction."""
+
+    min_relationship: int | None = None
+    min_sect_standing: int | None = None
+    min_sect_standing_by_role: dict[str, int] = Field(default_factory=dict)
+    required_sect_id: str | None = None
+    required_sect_rank_ids: list[str] = Field(default_factory=list)
+    required_realm_ids: list[str] = Field(default_factory=list)
+    min_realm_order: int | None = Field(default=None, ge=1)
+    required_stage_ids: list[str] = Field(default_factory=list)
+    required_location_ids: list[str] = Field(default_factory=list)
+    flags_all: list[str] = Field(default_factory=list)
+    flags_none: list[str] = Field(default_factory=list)
+    required_role_tags_any: list[str] = Field(default_factory=list)
+    allowed_npc_ids: list[str] = Field(default_factory=list)
+
+
+class NpcInteractionReward(BaseModel):
+    """One allowlisted reward object from the interaction catalog."""
+
+    type: str = Field(min_length=1)
+    delta: int | None = None
+    technique_id: str | None = None
+    flag: str | None = None
+    value: bool | None = None
+    item_code: str | None = None
+    quantity: int | None = Field(default=None, ge=1)
+    trigger_kind: str | None = None
+    location_id: str | None = None
+
+    @field_validator("type")
+    @classmethod
+    def _known_reward_type(cls, value: str) -> str:
+        cleaned = value.strip()
+        if cleaned in RESERVED_NPC_REWARD_TYPES:
+            raise ValueError(
+                f"reward type {cleaned!r} is reserved and not implemented yet"
+            )
+        if cleaned not in IMPLEMENTED_NPC_REWARD_TYPES:
+            raise ValueError(f"unknown NPC reward type: {cleaned!r}")
+        return cleaned
+
+
+class NpcActionDefinition(BaseModel):
+    """One authored NPC interaction in the permanent interaction catalog."""
+
+    id: str = Field(min_length=1)
+    label: str = Field(min_length=1)
+    description: str = ""
+    duration_days: int = Field(default=0, ge=0)
+    marks_met: bool = True
+    requirements: NpcInteractionRequirements = Field(
+        default_factory=NpcInteractionRequirements
+    )
+    rewards: list[NpcInteractionReward] = Field(default_factory=list)
+    presentation_template: str = Field(min_length=1)
+
+    @field_validator("id")
+    @classmethod
+    def _non_empty_id(cls, value: str) -> str:
+        cleaned = value.strip()
+        if not cleaned:
+            raise ValueError("action id must be non-empty")
+        if not cleaned.replace("_", "").isalnum():
+            raise ValueError(f"invalid action id: {cleaned!r}")
+        return cleaned
+
+
+class NpcActionCatalog(BaseModel):
+    """Global authored NPC interaction catalog."""
+
+    schema_version: int = Field(ge=1)
+    actions: list[NpcActionDefinition] = Field(min_length=1)
+
+    @field_validator("actions")
+    @classmethod
+    def _unique_ids(cls, value: list[NpcActionDefinition]) -> list[NpcActionDefinition]:
+        ids = [item.id for item in value]
+        if len(ids) != len(set(ids)):
+            raise ValueError("duplicate NPC action ids")
+        return value
+
+    @property
+    def by_id(self) -> dict[str, NpcActionDefinition]:
+        """Index actions by id."""
+
+        return {item.id: item for item in self.actions}
+
+
+@dataclass(frozen=True, slots=True)
+class NpcInteractionPlayerContext:
+    """Player-side facts needed to validate interaction requirements."""
+
+    location_id: str
+    realm_id: str
+    stage_id: str
+    sect_id: str | None
+    sect_rank_id: str | None
+    sect_standing: int | None
+    story_flags: dict[str, bool]
+
+
+@dataclass(frozen=True, slots=True)
+class PlannedNpcReward:
+    """Validated reward ready for service-layer application."""
+
+    type: str
+    delta: int | None = None
+    technique_id: str | None = None
+    flag: str | None = None
+    value: bool | None = None
+    item_code: str | None = None
+    quantity: int | None = None
+    trigger_kind: str | None = None
+    location_id: str | None = None
+
+
 @dataclass(frozen=True, slots=True)
 class NpcInteractionResolution:
-    """Pure result of one NPC interaction."""
+    """Pure result of one NPC interaction plan."""
 
     npc_id: str
     action_id: str
     relationship_before: int
     relationship_after: int
     met: bool
+    duration_days: int
+    trigger_kind: str | None
     summary: str
     presentation_text: str
+    sect_id: str | None = None
+    sect_standing_before: int | None = None
+    sect_standing_after: int | None = None
+    sect_standing_delta: int = 0
+    planned_rewards: tuple[PlannedNpcReward, ...] = ()
+    flag_updates: tuple[tuple[str, bool], ...] = ()
+    technique_ids_to_learn: tuple[str, ...] = ()
+    items_to_grant: tuple[tuple[str, int], ...] = ()
+    location_ids_to_unlock: tuple[str, ...] = ()
+
+
+def clear_npc_action_catalog_cache() -> None:
+    """Drop cached NPC action catalog (tests)."""
+
+    load_npc_action_catalog.cache_clear()
+
+
+@lru_cache(maxsize=1)
+def load_npc_action_catalog(path: str | None = None) -> NpcActionCatalog:
+    """Load and cross-validate the NPC interaction catalog."""
+
+    catalog_path = Path(path) if path else _NPC_ACTION_CATALOG_PATH
+    if not catalog_path.is_file():
+        raise EngineValidationError(f"NPC action catalog missing: {catalog_path}")
+    try:
+        raw = json.loads(catalog_path.read_text(encoding="utf-8"))
+        catalog = NpcActionCatalog.model_validate(raw)
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise EngineValidationError(f"Invalid NPC action catalog: {exc}") from exc
+    errors = validate_npc_action_catalog(catalog)
+    if errors:
+        raise EngineValidationError("Invalid NPC action catalog: " + "; ".join(errors))
+    return catalog
+
+
+def validate_npc_action_catalog(
+    catalog: NpcActionCatalog | None = None,
+) -> list[str]:
+    """Return catalog validation errors (empty if ok)."""
+
+    cat = catalog if catalog is not None else None
+    if cat is None:
+        try:
+            path = _NPC_ACTION_CATALOG_PATH
+            raw = json.loads(path.read_text(encoding="utf-8"))
+            cat = NpcActionCatalog.model_validate(raw)
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
+            return [str(exc)]
+
+    errors: list[str] = []
+    from ai_adventure.engine.techniques import list_techniques
+
+    technique_ids = {tech.id for tech in list_techniques()}
+    for action in cat.actions:
+        for reward in action.rewards:
+            if reward.type == "learn_technique":
+                if not reward.technique_id:
+                    errors.append(f"{action.id}: learn_technique missing technique_id")
+                elif reward.technique_id not in technique_ids:
+                    errors.append(
+                        f"{action.id}: unknown technique_id {reward.technique_id!r}"
+                    )
+            if reward.type == "adjust_relationship" and reward.delta is None:
+                errors.append(f"{action.id}: adjust_relationship missing delta")
+            if reward.type == "adjust_sect_standing" and reward.delta is None:
+                errors.append(f"{action.id}: adjust_sect_standing missing delta")
+            if reward.type == "set_flag" and not reward.flag:
+                errors.append(f"{action.id}: set_flag missing flag")
+            if reward.type == "grant_item":
+                if not reward.item_code or reward.quantity is None:
+                    errors.append(f"{action.id}: grant_item needs item_code and quantity")
+            if reward.type == "emit_trigger" and not reward.trigger_kind:
+                errors.append(f"{action.id}: emit_trigger missing trigger_kind")
+            if reward.type == "unlock_location" and not reward.location_id:
+                errors.append(f"{action.id}: unlock_location missing location_id")
+    return errors
+
+
+def get_npc_action(action_id: str, *, catalog: NpcActionCatalog | None = None) -> NpcActionDefinition:
+    """Return one NPC action definition or raise."""
+
+    cat = catalog if catalog is not None else load_npc_action_catalog()
+    action = cat.by_id.get(action_id)
+    if action is None:
+        raise EngineValidationError(f"Unknown NPC action: {action_id!r}")
+    return action
+
+
+def list_npc_actions(*, catalog: NpcActionCatalog | None = None) -> list[NpcActionDefinition]:
+    """Return NPC actions in catalog order."""
+
+    cat = catalog if catalog is not None else load_npc_action_catalog()
+    return list(cat.actions)
+
+
+def action_offered_by_npc(
+    action: NpcActionDefinition,
+    definition: NpcDefinition,
+) -> bool:
+    """Return whether this NPC may offer the action (binding only, not full gates)."""
+
+    req = action.requirements
+    if req.allowed_npc_ids and definition.npc_id not in req.allowed_npc_ids:
+        return False
+    if req.required_role_tags_any:
+        if not set(definition.role_tags) & set(req.required_role_tags_any):
+            return False
+    return True
+
+
+def list_offered_actions_for_npc(
+    definition: NpcDefinition,
+    *,
+    catalog: NpcActionCatalog | None = None,
+) -> list[NpcActionDefinition]:
+    """Return catalog actions offered by this NPC (binding filter only)."""
+
+    return [
+        action
+        for action in list_npc_actions(catalog=catalog)
+        if action_offered_by_npc(action, definition)
+    ]
 
 
 def clear_npc_catalog_cache() -> None:
     """Drop cached NPC catalog (tests)."""
 
     load_npc_catalog.cache_clear()
+    clear_npc_action_catalog_cache()
 
 
 @lru_cache(maxsize=1)
@@ -167,6 +446,11 @@ def assert_npc_catalog_valid(world_dir: str | Path | None = None) -> None:
     errors = validate_npc_catalog(world_dir)
     if errors:
         raise EngineValidationError("Invalid NPC catalog: " + "; ".join(errors))
+    action_errors = validate_npc_action_catalog()
+    if action_errors:
+        raise EngineValidationError(
+            "Invalid NPC action catalog: " + "; ".join(action_errors)
+        )
 
 
 def get_npc(npc_id: str, *, catalog: NpcCatalog | None = None) -> NpcDefinition:
@@ -204,37 +488,259 @@ def resolve_npc_sect_id(
     return definition.sect_id
 
 
+def _validate_requirements(
+    *,
+    action: NpcActionDefinition,
+    definition: NpcDefinition,
+    state: NpcWorldStateRecord,
+    player: NpcInteractionPlayerContext,
+    npc_sect_id: str | None,
+) -> None:
+    """Raise with a clear message on the first unmet requirement."""
+
+    req = action.requirements
+    if not action_offered_by_npc(action, definition):
+        raise EngineValidationError(
+            f"{definition.display_name} does not offer {action.label}."
+        )
+
+    if req.required_location_ids and player.location_id not in req.required_location_ids:
+        raise EngineValidationError(
+            f"You must be at a valid location to {action.label.lower()}."
+        )
+
+    if req.required_sect_id is not None:
+        if player.sect_id != req.required_sect_id:
+            raise EngineValidationError(
+                f"You must be a member of {req.required_sect_id} to "
+                f"{action.label.lower()}."
+            )
+
+    if req.required_sect_rank_ids:
+        if player.sect_rank_id not in req.required_sect_rank_ids:
+            raise EngineValidationError(
+                f"Your sect rank does not permit {action.label.lower()}."
+            )
+
+    if req.required_realm_ids and player.realm_id not in req.required_realm_ids:
+        raise EngineValidationError(
+            f"Your realm does not permit {action.label.lower()}."
+        )
+
+    if req.min_realm_order is not None:
+        from ai_adventure.engine.realms import get_realm
+
+        if get_realm(player.realm_id).order_index < int(req.min_realm_order):
+            raise EngineValidationError(
+                f"Your realm is too low to {action.label.lower()}."
+            )
+
+    if req.required_stage_ids and player.stage_id not in req.required_stage_ids:
+        raise EngineValidationError(
+            f"Your stage does not permit {action.label.lower()}."
+        )
+
+    standing_value = 0 if player.sect_standing is None else int(player.sect_standing)
+    role_floor = required_standing_for_npc_action(
+        action_min_sect_standing=req.min_sect_standing,
+        min_sect_standing_by_role=dict(req.min_sect_standing_by_role),
+        npc_role_tags=list(definition.role_tags),
+    )
+    if role_floor is not None:
+        if npc_sect_id is None:
+            raise EngineValidationError(
+                f"{definition.display_name} has no sect standing to evaluate."
+            )
+        if standing_value < role_floor:
+            raise EngineValidationError(
+                f"Sect standing {standing_value} is below the requirement "
+                f"{role_floor} to {action.label.lower()} {definition.display_name}."
+            )
+
+    if req.min_relationship is not None:
+        if int(state.relationship_score) < int(req.min_relationship):
+            raise EngineValidationError(
+                f"Relationship {state.relationship_score} is below the requirement "
+                f"{req.min_relationship} to {action.label.lower()} "
+                f"{definition.display_name}."
+            )
+
+    flags = player.story_flags
+    for flag in req.flags_all:
+        if not flags.get(flag, False):
+            raise EngineValidationError(
+                f"Missing required progress flag to {action.label.lower()}."
+            )
+    for flag in req.flags_none:
+        if flags.get(flag, False):
+            raise EngineValidationError(
+                f"You have already done this with {definition.display_name}."
+            )
+
+
+def npc_action_eligible(
+    *,
+    action: NpcActionDefinition,
+    definition: NpcDefinition,
+    state: NpcWorldStateRecord,
+    player: NpcInteractionPlayerContext,
+    npc_sect_id: str | None,
+) -> bool:
+    """True when the action's requirements are met (no raise)."""
+
+    try:
+        _validate_requirements(
+            action=action,
+            definition=definition,
+            state=state,
+            player=player,
+            npc_sect_id=npc_sect_id,
+        )
+    except EngineValidationError:
+        return False
+    return True
+
+
+def plan_npc_interaction(
+    *,
+    definition: NpcDefinition,
+    state: NpcWorldStateRecord,
+    player: NpcInteractionPlayerContext,
+    action_id: str,
+    action_catalog: NpcActionCatalog | None = None,
+) -> NpcInteractionResolution:
+    """Pure NPC interaction plan: validate requirements and compute rewards."""
+
+    action = get_npc_action(action_id, catalog=action_catalog)
+    if state.status != "active":
+        raise EngineValidationError(f"NPC {definition.npc_id!r} is not active")
+    if not state.discovered:
+        raise EngineValidationError(f"NPC {definition.npc_id!r} has not been discovered")
+    if state.current_location_id != player.location_id:
+        raise EngineValidationError(
+            f"NPC {definition.display_name} is not at your current location"
+        )
+
+    npc_sect_id = resolve_npc_sect_id(definition, sect_id_override=state.sect_id_override)
+    _validate_requirements(
+        action=action,
+        definition=definition,
+        state=state,
+        player=player,
+        npc_sect_id=npc_sect_id,
+    )
+
+    relationship_before = int(state.relationship_score)
+    relationship_delta = 0
+    standing_delta = 0
+    planned: list[PlannedNpcReward] = []
+    flag_updates: list[tuple[str, bool]] = []
+    technique_ids: list[str] = []
+    items: list[tuple[str, int]] = []
+    unlock_location_ids: list[str] = []
+    trigger_kind: str | None = None
+
+    for reward in action.rewards:
+        planned.append(
+            PlannedNpcReward(
+                type=reward.type,
+                delta=reward.delta,
+                technique_id=reward.technique_id,
+                flag=reward.flag,
+                value=reward.value,
+                item_code=reward.item_code,
+                quantity=reward.quantity,
+                trigger_kind=reward.trigger_kind,
+                location_id=reward.location_id,
+            )
+        )
+        if reward.type == "adjust_relationship":
+            relationship_delta += int(reward.delta or 0)
+        elif reward.type == "adjust_sect_standing":
+            standing_delta += int(reward.delta or 0)
+        elif reward.type == "learn_technique" and reward.technique_id:
+            technique_ids.append(reward.technique_id)
+        elif reward.type == "set_flag" and reward.flag:
+            flag_updates.append((reward.flag, bool(True if reward.value is None else reward.value)))
+        elif reward.type == "grant_item" and reward.item_code and reward.quantity:
+            items.append((reward.item_code, int(reward.quantity)))
+        elif reward.type == "emit_trigger" and reward.trigger_kind:
+            trigger_kind = reward.trigger_kind
+        elif reward.type == "unlock_location" and reward.location_id:
+            unlock_location_ids.append(reward.location_id)
+
+    relationship_after = clamp_relationship_score(relationship_before + relationship_delta)
+
+    standing_before: int | None = None
+    standing_after: int | None = None
+    applies_standing = any(r.type == "adjust_sect_standing" for r in action.rewards)
+    if npc_sect_id is not None and applies_standing:
+        standing_before = 0 if player.sect_standing is None else int(player.sect_standing)
+        standing_after = apply_standing_delta(
+            current=standing_before,
+            delta=standing_delta,
+        )
+
+    met = bool(state.met) or bool(action.marks_met)
+    text = action.presentation_template.format(
+        display_name=definition.display_name,
+        description=definition.description,
+        realm_id=definition.cultivation_summary.realm_id,
+        stage_id=definition.cultivation_summary.stage_id,
+    )
+    return NpcInteractionResolution(
+        npc_id=definition.npc_id,
+        action_id=action.id,
+        relationship_before=relationship_before,
+        relationship_after=relationship_after,
+        met=met,
+        duration_days=int(action.duration_days),
+        trigger_kind=trigger_kind,
+        summary=f"{action.label}: {definition.display_name}.",
+        presentation_text=text,
+        sect_id=npc_sect_id,
+        sect_standing_before=standing_before,
+        sect_standing_after=standing_after,
+        sect_standing_delta=standing_delta,
+        planned_rewards=tuple(planned),
+        flag_updates=tuple(flag_updates),
+        technique_ids_to_learn=tuple(technique_ids),
+        items_to_grant=tuple(items),
+        location_ids_to_unlock=tuple(unlock_location_ids),
+    )
+
+
 def plan_greet(
     *,
     definition: NpcDefinition,
     state: NpcWorldStateRecord,
     player_location_id: str,
+    player: NpcInteractionPlayerContext | None = None,
 ) -> NpcInteractionResolution:
-    """Pure greet interaction: colocated active NPC → relationship delta."""
+    """Compatibility wrapper for the greet action."""
 
-    if state.status != "active":
-        raise EngineValidationError(f"NPC {definition.npc_id!r} is not active")
-    if not state.discovered:
-        raise EngineValidationError(f"NPC {definition.npc_id!r} has not been discovered")
-    if state.current_location_id != player_location_id:
-        raise EngineValidationError(
-            f"NPC {definition.display_name} is not at your current location"
-        )
-
-    before = int(state.relationship_score)
-    after = clamp_relationship_score(before + GREET_RELATIONSHIP_DELTA)
-    text = (
-        f"You greet {definition.display_name}. "
-        f"They acknowledge you with a measured nod."
+    ctx = player or NpcInteractionPlayerContext(
+        location_id=player_location_id,
+        realm_id="body_tempering",
+        stage_id="early",
+        sect_id=None,
+        sect_rank_id=None,
+        sect_standing=None,
+        story_flags={},
     )
-    return NpcInteractionResolution(
-        npc_id=definition.npc_id,
+    return plan_npc_interaction(
+        definition=definition,
+        state=state,
+        player=NpcInteractionPlayerContext(
+            location_id=player_location_id,
+            realm_id=ctx.realm_id,
+            stage_id=ctx.stage_id,
+            sect_id=ctx.sect_id,
+            sect_rank_id=ctx.sect_rank_id,
+            sect_standing=ctx.sect_standing,
+            story_flags=dict(ctx.story_flags),
+        ),
         action_id="greet",
-        relationship_before=before,
-        relationship_after=after,
-        met=True,
-        summary=f"Greeted {definition.display_name}.",
-        presentation_text=text,
     )
 
 
@@ -318,22 +824,40 @@ def _load_npc_catalog_unchecked(root: Path) -> tuple[NpcCatalog, list[str]]:
 __all__ = [
     "CultivationSummary",
     "GREET_RELATIONSHIP_DELTA",
+    "IMPLEMENTED_NPC_REWARD_TYPES",
+    "KNOWN_NPC_ACTION_IDS",
     "KNOWN_NPC_ROLE_TAGS",
+    "NpcActionCatalog",
+    "NpcActionDefinition",
     "NpcCatalog",
     "NpcDefinition",
     "NpcFile",
+    "NpcInteractionPlayerContext",
+    "NpcInteractionRequirements",
     "NpcInteractionResolution",
+    "NpcInteractionReward",
     "NpcStatus",
     "NpcWorldStateRecord",
+    "PlannedNpcReward",
     "RELATIONSHIP_SCORE_MAX",
     "RELATIONSHIP_SCORE_MIN",
+    "RESERVED_NPC_REWARD_TYPES",
+    "action_offered_by_npc",
     "assert_npc_catalog_valid",
     "clamp_relationship_score",
+    "clear_npc_action_catalog_cache",
     "clear_npc_catalog_cache",
     "get_npc",
+    "get_npc_action",
+    "list_npc_actions",
     "list_npcs",
+    "list_offered_actions_for_npc",
+    "load_npc_action_catalog",
     "load_npc_catalog",
+    "npc_action_eligible",
     "plan_greet",
+    "plan_npc_interaction",
     "resolve_npc_sect_id",
+    "validate_npc_action_catalog",
     "validate_npc_catalog",
 ]

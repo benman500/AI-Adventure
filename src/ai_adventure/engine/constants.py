@@ -83,6 +83,7 @@ EVENT_TYPE_TECHNIQUE_LEARNED = "technique_learned"
 EVENT_TYPE_SPIRITUAL_ROOT_AWAKENED = "spiritual_root_awakened"
 EVENT_TYPE_ALCHEMY_RECIPE_AWAKENED = "alchemy_recipe_awakened"
 EVENT_TYPE_NPC_INTERACTION = "npc_interaction"
+EVENT_TYPE_SECT_JOINED = "sect_joined"
 
 # Story flags.
 FLAG_LESSON_COMPLETE = "lesson_complete"
@@ -91,6 +92,9 @@ FLAG_ANOMALY_TRIGGERED = "anomaly_triggered"
 FLAG_INVESTIGATION_COMPLETE = "investigation_complete"
 FLAG_REVELATION_SEEN = "revelation_seen"
 FLAG_PATH_CONFIRMED = "path_confirmed"
+FLAG_TAUGHT_FOUNDATION_GUARD = "taught_foundation_guard_pei"
+FLAG_YUN_MEI_ACKNOWLEDGED_PATH = "yun_mei_acknowledged_path"
+FLAG_ELDER_RECOMMENDATION_YUN_MEI = "elder_recommendation_yun_mei"
 
 # Sect / content ids.
 SECT_VERDANT_GATE_ID = "sect_verdant_gate"

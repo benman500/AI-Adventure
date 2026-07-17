@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "evt_npc_quiet_counsel",
+      "category": "npc_encounter",
+      "label": "Quiet Counsel",
+      "enabled": true,
+      "weight": 10,
+      "cooldown_days": 3,
+      "max_fires_per_save": null,
+      "trigger": {
+        "kinds": ["after_npc_interact"],
+        "chance": 0.35
+      },
+      "requirements": {
+        "path_status_in": ["confirmed_ordinary", "confirmed_boundless", "provisional"],
+        "location_ids": [
+          "verdant_gate_cultivation_hall",
+          "verdant_gate_foundation_hall",
+          "verdant_gate_registration",
+          "verdant_gate_outer_quarters"
+        ],
+        "subject_must_be_player": true
+      },
+      "context": {
+        "location_tags": ["verdant_gate"],
+        "weather_tags": [],
+        "time_tags": [],
+        "cultivation_tags": [],
+        "npc_tags": ["counsel"],
+        "environment_tags": ["sect", "indoor"]
+      },
+      "effects": [
+        {
+          "type": "noop",
+          "payload": {}
+        }
+      ],
+      "presentation": {
+        "placeholder_text": "A nearby disciple overhears and later shares a small, useful habit of practice.",
+        "narration_keys": ["quiet_counsel"]
+      },
+      "ai_prompt_key": "evt_npc_quiet_counsel"
+    }
+  ]
+}

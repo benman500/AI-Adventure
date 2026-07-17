@@ -30,7 +30,8 @@ _PACKS_DIR = _WORLD_DIR / "packs"
 
 LocationKind = Literal["region", "settlement", "site"]
 
-# Reserved action ids for Phase 5c+; empty lists are valid in 5a.
+# Reserved / implemented action ids. Prefer action_catalog.json as authority;
+# this set is a location-pack gate so unknown typos fail closed at load.
 KNOWN_LOCATION_ACTIONS: frozenset[str] = frozenset(
     {
         "cultivate",
@@ -43,6 +44,10 @@ KNOWN_LOCATION_ACTIONS: frozenset[str] = frozenset(
         "travel",
         "study",
         "trade",
+        "duty_herb_path",
+        "duty_lecture",
+        "duty_outer_chore",
+        "job_sort_herbs",
     }
 )
 
@@ -355,6 +360,7 @@ def list_travel_destinations(
     *,
     catalog: LocationCatalog | None = None,
     include_hidden: bool = False,
+    story_flags: dict[str, bool] | None = None,
 ) -> list[TravelEdgeDefinition]:
     """List outbound edges from a location (optionally including hidden routes)."""
 
@@ -362,7 +368,14 @@ def list_travel_destinations(
     edges: list[TravelEdgeDefinition] = []
     for edge in origin.travel:
         if edge.hidden_route or edge.visibility in {"hidden", "secret"}:
-            if not include_hidden:
+            unlocked = bool(
+                edge.unlock_requirements.get("flags_all")
+                and all(
+                    (story_flags or {}).get(flag, False)
+                    for flag in edge.unlock_requirements["flags_all"]
+                )
+            )
+            if not include_hidden and not unlocked:
                 continue
         edges.append(edge)
     return edges
@@ -380,6 +393,7 @@ def plan_travel(
     mode: TravelMode,
     days_override: int | None = None,
     catalog: LocationCatalog | None = None,
+    story_flags: dict[str, bool] | None = None,
 ) -> TravelResolution:
     """Validate and plan a location change without touching persistence.
 
@@ -423,13 +437,14 @@ def plan_travel(
         )
 
     if mode == "travel" and _edge_is_hidden(edge):
-        # Unlock requirements reserved; hidden routes block free travel for now.
-        return TravelResolution(
-            outcome_type="blocked",
-            plan=None,
-            summary="That route is not available.",
-            blocked_reason="hidden_route",
-        )
+        flags_all = edge.unlock_requirements.get("flags_all")
+        if not flags_all or not all((story_flags or {}).get(flag, False) for flag in flags_all):
+            return TravelResolution(
+                outcome_type="blocked",
+                plan=None,
+                summary="That route is not available.",
+                blocked_reason="hidden_route",
+            )
 
     if edge.requirements:
         # Reserved: future flag/realm/item gates. Unknown keys fail closed.

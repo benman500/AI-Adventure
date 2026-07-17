@@ -69,6 +69,8 @@ ALLOWED_TRIGGER_KINDS: frozenset[str] = frozenset(
         "after_story_travel",
         "after_explore",
         "after_inspect",
+        "after_npc_interact",
+        "after_duty",
         "manual_debug",
         "on_day_advance",
     }

@@ -39,7 +39,6 @@ from ai_adventure.repositories import (
     MetaRepository,
     NpcRepository,
     SaveRepository,
-    SectRepository,
     StoryRepository,
 )
 from ai_adventure.services.locations import LocationService
@@ -129,6 +128,9 @@ class PlaySceneModel:
     techniques: list[dict[str, Any]]
     spiritual_roots: list[dict[str, Any]] = field(default_factory=list)
     present_npcs: list[dict[str, Any]] = field(default_factory=list)
+    sect_membership: dict[str, Any] | None = None
+    aspiration_panel: dict[str, Any] | None = None
+    travel_destinations: list[dict[str, Any]] = field(default_factory=list)
     message: str | None = None
     opening_complete: bool = False
     cultivation_available: bool = True
@@ -393,7 +395,6 @@ class GameAppService:
             save_repo = SaveRepository(session)
             story_repo = StoryRepository(session)
             npc_repo = NpcRepository(session)
-            sect_repo = SectRepository(session)
 
             save = save_repo.get_with_player(save_id)
             if save is None or save.player is None:
@@ -411,7 +412,6 @@ class GameAppService:
                 save_repo=save_repo,
                 story_repo=story_repo,
                 npc_repo=npc_repo,
-                sect_repo=sect_repo,
                 save=save,
                 player=player,
                 progress=progress,
@@ -557,6 +557,42 @@ class GameAppService:
             )
         return cards
 
+    def travel_to(self, save_id: str, to_location_id: str) -> PlaySceneModel:
+        """Travel along a catalog edge via LocationService (existing travel graph)."""
+
+        with self._session_factory() as session:
+            save_repo = SaveRepository(session)
+            save = save_repo.get_with_player(save_id)
+            if save is None or save.player is None:
+                raise EngineValidationError("Save not found")
+            progress = save.story_progress
+            if progress is None:
+                raise EngineValidationError("Story progress not initialized")
+
+            result = LocationService(session).travel(
+                save=save,
+                player=save.player,
+                progress=progress,
+                to_location_id=to_location_id,
+            )
+            save_repo.touch_last_played(save)
+            session.commit()
+
+            context = self._story_context(session, save, save.player, progress)
+            scene = build_scene_view(context)
+            techniques = self._technique_cards(session, save, save.player)
+            message = result.presentation_message or result.resolution.summary
+            if result.event_message:
+                message = f"{message} {result.event_message}".strip()
+            return self._play_scene_model(
+                save=save,
+                player=save.player,
+                scene=scene,
+                message=message,
+                techniques=techniques,
+                breakthrough_modifiers=context.breakthrough_modifiers,
+            )
+
     def learn_technique(self, save_id: str, technique_id: str) -> PlaySceneModel:
         """Learn a starter technique and return the refreshed play scene."""
 
@@ -569,15 +605,21 @@ class GameAppService:
         )
 
     def greet_npc(self, save_id: str, npc_id: str) -> PlaySceneModel:
-        """Greet an NPC at the player's current location (Phase 9b vertical slice)."""
+        """Greet an NPC (compat wrapper around ``interact_with_npc``)."""
+
+        return self.interact_with_npc(save_id, npc_id, "greet")
+
+    def interact_with_npc(self, save_id: str, npc_id: str, action_id: str) -> PlaySceneModel:
+        """Canonical NPC interaction via NpcService (Phase 9c)."""
 
         from ai_adventure.services.npcs import NpcService
 
-        outcome = NpcService(self._session_factory).greet(save_id, npc_id)
-        return self.get_play_scene(
-            save_id,
-            message=outcome["presentation_text"],
-        )
+        outcome = NpcService(self._session_factory).interact(save_id, npc_id, action_id)
+        message = str(outcome["presentation_text"])
+        event_message = outcome.get("event_message")
+        if event_message:
+            message = f"{message} {event_message}".strip()
+        return self.get_play_scene(save_id, message=message)
 
     def _persist_story_result(
         self,
@@ -586,7 +628,6 @@ class GameAppService:
         save_repo: SaveRepository,
         story_repo: StoryRepository,
         npc_repo: NpcRepository,
-        sect_repo: SectRepository,
         save: object,
         player: object,
         progress: object,
@@ -639,10 +680,15 @@ class GameAppService:
                 npc_id=str(npc["npc_id"]),
             )
         if result.sect_id and result.sect_rank:
-            sect_repo.upsert(
+            from ai_adventure.services.sects import SectService
+
+            SectService(self._session_factory).join(
+                session,
                 save_id=getattr(save, "id"),
-                sect_id=result.sect_id,
-                rank_id=result.sect_rank,
+                sect_id=str(result.sect_id),
+                rank_id=str(result.sect_rank),
+                world_day=int(getattr(save, "world_day")),
+                waive_standing_gate=True,
             )
         for event in result.events:
             save_repo.append_event(
@@ -715,8 +761,11 @@ class GameAppService:
             for item in list_available_location_actions(str(getattr(player, "current_location_id")))
         ]
 
+        from ai_adventure.engine.locations import get_location, list_travel_destinations
+        from ai_adventure.services.aspirations import AspirationService
         from ai_adventure.services.spiritual_roots import SpiritualRootService
         from ai_adventure.services.npcs import NpcService
+        from ai_adventure.services.sects import SectService
 
         with self._session_factory() as root_session:
             spiritual_roots = SpiritualRootService(self._session_factory).list_root_cards(
@@ -728,6 +777,33 @@ class GameAppService:
                 root_session,
                 save_id=str(getattr(save, "id")),
                 location_id=str(getattr(player, "current_location_id")),
+            )
+            sect_membership = SectService(self._session_factory).membership_card(
+                root_session,
+                str(getattr(save, "id")),
+            )
+            aspiration_panel = AspirationService(self._session_factory).build_play_panel(
+                root_session,
+                str(getattr(save, "id")),
+            )
+
+        travel_destinations: list[dict[str, Any]] = []
+        story_flags = (
+            parse_flags(save.story_progress.flags_json).values
+            if getattr(save, "story_progress", None) is not None
+            else {}
+        )
+        for edge in list_travel_destinations(
+            str(getattr(player, "current_location_id")),
+            story_flags=dict(story_flags),
+        ):
+            destination = get_location(edge.to)
+            travel_destinations.append(
+                {
+                    "location_id": destination.id,
+                    "display_name": destination.display_name,
+                    "days": int(edge.days),
+                }
             )
 
         return PlaySceneModel(
@@ -747,6 +823,9 @@ class GameAppService:
             techniques=list(techniques or []),
             spiritual_roots=spiritual_roots,
             present_npcs=present_npcs,
+            sect_membership=sect_membership,
+            aspiration_panel=aspiration_panel,
+            travel_destinations=travel_destinations,
             message=message,
             opening_complete=opening_complete,
             cultivation_available=bool(getattr(scene, "cultivation_available", True)),

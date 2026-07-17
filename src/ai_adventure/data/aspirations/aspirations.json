@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "aspirations": [
+    {
+      "id": "asp_stabilize_outer_probation",
+      "display_name": "Find Your Footing",
+      "summary": "Prove you belong at Verdant Gate after the anomaly.",
+      "fantasy": "The hall no longer treats you as an unexplained failure—but belonging is earned, not granted. Make yourself known to the instructors who shape outer disciples, learn the mantra that steadies a foundation, and let Elder Yun Mei record the path you chose.",
+      "kind": "primary",
+      "sort_order": 10,
+      "possible_paths": [
+        "Speak with Elder Yun Mei in the Foundation Hall about the path you chose.",
+        "Travel to the Cultivation Hall and greet Instructor Pei until he trusts you.",
+        "When Pei is ready, Request Instruction to learn the Foundation Guard Mantra."
+      ],
+      "available_when": {
+        "path_status_any": ["confirmed_ordinary", "confirmed_boundless"],
+        "flags_all": ["path_confirmed"]
+      },
+      "requires_aspiration_ids": [],
+      "facets": [
+        {
+          "id": "instructor_notice",
+          "label": "Known to Instructor Pei",
+          "description": "The Cultivation Hall must recognize you as a disciple worth teaching—not a rumor from the Foundation Hall.",
+          "hint": "Open Travel, go to the Cultivation Hall, and greet Instructor Pei.",
+          "requirements": {
+            "min_npc_relationship": {
+              "npc_id": "npc_instructor_001",
+              "min": 5
+            }
+          }
+        },
+        {
+          "id": "foundation_mantra",
+          "label": "Foundation Guard Mantra",
+          "description": "Outer disciples are expected to hold a stabilizing art. Pei teaches it only after a first greeting is not enough—earn a little more trust, then ask.",
+          "hint": "Greet Pei again (or seek guidance) until Request Instruction appears, then take the lesson.",
+          "requirements": {
+            "known_technique_ids_any": ["tech_foundation_guard"]
+          }
+        },
+        {
+          "id": "elder_witness",
+          "label": "Elder Yun Mei's acknowledgment",
+          "description": "Yun Mei alone witnessed your permanent choice. Until she records it, the sect's memory of you remains unfinished.",
+          "hint": "In the Foundation Hall, choose Speak of Your Path with Elder Yun Mei.",
+          "requirements": {
+            "flags_all": ["yun_mei_acknowledged_path"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "asp_earn_elder_recommendation",
+      "display_name": "Earn an Elder's Recommendation",
+      "summary": "Win Elder Yun Mei's formal word—the key that opens the Inner Disciple Trial.",
+      "fantasy": "A recommendation is not a stamp. It is an elder risking their name on your readiness. Cultivate favor, standing, and presence until Yun Mei will speak for you.",
+      "kind": "primary",
+      "sort_order": 20,
+      "possible_paths": [
+        "Assist with an outer duty (herb path, lecture, or grounds chore).",
+        "Seek guidance from Elder Yun Mei in the Foundation Hall.",
+        "Sort herbs for the herb steward if you need coin or standing.",
+        "Improve your foundation through cultivation between duties."
+      ],
+      "available_when": {
+        "path_status_any": ["confirmed_ordinary", "confirmed_boundless"],
+        "flags_all": ["path_confirmed"]
+      },
+      "requires_aspiration_ids": ["asp_stabilize_outer_probation"],
+      "facets": [
+        {
+          "id": "institutional_favor",
+          "label": "Verdant Gate standing",
+          "description": "The sect ledger must show more than probationary notice.",
+          "hint": "Outer duties and elder guidance raise Verdant Gate standing.",
+          "requirements": {
+            "required_sect_id": "sect_verdant_gate",
+            "min_sect_standing": 12
+          }
+        },
+        {
+          "id": "yun_mei_favor",
+          "label": "Elder Yun Mei's trust",
+          "description": "She will not recommend a stranger she corrected once and forgot.",
+          "hint": "Return to the Foundation Hall. Greet her. Seek counsel. Let trust accumulate.",
+          "requirements": {
+            "min_npc_relationship": {
+              "npc_id": "npc_foundation_elder_001",
+              "min": 12
+            }
+          }
+        },
+        {
+          "id": "formal_recommendation",
+          "label": "Formal recommendation granted",
+          "description": "When she is ready, ask for her recommendation—and accept the weight of it.",
+          "hint": "When Request Recommendation appears under Elder Yun Mei, take it.",
+          "requirements": {
+            "flags_all": ["elder_recommendation_yun_mei"]
+          }
+        }
+      ]
+    }
+  ]
+}

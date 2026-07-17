@@ -8,25 +8,34 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
+from uuid import uuid4
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
-from ai_adventure.db.models import GameSave, Player, StoryProgress
+from ai_adventure.db.models import GameSave, InventoryItem, Player, StoryProgress
 from ai_adventure.engine.constants import EVENT_TYPE_LOCATION_ACTION, EVENT_TYPE_TRAVEL_RESOLVED
 from ai_adventure.engine.errors import EngineValidationError
 from ai_adventure.engine.location_actions import (
     AvailableLocationAction,
+    LocationActionPlayerContext,
     LocationActionResolution,
     list_available_location_actions,
     plan_location_action,
 )
+from ai_adventure.engine.npcs import clamp_relationship_score
+from ai_adventure.engine.realms import get_realm
+from ai_adventure.engine.story import flags_to_json, parse_flags
 from ai_adventure.engine.locations import (
     TravelResolution,
     plan_travel,
     resolve_location_display_name,
 )
 from ai_adventure.repositories.locations import LocationPresenceRepository
+from ai_adventure.repositories.npc_world_state import NpcWorldStateRepository
 from ai_adventure.repositories.saves import SaveRepository
+from ai_adventure.repositories.sects import SectRepository
+from ai_adventure.repositories.story import StoryRepository
+from ai_adventure.services.sects import SectService
 
 
 @dataclass(frozen=True, slots=True)
@@ -65,6 +74,7 @@ class LocationService:
         self._session = session
         self._saves = SaveRepository(session)
         self._presence = LocationPresenceRepository(session)
+        self._sect_service = SectService(sessionmaker(bind=session.get_bind()))
 
     def list_actions_for_player(self, player: Player) -> list[AvailableLocationAction]:
         """Return actions offered at the player's current location."""
@@ -81,10 +91,30 @@ class LocationService:
     ) -> LocationActionResult:
         """Run a location action: validate → clock → events → persist facts."""
 
+        membership = SectRepository(self._session).get_for_save(save.id)
+        story_flags = (
+            parse_flags(progress.flags_json).values if progress is not None else {}
+        )
+        sect_id = None if membership is None else str(membership.sect_id)
+        standing = (
+            self._sect_service.get_standing_score(
+                self._session, save.id, sect_id
+            )
+            if sect_id is not None
+            else None
+        )
         resolution = plan_location_action(
             location_id=str(player.current_location_id),
             action_id=action_id,
             world_day=int(save.world_day),
+            player=LocationActionPlayerContext(
+                sect_id=sect_id,
+                sect_standing=standing,
+                story_flags=dict(story_flags),
+                realm_order=get_realm(str(player.realm_id)).order_index,
+                background_id=str(player.background_id),
+                money_copper=int(player.money_copper),
+            ),
         )
         if resolution.outcome_type == "blocked" or resolution.plan is None:
             raise EngineValidationError(
@@ -97,6 +127,94 @@ class LocationService:
         if plan.duration_days:
             self.advance_world_days(save, plan.duration_days)
 
+        # Ensure NPCs exist before relationship rewards (catalog defaults).
+        from ai_adventure.engine.npcs import list_npcs
+        from ai_adventure.repositories.npc_world_state import NpcWorldStateRepository
+
+        npc_repo = NpcWorldStateRepository(self._session)
+        for definition in list_npcs():
+            if definition.default_location_id == str(player.current_location_id):
+                npc_repo.ensure_spawned(
+                    save_id=save.id,
+                    npc_id=definition.npc_id,
+                    current_location_id=definition.default_location_id,
+                    discovered=True,
+                )
+
+        flag_updates: list[tuple[str, bool]] = []
+        triggers: list[str] = []
+        for reward in plan.planned_rewards:
+            if reward.type == "adjust_sect_standing":
+                if sect_id is None:
+                    raise EngineValidationError("A sect is required for this standing reward.")
+                current = 0 if standing is None else int(standing)
+                from ai_adventure.engine.sects import apply_standing_delta
+
+                standing = self._sect_service.apply_standing(
+                    self._session,
+                    save_id=save.id,
+                    sect_id=sect_id,
+                    standing_score=apply_standing_delta(
+                        current=current, delta=int(reward.delta or 0)
+                    ),
+                    world_day=int(save.world_day),
+                )
+            elif reward.type in {"modify_money", "grant_money"}:
+                delta = int(reward.copper_delta if reward.copper_delta is not None else reward.delta or 0)
+                delta += int(plan.background_money_bonus.get(str(player.background_id), 0))
+                if int(player.money_copper) + delta < 0:
+                    raise EngineValidationError("Action would reduce money below zero.")
+                player.money_copper = int(player.money_copper) + delta
+                self._session.add(player)
+            elif reward.type == "grant_item":
+                if not reward.item_code or reward.quantity is None:
+                    raise EngineValidationError("grant_item requires item_code and quantity.")
+                self._grant_item(
+                    player=player,
+                    save_id=save.id,
+                    item_code=reward.item_code,
+                    display_name=reward.display_name or reward.item_code,
+                    quantity=reward.quantity,
+                )
+            elif reward.type == "set_flag":
+                if not reward.flag:
+                    raise EngineValidationError("set_flag requires flag.")
+                flag_updates.append((reward.flag, True if reward.value is None else reward.value))
+            elif reward.type == "unlock_location":
+                if not reward.location_id:
+                    raise EngineValidationError("unlock_location requires location_id.")
+                flag_updates.append((f"unlocked_{reward.location_id}", True))
+                self._presence.record_visit(save.id, reward.location_id, int(save.world_day))
+            elif reward.type == "emit_trigger":
+                if not reward.trigger_kind:
+                    raise EngineValidationError("emit_trigger requires trigger_kind.")
+                triggers.append(reward.trigger_kind)
+            elif reward.type == "adjust_relationship":
+                if not reward.npc_id:
+                    raise EngineValidationError("adjust_relationship requires npc_id.")
+                npc_repo = NpcWorldStateRepository(self._session)
+                npc = npc_repo.get_by_npc_id(save.id, reward.npc_id)
+                if npc is None:
+                    raise EngineValidationError(f"Unknown NPC in this save: {reward.npc_id!r}")
+                npc_repo.apply_interaction(
+                    npc,
+                    relationship_score=clamp_relationship_score(
+                        int(npc.relationship_score) + int(reward.delta or 0)
+                    ),
+                    met=bool(npc.met),
+                    world_day=int(save.world_day),
+                )
+
+        if flag_updates and progress is not None:
+            flags = parse_flags(progress.flags_json)
+            for name, value in flag_updates:
+                flags = flags.set(name, value)
+            StoryRepository(self._session).update(
+                progress,
+                current_node_id=progress.current_node_id,
+                flags_json=flags_to_json(flags),
+            )
+
         payload = dict(resolution.event_payload or {})
         payload["world_day"] = int(save.world_day)
         self._saves.append_event(
@@ -106,7 +224,8 @@ class LocationService:
         )
 
         event_message: str | None = None
-        if plan.trigger_kind == "after_explore":
+        trigger_kind = triggers[-1] if triggers else plan.trigger_kind
+        if trigger_kind == "after_explore":
             from ai_adventure.services.events import EventService
 
             event_message = EventService(self._session).run_after_explore(
@@ -114,7 +233,7 @@ class LocationService:
                 player=player,
                 progress=progress,
             ).presentation_message
-        elif plan.trigger_kind == "after_inspect":
+        elif trigger_kind == "after_inspect":
             from ai_adventure.services.events import EventService
 
             event_message = EventService(self._session).run_after_inspect(
@@ -122,14 +241,14 @@ class LocationService:
                 player=player,
                 progress=progress,
             ).presentation_message
-        elif plan.trigger_kind is not None:
+        elif trigger_kind is not None:
             from ai_adventure.services.events import EventService
 
             event_message = EventService(self._session).run_trigger(
                 save=save,
                 player=player,
                 progress=progress,
-                trigger_kind=plan.trigger_kind,
+                trigger_kind=trigger_kind,
                 action_id=plan.action_id,
             ).presentation_message
 
@@ -140,6 +259,33 @@ class LocationService:
             world_day=int(save.world_day),
             location_id=str(player.current_location_id),
             action_id=plan.action_id,
+        )
+
+    def _grant_item(
+        self,
+        *,
+        player: Player,
+        save_id: str,
+        item_code: str,
+        display_name: str,
+        quantity: int,
+    ) -> None:
+        """Stack or create an inventory item awarded by a location action."""
+
+        for row in list(player.inventory_items):
+            if row.item_code == item_code:
+                row.quantity = int(row.quantity) + int(quantity)
+                self._session.add(row)
+                return
+        self._session.add(
+            InventoryItem(
+                id=str(uuid4()),
+                save_id=save_id,
+                player_id=player.id,
+                item_code=item_code,
+                display_name=display_name,
+                quantity=int(quantity),
+            )
         )
 
     def advance_world_days(self, save: GameSave, days: int) -> int:
@@ -271,6 +417,9 @@ class LocationService:
             world_day=int(save.world_day),
             mode=mode,  # type: ignore[arg-type]
             days_override=days_override,
+            story_flags=(
+                parse_flags(progress.flags_json).values if progress is not None else {}
+            ),
         )
         if resolution.outcome_type == "blocked":
             raise EngineValidationError(
@@ -302,6 +451,19 @@ class LocationService:
             location_name=plan.to_display_name,
         )
         self._presence.record_visit(save.id, plan.to_location_id, int(save.world_day))
+
+        from ai_adventure.engine.npcs import list_npcs
+        from ai_adventure.repositories.npc_world_state import NpcWorldStateRepository
+
+        npc_repo = NpcWorldStateRepository(self._session)
+        for definition in list_npcs():
+            if definition.default_location_id == plan.to_location_id:
+                npc_repo.ensure_spawned(
+                    save_id=save.id,
+                    npc_id=definition.npc_id,
+                    current_location_id=definition.default_location_id,
+                    discovered=True,
+                )
 
         payload = dict(resolution.event_payload or {})
         payload["world_day"] = int(save.world_day)

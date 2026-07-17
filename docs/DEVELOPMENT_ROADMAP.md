@@ -48,21 +48,32 @@ Stack is locked in [TECH_STACK.md](TECH_STACK.md).
 | **6d** | **Event Selection Bias consumer** | **Shipped** — generic `weight_mult` / `chance_flat` + category; Event Engine soft bias only |
 | **7** | **Spiritual Roots** | **Shipped** — second modifier source; see [SPIRITUAL_ROOTS.md](SPIRITUAL_ROOTS.md) |
 
+### Completed (continued)
+
+| Phase | System | Status |
+|------:|--------|--------|
+| **8** | **Alchemy** | **Shipped** — third modifier source |
+| **9a–9b** | **NPC / sect catalogs + world state** | **Shipped (`0012`)** |
+| **9c** | **NPC interactions** | **Shipped** — inspect / greet / ask_guidance |
+| **9d** | **Sect membership lifecycle + institutional standing** | **Shipped (`0013`)** — local standing; not reputation graph |
+| **10** | **Authored NPC interaction framework** | **Shipped** — requirements/rewards pipeline; Pei Request Instruction |
+| **11a** | **Post-Boundless Living Loop — Aspirations** | **Shipped** — catalog + eligibility + Working Toward / Gaps UI |
+| **11b** | **Instruments that feed facets** | **Shipped** — duties, herb job, unlock_location, reactive events |
+
 ### In progress / next
 
 | Phase | System | Scope |
 |------:|--------|--------|
-| 9c | NPC interaction expansion | inspect / ask_guidance / event hooks |
-| 9d | Sect membership & standing | Join eligibility, rank, local standing |
-| 10 | Combat expansion | Beyond stubs; bounded combat modifiers reuse the framework |
-| 11 | World simulation | Off-screen ticks, broader living world |
-| 12 | AI-generated story arcs | Narration/proposals only; engine commits |
+| 11c | Surprise density | More authored events across triggers — only after 11b playtest |
+| 12 | Combat expansion | Beyond stubs; deferred past living loop |
+| 13 | World simulation | Off-screen ticks |
+| 14 | AI-generated story arcs | Narration/proposals only; engine commits |
 
-**Deferred by decision:** Profession earn loop until after Locations, Techniques, and Spiritual Roots.
+**Deferred by decision:** Combat and full Sect Life until the post-Boundless living loop is enjoyable. Full reputation opinion graph deferred.
 
-**Travel hook:** Shipped in Location Phase **5b**.
+**Travel hook:** Shipped in Location Phase **5b**; free-travel play UI + flag-gated hidden routes in **11a/11b**.
 
-**Canonical Phase 6–9 order:** 6a → 6b → 6c → 6d → **7 Roots** → **8 Alchemy** → **9a–9b NPC vertical slice**. Stop after 9b before expanding interactions (9c).
+**Canonical Phase 6–11 order:** 6a→6b→6c→6d → **7 Roots** → **8 Alchemy** → **9a–9d NPC/sect** → **10 authored interactions** → **11 Living Loop (11a aspirations → 11b instruments)**.
 
 ```mermaid
 flowchart LR
@@ -77,10 +88,14 @@ flowchart LR
   e6d[EventBias_6d]
   r7[Roots_7]
   a8[Alchemy_8]
-  n9[NPC_9ab]
-  c1 --> e4 --> l5a --> l5b --> l5c --> m6a --> m6b --> t6c --> e6d --> r7 --> a8 --> n9
+  n9b[NPC_9ab]
+  n9c[NPC_9c]
+  n9d[SectStanding_9d]
+  n10[NpcInteract_10]
+  a11a[Aspirations_11a]
+  a11b[Instruments_11b]
+  c1 --> e4 --> l5a --> l5b --> l5c --> m6a --> m6b --> t6c --> e6d --> r7 --> a8 --> n9b --> n9c --> n9d --> n10 --> a11a --> a11b
 ```
-
 ---
 
 ## Historical delivery milestones (archive)

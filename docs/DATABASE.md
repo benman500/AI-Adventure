@@ -26,7 +26,7 @@ Owns persistence expectations for the world simulation: what must be stored, how
 | `inventory_items` | Starting / owned item stacks |
 | `event_log` | Append-only events (`character_created`, …) |
 
-Migrations: `0001_initial`, `0002_character_saves`, `0003_opening_story_cultivation`, `0004_cultivation_phase1_meters`, `0005_cultivation_sessions`, `0006_cultivation_breakthroughs`, `0007_event_engine`, `0008_locations`, `0009_technique_mastery`, `0010_spiritual_roots`, `0011_alchemy_recipe_ownership`, `0012_npc_world_state`.
+Migrations: `0001_initial`, `0002_character_saves`, `0003_opening_story_cultivation`, `0004_cultivation_phase1_meters`, `0005_cultivation_sessions`, `0006_cultivation_breakthroughs`, `0007_event_engine`, `0008_locations`, `0009_technique_mastery`, `0010_spiritual_roots`, `0011_alchemy_recipe_ownership`, `0012_npc_world_state`, `0013_sect_standing`.
 
 ### Phase 1 cultivation schema additions
 
@@ -90,6 +90,14 @@ Root definitions live under `src/ai_adventure/data/cultivation/spiritual_roots.j
 | `npc_world_state` | Per-save mutable NPC instance: `npc_id` (catalog ref), location, status, discovered/met, relationship_score, optional sect override, flags, last interaction day. Row `id` = opaque actor_id. |
 
 NPC/sect definitions live in world packs (`npcs.json` / `sects.json`). Legacy `npc_records` is superseded for new writes. See [NPCS.md](NPCS.md).
+
+### Phase 9d sect standing schema additions
+
+| Table / column | Role |
+|----------------|------|
+| `sect_standing` | Per-save institutional standing with a catalog `sect_id`: `standing_score` (−100…100), `updated_world_day`. Unique `(save_id, sect_id)`. Separate from `sect_membership` and from NPC `relationship_score`. |
+
+See [SECTS.md](SECTS.md).
 
 ### Milestone 3 schema additions
 

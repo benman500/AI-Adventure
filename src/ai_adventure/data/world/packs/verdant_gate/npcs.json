@@ -56,6 +56,20 @@
         "path_tags": ["ordinary", "boundless_aware"]
       },
       "description": "Foundation Hall elder; keeper of ancient foundation manuscripts."
+    },
+    {
+      "npc_id": "npc_herb_steward_001",
+      "display_name": "Herb Steward Qian",
+      "role_tags": ["disciple", "herb_steward"],
+      "home_location_id": "verdant_gate_herb_garden",
+      "default_location_id": "verdant_gate_herb_garden",
+      "sect_id": "sect_verdant_gate",
+      "cultivation_summary": {
+        "realm_id": "qi_gathering",
+        "stage_id": "early",
+        "path_tags": ["ordinary"]
+      },
+      "description": "Outer disciple who keeps the herb garden ledgers and knows which misted paths stay closed."
     }
   ]
 }

@@ -17,6 +17,10 @@
       <p class="meta-line">
         <strong>{{ scene.character_name }}</strong> · {{ scene.background_display_name }}
         · Day {{ scene.world_day }} · {{ scene.current_location_name }}
+        {% if scene.sect_membership %}
+        · {{ scene.sect_membership.display_name }} ({{ scene.sect_membership.rank_display_name }})
+        · Sect standing {{ scene.sect_membership.standing_score }}
+        {% endif %}
       </p>
     </header>
 
@@ -25,7 +29,60 @@
     {% endif %}
 
     {% if scene.opening_complete %}
-    <p class="flash success">Opening complete — your path is set. Continue cultivating or save and return later.</p>
+    <p class="flash success">Your path is set. The opening is behind you—what remains is belonging, and what you choose to become.</p>
+    {% endif %}
+
+    {% if scene.aspiration_panel and scene.aspiration_panel.visible %}
+    <section class="panel aspiration-panel">
+      <h2>Working Toward</h2>
+      {% set toward = scene.aspiration_panel.working_toward %}
+      <p class="meta-line">
+        <strong>{{ toward.display_name }}</strong>
+        {% if not scene.aspiration_panel.all_primary_complete %}
+        · {{ toward.progress_met }} / {{ toward.progress_total }}
+        {% endif %}
+      </p>
+      <p>{{ toward.summary }}</p>
+      <p class="method-desc">{{ toward.fantasy }}</p>
+
+      {% if scene.aspiration_panel.fulfilled_previous %}
+      <p class="flash success">
+        Fulfilled: <strong>{{ scene.aspiration_panel.fulfilled_previous.display_name }}</strong>.
+        Your footing here is secure—a new purpose now stands before you.
+      </p>
+      {% endif %}
+
+      {% if scene.aspiration_panel.all_primary_complete %}
+      <p class="flash success">You have fulfilled this season's purpose. New north stars will open as the world deepens.</p>
+      {% elif scene.aspiration_panel.current_gaps %}
+      <h3>Current Gaps</h3>
+      <ul class="session-deltas">
+        {% for gap in scene.aspiration_panel.current_gaps %}
+        <li>
+          <strong>{{ gap.label }}</strong> — {{ gap.description }}
+          <br><span class="method-meta">{{ gap.hint }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% if scene.aspiration_panel.possible_paths %}
+      <h3>Possible Paths</h3>
+      <ul class="session-deltas">
+        {% for path in scene.aspiration_panel.possible_paths %}
+        <li>{{ path }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% else %}
+      <p class="flash success">Every gap is closed. Your footing here is secure.</p>
+      {% endif %}
+
+      {% if scene.aspiration_panel.next_preview and not scene.aspiration_panel.all_primary_complete %}
+      <p class="meta-line" style="margin-top: 0.75rem;">
+        Beyond this: <strong>{{ scene.aspiration_panel.next_preview.display_name }}</strong>
+        — {{ scene.aspiration_panel.next_preview.summary }}
+      </p>
+      {% endif %}
+    </section>
     {% endif %}
 
     <section class="panel story-panel">
@@ -202,6 +259,28 @@
     </section>
     {% endif %}
 
+    {% if scene.travel_destinations %}
+    <section class="panel actions-panel location-actions-panel">
+      <h2>Travel</h2>
+      <p class="meta-line">Known paths from here. Leave the hall when purpose calls elsewhere.</p>
+      <form method="post" action="/play/{{ scene.save_id }}/travel" class="action-grid">
+        {% for dest in scene.travel_destinations %}
+        <button
+          type="submit"
+          name="to_location_id"
+          value="{{ dest.location_id }}"
+          class="button method-button"
+        >
+          <span class="method-label">{{ dest.display_name }}</span>
+          <span class="method-meta">
+            {% if dest.days %}{{ dest.days }} day{% if dest.days != 1 %}s{% endif %}{% else %}Nearby{% endif %}
+          </span>
+        </button>
+        {% endfor %}
+      </form>
+    </section>
+    {% endif %}
+
     {% if scene.present_npcs %}
     <section class="panel actions-panel location-actions-panel">
       <h2>People here</h2>
@@ -212,10 +291,22 @@
           <span class="method-label">{{ npc.display_name }}</span>
           <span class="method-meta">
             Standing {{ npc.relationship_score }}
+            {% if npc.sect_standing_score is not none %} · Sect {{ npc.sect_standing_score }}{% endif %}
             {% if npc.met %} · Met{% else %} · Not yet greeted{% endif %}
           </span>
           <span class="method-desc">{{ npc.description }}</span>
-          {% if npc.can_greet %}
+          {% if npc.available_actions %}
+          <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
+            {% for action in npc.available_actions %}
+            <form method="post" action="/play/{{ scene.save_id }}/npcs/interact">
+              <input type="hidden" name="npc_id" value="{{ npc.npc_id }}">
+              <button type="submit" name="action_id" value="{{ action.id }}" class="button" title="{{ action.description }}">
+                {{ action.label }}{% if action.duration_days %} ({{ action.duration_days }}d){% endif %}
+              </button>
+            </form>
+            {% endfor %}
+          </div>
+          {% elif npc.can_greet %}
           <form method="post" action="/play/{{ scene.save_id }}/npcs/greet" style="margin-top: 0.5rem;">
             <button type="submit" name="npc_id" value="{{ npc.npc_id }}" class="button">
               Greet

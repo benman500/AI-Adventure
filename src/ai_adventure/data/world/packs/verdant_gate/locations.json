@@ -122,12 +122,25 @@
           "visibility": "public",
           "hidden_route": false,
           "unlock_requirements": {}
+        },
+        {
+          "to": "verdant_gate_herb_garden",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
         }
       ],
       "actions": [
         "rest",
         "explore",
-        "inspect"
+        "inspect",
+        "duty_outer_chore"
       ],
       "weather_tags": [],
       "spiritual_density": null,
@@ -186,13 +199,26 @@
           "visibility": "public",
           "hidden_route": false,
           "unlock_requirements": {}
+        },
+        {
+          "to": "verdant_gate_herb_garden",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
         }
       ],
       "actions": [
         "cultivate",
         "explore",
         "inspect",
-        "rest"
+        "rest",
+        "duty_lecture"
       ],
       "weather_tags": [],
       "spiritual_density": null,
@@ -257,6 +283,18 @@
           "visibility": "public",
           "hidden_route": false,
           "unlock_requirements": {}
+        },
+        {
+          "to": "verdant_gate_herb_garden",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
         }
       ],
       "actions": [
@@ -285,6 +323,152 @@
         "foundation",
         "boundless_lore"
       ],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "verdant_gate_herb_garden",
+      "kind": "site",
+      "display_name": "Verdant Gate — Outer Herb Garden",
+      "parent_id": "jade_ridge_verdant_gate",
+      "tags": [
+        "verdant_gate",
+        "sect",
+        "herbs",
+        "garden"
+      ],
+      "sect_id": "sect_verdant_gate",
+      "travel": [
+        {
+          "to": "verdant_gate_outer_quarters",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "verdant_gate_cultivation_hall",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "verdant_gate_foundation_hall",
+          "days": 0,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        },
+        {
+          "to": "verdant_gate_misty_grove",
+          "days": 1,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "hidden",
+          "hidden_route": true,
+          "unlock_requirements": {
+            "flags_all": ["unlocked_verdant_gate_misty_grove"]
+          }
+        }
+      ],
+      "actions": [
+        "explore",
+        "inspect",
+        "duty_herb_path",
+        "job_sort_herbs"
+      ],
+      "weather_tags": [],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": "body_tempering",
+      "resources": ["herbs"],
+      "npc_spawn_tags": [
+        "herb_steward"
+      ],
+      "event_weight_modifiers": {},
+      "cultivation_tags": [],
+      "environment_tags": [
+        "sect",
+        "garden",
+        "outdoor"
+      ],
+      "technique_tags": [],
+      "technique_ids": [],
+      "presentation": {
+        "music": null,
+        "artwork": null,
+        "ambience": null
+      }
+    },
+    {
+      "id": "verdant_gate_misty_grove",
+      "kind": "site",
+      "display_name": "Verdant Gate — Misty Herb Grove",
+      "parent_id": "jade_ridge_verdant_gate",
+      "tags": [
+        "verdant_gate",
+        "sect",
+        "herbs",
+        "hidden",
+        "grove"
+      ],
+      "sect_id": "sect_verdant_gate",
+      "travel": [
+        {
+          "to": "verdant_gate_herb_garden",
+          "days": 1,
+          "requirements": {},
+          "travel_method": null,
+          "travel_danger": null,
+          "travel_restrictions": [],
+          "travel_cost": {},
+          "visibility": "public",
+          "hidden_route": false,
+          "unlock_requirements": {}
+        }
+      ],
+      "actions": [
+        "explore",
+        "inspect"
+      ],
+      "weather_tags": ["mist"],
+      "spiritual_density": null,
+      "danger_rating": null,
+      "recommended_realm": "body_tempering",
+      "resources": ["rare_herbs"],
+      "npc_spawn_tags": [],
+      "event_weight_modifiers": {},
+      "cultivation_tags": ["quiet_qi"],
+      "environment_tags": [
+        "sect",
+        "garden",
+        "mist",
+        "hidden"
+      ],
+      "technique_tags": [],
       "technique_ids": [],
       "presentation": {
         "music": null,

@@ -206,10 +206,60 @@ Canonical doc: [SPIRITUAL_ROOTS.md](SPIRITUAL_ROOTS.md).
 | Identity | Catalog-only; story `spawn_npc` payload is `{npc_id}` |
 | Mutable state | `npc_world_state` (`0012`); row id = opaque actor_id |
 | Vertical slice | Spawn → greet → relationship delta → save/reload |
-| Out of scope | AI dialogue, NPC cultivation sim, schedules, combat, reputation graph, new modifier sources |
-| Next | 9c expand interactions; 9d sect standing |
+| Phase 9c | Canonical `interact`; inspect / greet / ask_guidance; `after_npc_interact` hook; ask_guidance costs 1 world day |
+| Phase 9d | Membership lifecycle + institutional standing (`sect_standing`); authored `initial_standing`; catalog standing deltas |
+| Standing vs reputation | Institutional standing is local per sect; full opinion graph deferred |
+| Membership asymmetry | Player: `sect_membership` + `sect_standing`. NPC: catalog `sect_id` + override only |
+| Out of scope (9d) | Reputation graph, Sect Life, multi-sect, Actor unification, sect modifiers, AI dialogue |
+| Next | Stop for review before larger social / faction systems |
+
+Canonical docs: [NPCS.md](NPCS.md), [SECTS.md](SECTS.md).
+
+### Phase 10 — Authored NPC interaction framework
+
+| Decision | Choice |
+|----------|--------|
+| Role | Permanent catalog-driven interaction pipeline; teaching is first proof |
+| Catalog | `npc_action_catalog.json` — requirements + rewards allowlists |
+| Entry | `NpcService.interact` only |
+| Techniques | `TechniqueService.learn_in_session` (same transaction) |
+| Vertical slice | Instructor Pei `request_instruction` → `tech_foundation_guard` |
+| Reserved rewards | Documented; catalog rejects until implemented |
+| Out of scope | Quests, AI dialogue, Sect Life, reputation graph, combat |
+| Next | Stop for review before expanding NPC gameplay |
 
 Canonical doc: [NPCS.md](NPCS.md).
+
+### Phase 11a — Aspiration MPS (Living Loop)
+
+| Decision | Choice |
+|----------|--------|
+| Role | Purpose layer: authored north stars; eligibility over durable facts only |
+| Catalog | `data/aspirations/aspirations.json` |
+| Persistence | **None** — derived every read; no aspiration table |
+| Writers | Never — NPC / sect / technique / story / travel write facts |
+| UI | Working Toward + Current Gaps on play scene after path confirm |
+| Travel UI | Expose existing `LocationService.travel` (catalog edges) |
+| Seed | `asp_stabilize_outer_probation` → `asp_earn_elder_recommendation` |
+| Content | Yun Mei `acknowledge_path` / `request_recommendation`; post-path story copy |
+| Non-goals | Duties, profession, combat, identity phrases, quest journals |
+| Next | Ship only when 11a is fun; then denser living-loop content |
+
+Canonical doc: [ASPIRATIONS.md](ASPIRATIONS.md).
+
+### Phase 11b — Instruments that feed facets
+
+| Decision | Choice |
+|----------|--------|
+| Duties | Location actions: `duty_herb_path`, `duty_lecture`, `duty_outer_chore` |
+| Profession foothold | `job_sort_herbs` — money + herbs; alchemist background copper bonus |
+| Location pipeline | Allowlisted requirements + rewards on location actions |
+| Unlock | `unlock_location` NPC/location reward → flag `unlocked_<id>` + presence; hidden travel edges |
+| Gated site | `verdant_gate_misty_grove` via Herb Steward Qian |
+| Events | `living_loop_duties.json` on `after_duty` / explore / inspect |
+| Aspirations | Still read-only; `possible_paths` presentation only |
+| Non-goals | Duty currency, profession XP, quest journal, combat, Sect Life ticks |
+| Next | Stop for 11b playtest before 11c event density |
 
 ### Schema drift note (Milestone 3 repair)
 

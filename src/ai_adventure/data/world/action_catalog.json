@@ -210,6 +210,105 @@
       "presentation": {
         "placeholder_summary": "You look for a trade."
       }
+    },
+    {
+      "id": "duty_herb_path",
+      "label": "Herb Path Assistance",
+      "description": "Help the herb steward gather and sort living plants along the outer herb path. Raises Verdant Gate standing and yields fresh herbs.",
+      "enabled": true,
+      "implemented": true,
+      "duration_days": 1,
+      "requirements": {
+        "required_sect_id": "sect_verdant_gate",
+        "flags_all": ["path_confirmed"]
+      },
+      "rewards": [
+        { "type": "adjust_sect_standing", "delta": 2 },
+        {
+          "type": "grant_item",
+          "item_code": "fresh_spirit_herb",
+          "display_name": "Fresh Spirit Herb",
+          "quantity": 1
+        },
+        { "type": "adjust_relationship", "npc_id": "npc_herb_steward_001", "delta": 3 }
+      ],
+      "supports_facets": ["institutional_favor"],
+      "trigger_kind": "after_duty",
+      "presentation": {
+        "placeholder_summary": "You spend the day among damp leaves and careful hands. The herb steward nods once—work done properly."
+      }
+    },
+    {
+      "id": "duty_lecture",
+      "label": "Lecture Attendance",
+      "description": "Sit through Instructor Pei's outer-disciple lecture. Earns standing and a measure of comprehension.",
+      "enabled": true,
+      "implemented": true,
+      "duration_days": 1,
+      "requirements": {
+        "required_sect_id": "sect_verdant_gate",
+        "flags_all": ["path_confirmed"]
+      },
+      "rewards": [
+        { "type": "adjust_sect_standing", "delta": 2 },
+        { "type": "adjust_relationship", "npc_id": "npc_instructor_001", "delta": 2 }
+      ],
+      "supports_facets": ["institutional_favor", "yun_mei_favor"],
+      "trigger_kind": "after_duty",
+      "presentation": {
+        "placeholder_summary": "You attend the lecture without fidgeting. Pei's words settle like measured breath—ordinary, useful, remembered."
+      }
+    },
+    {
+      "id": "duty_outer_chore",
+      "label": "Outer Grounds Chore",
+      "description": "Sweep courts, carry water, and mend railings on the outer grounds. Modest standing and a few copper for honest labor.",
+      "enabled": true,
+      "implemented": true,
+      "duration_days": 1,
+      "requirements": {
+        "required_sect_id": "sect_verdant_gate",
+        "flags_all": ["path_confirmed"]
+      },
+      "rewards": [
+        { "type": "adjust_sect_standing", "delta": 1 },
+        { "type": "modify_money", "copper_delta": 8 }
+      ],
+      "supports_facets": ["institutional_favor"],
+      "trigger_kind": "after_duty",
+      "presentation": {
+        "placeholder_summary": "Dust, buckets, and splinters. The outer grounds look no grander—but the ledger will notice you showed up."
+      }
+    },
+    {
+      "id": "job_sort_herbs",
+      "label": "Sort Herbs",
+      "description": "Profession foothold: sort dried and fresh herbs for the steward. Earns copper and herb scraps. Alchemist's apprentices are paid a little more.",
+      "enabled": true,
+      "implemented": true,
+      "duration_days": 1,
+      "requirements": {
+        "required_sect_id": "sect_verdant_gate",
+        "flags_all": ["path_confirmed"]
+      },
+      "rewards": [
+        { "type": "modify_money", "copper_delta": 12 },
+        {
+          "type": "grant_item",
+          "item_code": "dried_herb_scrap",
+          "display_name": "Dried Herb Scrap",
+          "quantity": 2
+        },
+        { "type": "adjust_sect_standing", "delta": 1 }
+      ],
+      "background_money_bonus": {
+        "alchemists_apprentice": 8
+      },
+      "supports_facets": ["institutional_favor"],
+      "trigger_kind": "after_duty",
+      "presentation": {
+        "placeholder_summary": "You sort stems from roots until your fingers stain green. Coin and scraps change hands—honest work that funds cultivation."
+      }
     }
   ]
 }

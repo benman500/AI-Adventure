@@ -131,6 +131,28 @@ class EventService:
             action_id="inspect",
         )
 
+    def run_after_npc_interact(
+        self,
+        *,
+        save: GameSave,
+        player: Player,
+        progress: StoryProgress | None,
+        action_id: str,
+        cultivation: CultivationState | None = None,
+        rng: Random | None = None,
+    ) -> PersistedTriggerResult:
+        """Evaluate ``after_npc_interact`` and persist any resolution."""
+
+        return self.run_trigger(
+            save=save,
+            player=player,
+            progress=progress,
+            trigger_kind="after_npc_interact",
+            cultivation=cultivation,
+            rng=rng,
+            action_id=action_id,
+        )
+
     def run_trigger(
         self,
         *,
