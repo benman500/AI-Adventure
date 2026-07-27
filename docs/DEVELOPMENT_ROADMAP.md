@@ -64,10 +64,13 @@ Stack is locked in [TECH_STACK.md](TECH_STACK.md).
 
 | Phase | System | Scope |
 |------:|--------|--------|
-| 11c | Surprise density | More authored events across triggers — only after 11b playtest |
+| **UI** | **Novel-first presentation overhaul** | **Active** — story focus, collapsible panels, VN creation; no gameplay changes |
+| 11c | Surprise density | More authored events across triggers — only after UI review + 11b playtest |
 | 12 | Combat expansion | Beyond stubs; deferred past living loop |
 | 13 | World simulation | Off-screen ticks |
 | 14 | AI-generated story arcs | Narration/proposals only; engine commits |
+
+**Paused:** All gameplay expansion until the UI/UX overhaul is reviewed (screenshots). Cultivation novel first; management second.
 
 **Deferred by decision:** Combat and full Sect Life until the post-Boundless living loop is enjoyable. Full reputation opinion graph deferred.
 

@@ -8,375 +8,431 @@
 </head>
 <body>
   <main class="shell play-shell">
-    <p class="breadcrumb">
-      <a href="/">Home</a> / <a href="/saves">Saves</a> / {{ scene.character_name }}
-    </p>
-
-    <header class="play-header">
-      <h1>{{ scene.title }}</h1>
-      <p class="meta-line">
-        <strong>{{ scene.character_name }}</strong> · {{ scene.background_display_name }}
-        · Day {{ scene.world_day }} · {{ scene.current_location_name }}
+    <div class="play-chrome">
+      <p class="place">
+        <strong>{{ scene.character_name }}</strong>
+        · Day {{ scene.world_day }}
         {% if scene.sect_membership %}
-        · {{ scene.sect_membership.display_name }} ({{ scene.sect_membership.rank_display_name }})
-        · Sect standing {{ scene.sect_membership.standing_score }}
+        · {{ scene.sect_membership.rank_display_name }}
         {% endif %}
       </p>
-    </header>
+      <nav class="utility-bar" aria-label="Utility">
+        <a class="button utility btn-utility" href="/play/{{ scene.save_id }}/status">Character</a>
+        <a class="button utility btn-utility" href="/saves">Saves</a>
+      </nav>
+    </div>
 
     {% if scene.message %}
     <p class="flash message">{{ scene.message }}</p>
     {% endif %}
 
     {% if scene.opening_complete %}
-    <p class="flash success">Your path is set. The opening is behind you—what remains is belonging, and what you choose to become.</p>
+    <p class="flash success">Your path is set. What remains is belonging—and what you choose to become.</p>
     {% endif %}
 
-    {% if scene.aspiration_panel and scene.aspiration_panel.visible %}
-    <section class="panel aspiration-panel">
-      <h2>Working Toward</h2>
-      {% set toward = scene.aspiration_panel.working_toward %}
-      <p class="meta-line">
-        <strong>{{ toward.display_name }}</strong>
-        {% if not scene.aspiration_panel.all_primary_complete %}
-        · {{ toward.progress_met }} / {{ toward.progress_total }}
-        {% endif %}
-      </p>
-      <p>{{ toward.summary }}</p>
-      <p class="method-desc">{{ toward.fantasy }}</p>
+    <div class="play-layout">
+      <div class="play-main">
+        <p class="location-kicker">{{ scene.current_location_name }}</p>
+        <h1 class="play-title">{{ scene.title }}</h1>
 
-      {% if scene.aspiration_panel.fulfilled_previous %}
-      <p class="flash success">
-        Fulfilled: <strong>{{ scene.aspiration_panel.fulfilled_previous.display_name }}</strong>.
-        Your footing here is secure—a new purpose now stands before you.
-      </p>
-      {% endif %}
+        <article class="story-stage">
+          <div class="story-text" id="narration">{{ scene.narrative }}</div>
+        </article>
 
-      {% if scene.aspiration_panel.all_primary_complete %}
-      <p class="flash success">You have fulfilled this season's purpose. New north stars will open as the world deepens.</p>
-      {% elif scene.aspiration_panel.current_gaps %}
-      <h3>Current Gaps</h3>
-      <ul class="session-deltas">
-        {% for gap in scene.aspiration_panel.current_gaps %}
-        <li>
-          <strong>{{ gap.label }}</strong> — {{ gap.description }}
-          <br><span class="method-meta">{{ gap.hint }}</span>
-        </li>
-        {% endfor %}
-      </ul>
-      {% if scene.aspiration_panel.possible_paths %}
-      <h3>Possible Paths</h3>
-      <ul class="session-deltas">
-        {% for path in scene.aspiration_panel.possible_paths %}
-        <li>{{ path }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-      {% else %}
-      <p class="flash success">Every gap is closed. Your footing here is secure.</p>
-      {% endif %}
-
-      {% if scene.aspiration_panel.next_preview and not scene.aspiration_panel.all_primary_complete %}
-      <p class="meta-line" style="margin-top: 0.75rem;">
-        Beyond this: <strong>{{ scene.aspiration_panel.next_preview.display_name }}</strong>
-        — {{ scene.aspiration_panel.next_preview.summary }}
-      </p>
-      {% endif %}
-    </section>
-    {% endif %}
-
-    <section class="panel story-panel">
-      <div class="story-text">{{ scene.narrative }}</div>
-    </section>
-
-    <section class="panel cultivation-panel">
-      <h2>Cultivation</h2>
-      <dl class="cultivation-stats">
-        <div><dt>Current Realm</dt><dd>{{ scene.cultivation.realm_name }}</dd></div>
-        <div><dt>Current Stage</dt><dd>{{ scene.cultivation.stage_name }}</dd></div>
-        <div><dt>Qi</dt><dd>{{ scene.cultivation.qi_current }} / {{ scene.cultivation.qi_max }}</dd></div>
-        <div><dt>Progress</dt><dd>{{ scene.cultivation.cultivation_progress }} / {{ scene.cultivation.cultivation_progress_max }}</dd></div>
-        <div><dt>Comprehension</dt><dd>{{ scene.cultivation.realm_comprehension }} / {{ scene.cultivation.realm_comprehension_max }}</dd></div>
-        <div><dt>Foundation Stability</dt><dd>{{ scene.cultivation.foundation_stability }} / {{ scene.cultivation.foundation_stability_max }}</dd></div>
-        <div><dt>Path</dt><dd>{{ scene.cultivation.cultivation_path }} ({{ scene.cultivation.path_status }})</dd></div>
-        {% if scene.cultivation.breakthrough_ready %}
-        <div class="highlight"><dt>Readiness</dt><dd>Breakthrough conditions met</dd></div>
-        {% endif %}
-      </dl>
-      <div class="progress-bar" aria-hidden="true" title="Cultivation progress">
-        <span style="width: {{ scene.cultivation.cultivation_progress }}%"></span>
-      </div>
-
-      {% if scene.breakthrough_readiness %}
-      <div class="breakthrough-readiness">
-        <h3>Breakthrough Readiness</h3>
-        {% if scene.breakthrough_readiness.target_realm_name and scene.breakthrough_readiness.target_stage_name %}
-        <p>
-          Target:
-          <strong>{{ scene.breakthrough_readiness.target_realm_name }} ({{ scene.breakthrough_readiness.target_stage_name }})</strong>
-          {% if scene.breakthrough_readiness.base_difficulty %}
-          · Difficulty: {{ scene.breakthrough_readiness.base_difficulty }}
-          {% endif %}
-        </p>
-        {% endif %}
-        <ul class="session-deltas">
-          <li>Progress {{ scene.breakthrough_readiness.progress_current }} / {{ scene.breakthrough_readiness.progress_required }}</li>
-          <li>Comprehension {{ scene.breakthrough_readiness.comprehension_current }} / {{ scene.breakthrough_readiness.comprehension_required }}</li>
-          <li>Stability {{ scene.breakthrough_readiness.stability_current }} (recommended {{ scene.breakthrough_readiness.stability_recommended }})</li>
-          <li>Qi cost {{ scene.breakthrough_readiness.qi_cost }} (have {{ scene.breakthrough_readiness.qi_current }} / {{ scene.breakthrough_readiness.qi_max }})</li>
-          {% if scene.breakthrough_readiness.mode != "opening" %}
-          <li>Estimated chance: {{ scene.breakthrough_readiness.success_chance_band }} (~{{ scene.breakthrough_readiness.success_chance_percent }}%)</li>
-          {% else %}
-          <li>Opening attempt: story-gated (anomaly path)</li>
-          {% endif %}
-        </ul>
-        {% for warning in scene.breakthrough_readiness.warnings %}
-        <p class="flash warning">{{ warning }}</p>
-        {% endfor %}
-        {% if not scene.breakthrough_readiness.eligible %}
-        <p class="flash warning">
-          {% if scene.breakthrough_readiness.blocking_reasons %}
-            {{ scene.breakthrough_readiness.blocking_reasons | join(" ") }}
-          {% else %}
-            Breakthrough is unavailable.
-          {% endif %}
-        </p>
-        {% endif %}
-
-        {% if scene.cultivation_methods %}
-        <form method="post" action="/play/{{ scene.save_id }}/action" class="breakthrough-form">
-          <button
-            type="submit"
-            name="action_id"
-            value="attempt_breakthrough"
-            class="button"
-            {% if not scene.breakthrough_can_attempt %}disabled{% endif %}
-          >
-            Attempt Breakthrough
-          </button>
-        </form>
-        {% endif %}
-      </div>
-      {% endif %}
-
-      {% if scene.last_breakthrough_result %}
-      <div class="session-result">
-        <h3>Last breakthrough</h3>
-        <p>
-          <strong>{{ scene.last_breakthrough_result.outcome_type }}</strong>
-          {% if scene.last_breakthrough_result.stage_before is defined %}
-          · {{ scene.last_breakthrough_result.stage_before }} → {{ scene.last_breakthrough_result.stage_after }}
-          {% endif %}
-        </p>
-        <p>{{ scene.last_breakthrough_result.summary }}</p>
-      </div>
-      {% endif %}
-
-      {% if scene.last_cultivation_result %}
-      <div class="session-result">
-        <h3>Last session</h3>
-        <p>
-          <strong>{{ scene.last_cultivation_result.method_label }}</strong>
-          · {{ scene.last_cultivation_result.outcome_type }}
-          · {{ scene.last_cultivation_result.time_consumed_days }} day(s)
-        </p>
-        <p>{{ scene.last_cultivation_result.summary }}</p>
-        <ul class="session-deltas">
-          <li>Qi {{ scene.last_cultivation_result.qi_before }} → {{ scene.last_cultivation_result.qi_after }}</li>
-          <li>Progress {{ scene.last_cultivation_result.progress_before }} → {{ scene.last_cultivation_result.progress_after }}</li>
-          <li>Comprehension {{ scene.last_cultivation_result.comprehension_before }} → {{ scene.last_cultivation_result.comprehension_after }}</li>
-          <li>Stability {{ scene.last_cultivation_result.stability_before }} → {{ scene.last_cultivation_result.stability_after }}</li>
-        </ul>
-        {% if scene.last_cultivation_result.setback and scene.last_cultivation_result.setback_description %}
-        <p class="flash warning">{{ scene.last_cultivation_result.setback_description }}</p>
-        {% endif %}
-      </div>
-      {% endif %}
-    </section>
-
-    {% if scene.cultivation_methods %}
-    <section class="panel actions-panel">
-      <h2>Cultivate</h2>
-      {% if not scene.cultivation_available %}
-      <p class="flash warning">{{ scene.cultivation_blocked_reason or "Cultivation is unavailable." }}</p>
-      {% endif %}
-      <form method="post" action="/play/{{ scene.save_id }}/action" class="method-grid">
-        {% for method in scene.cultivation_methods %}
-        <button
-          type="submit"
-          name="action_id"
-          value="{{ method.id }}"
-          class="button method-button"
-          {% if not scene.cultivation_available %}disabled{% endif %}
-        >
-          <span class="method-label">{{ method.label }}</span>
-          <span class="method-meta">Risk: {{ method.risk_level }} · {{ method.time_cost_days }} day</span>
-          <span class="method-desc">{{ method.description }}</span>
-        </button>
-        {% endfor %}
-      </form>
-    </section>
-    {% endif %}
-
-    {% if scene.actions %}
-    <section class="panel actions-panel">
-      <h2>Actions</h2>
-      <form method="post" action="/play/{{ scene.save_id }}/action" class="action-grid">
-        {% for action in scene.actions %}
-        {% if action.id != "attempt_breakthrough" %}
-        <button type="submit" name="action_id" value="{{ action.id }}" class="button">
-          {{ action.label }}
-        </button>
-        {% endif %}
-        {% endfor %}
-      </form>
-    </section>
-    {% endif %}
-
-    {% if scene.location_actions %}
-    <section class="panel actions-panel location-actions-panel">
-      <h2>At this location</h2>
-      <p class="meta-line">What you can do while present here.</p>
-      <form method="post" action="/play/{{ scene.save_id }}/location-action" class="action-grid">
-        {% for action in scene.location_actions %}
-        <button
-          type="submit"
-          name="action_id"
-          value="{{ action.id }}"
-          class="button method-button"
-          {% if not action.available %}disabled{% endif %}
-          title="{{ action.description }}"
-        >
-          <span class="method-label">{{ action.label }}</span>
-          <span class="method-meta">
-            {% if action.duration_days %}{{ action.duration_days }} day{% if action.duration_days != 1 %}s{% endif %}{% else %}Instant{% endif %}
-            {% if not action.available %} · Unavailable{% endif %}
-          </span>
-          <span class="method-desc">{{ action.description }}</span>
-        </button>
-        {% endfor %}
-      </form>
-    </section>
-    {% endif %}
-
-    {% if scene.travel_destinations %}
-    <section class="panel actions-panel location-actions-panel">
-      <h2>Travel</h2>
-      <p class="meta-line">Known paths from here. Leave the hall when purpose calls elsewhere.</p>
-      <form method="post" action="/play/{{ scene.save_id }}/travel" class="action-grid">
-        {% for dest in scene.travel_destinations %}
-        <button
-          type="submit"
-          name="to_location_id"
-          value="{{ dest.location_id }}"
-          class="button method-button"
-        >
-          <span class="method-label">{{ dest.display_name }}</span>
-          <span class="method-meta">
-            {% if dest.days %}{{ dest.days }} day{% if dest.days != 1 %}s{% endif %}{% else %}Nearby{% endif %}
-          </span>
-        </button>
-        {% endfor %}
-      </form>
-    </section>
-    {% endif %}
-
-    {% if scene.present_npcs %}
-    <section class="panel actions-panel location-actions-panel">
-      <h2>People here</h2>
-      <p class="meta-line">Catalog identity with your standing from this save.</p>
-      <div class="action-grid">
-        {% for npc in scene.present_npcs %}
-        <div class="method-button technique-card">
-          <span class="method-label">{{ npc.display_name }}</span>
-          <span class="method-meta">
-            Standing {{ npc.relationship_score }}
-            {% if npc.sect_standing_score is not none %} · Sect {{ npc.sect_standing_score }}{% endif %}
-            {% if npc.met %} · Met{% else %} · Not yet greeted{% endif %}
-          </span>
-          <span class="method-desc">{{ npc.description }}</span>
-          {% if npc.available_actions %}
-          <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
-            {% for action in npc.available_actions %}
-            <form method="post" action="/play/{{ scene.save_id }}/npcs/interact">
-              <input type="hidden" name="npc_id" value="{{ npc.npc_id }}">
-              <button type="submit" name="action_id" value="{{ action.id }}" class="button" title="{{ action.description }}">
-                {{ action.label }}{% if action.duration_days %} ({{ action.duration_days }}d){% endif %}
+        <div class="moment-actions">
+          {% if scene.actions %}
+          <section class="moment-block action-primary" aria-label="Continue the story">
+            <h2>Continue</h2>
+            <form method="post" action="/play/{{ scene.save_id }}/action" class="story-actions">
+              {% for action in scene.actions %}
+              {% if action.id != "attempt_breakthrough" %}
+              <button type="submit" name="action_id" value="{{ action.id }}" class="button primary btn-primary">
+                {{ action.label }}
               </button>
+              {% endif %}
+              {% endfor %}
             </form>
+          </section>
+          {% endif %}
+
+          {% if scene.present_npcs %}
+          <section class="moment-block" aria-label="People here">
+            <h2>People here</h2>
+            <div class="npc-list">
+              {% for npc in scene.present_npcs %}
+              <article class="npc-card">
+                <h3 class="npc-name">{{ npc.display_name }}</h3>
+                {% if npc.role_tags %}
+                <p class="npc-role">
+                  {{ npc.role_tags[0].replace('_', ' ')|title }}
+                </p>
+                {% endif %}
+                <p class="npc-presence">
+                  {% if npc.met %}Known to you{% else %}A stranger still{% endif %}
+                </p>
+                <p class="npc-blurb">{{ npc.description }}</p>
+                {% if npc.available_actions %}
+                <div class="npc-actions" aria-label="Available interactions">
+                  {% for action in npc.available_actions %}
+                  <form method="post" action="/play/{{ scene.save_id }}/npcs/interact">
+                    <input type="hidden" name="npc_id" value="{{ npc.npc_id }}">
+                    <button type="submit" name="action_id" value="{{ action.id }}" class="interact-link" title="{{ action.description }}">
+                      {{ action.label }}{% if action.duration_days %} · {{ action.duration_days }}d{% endif %}
+                    </button>
+                  </form>
+                  {% endfor %}
+                </div>
+                {% elif npc.can_greet %}
+                <div class="npc-actions">
+                  <form method="post" action="/play/{{ scene.save_id }}/npcs/greet">
+                    <button type="submit" name="npc_id" value="{{ npc.npc_id }}" class="interact-link">
+                      Greet
+                    </button>
+                  </form>
+                </div>
+                {% endif %}
+              </article>
+              {% endfor %}
+            </div>
+          </section>
+          {% endif %}
+
+          {% if scene.travel_destinations %}
+          <section class="moment-block" aria-label="Travel">
+            <h2>Nearby</h2>
+            <form method="post" action="/play/{{ scene.save_id }}/travel" class="travel-list">
+              {% for dest in scene.travel_destinations %}
+              {% set tags = dest.tags|default([]) %}
+              {% set env = dest.environment_tags|default([]) %}
+              {% set lid = dest.location_id %}
+              {% if 'herb' in lid or 'herb' in tags or 'herbs' in tags or 'garden' in env %}
+                {% set icon = '🌿' %}
+                {% set blurb = 'Medicinal herbs and quiet paths.' %}
+              {% elif 'hall' in tags or 'foundation' in lid or 'cultivation' in lid or 'lecture' in lid %}
+                {% set icon = '🏛' %}
+                {% set blurb = 'The heart of instruction.' %}
+              {% elif 'quarters' in lid or 'home' in tags %}
+                {% set icon = '🏠' %}
+                {% set blurb = 'Your residence among the outer disciples.' %}
+              {% elif 'road' in lid or 'path' in lid or 'approach' in lid %}
+                {% set icon = '🛤' %}
+                {% set blurb = 'A road that carries you onward.' %}
+              {% elif 'workshop' in lid or 'ember' in lid %}
+                {% set icon = '🔥' %}
+                {% set blurb = 'Smoke, tools, and patient craft.' %}
+              {% elif 'grove' in lid or 'mist' in lid %}
+                {% set icon = '🌫' %}
+                {% set blurb = 'A quieter place, half-hidden.' %}
+              {% elif 'registration' in lid %}
+                {% set icon = '📜' %}
+                {% set blurb = 'Where names are taken and paths begin.' %}
+              {% elif dest.ambience %}
+                {% set icon = '◆' %}
+                {% set blurb = dest.ambience %}
+              {% else %}
+                {% set icon = '◆' %}
+                {% set blurb = 'A place along your path.' %}
+              {% endif %}
+              <button
+                type="submit"
+                name="to_location_id"
+                value="{{ dest.location_id }}"
+                class="travel-card"
+              >
+                <span class="travel-icon" aria-hidden="true">{{ icon }}</span>
+                <span>
+                  <span class="travel-name">{{ dest.display_name }}</span>
+                  <span class="travel-blurb">{{ blurb }}</span>
+                </span>
+                <span class="travel-meta">
+                  {% if dest.days %}{{ dest.days }}d{% else %}Nearby{% endif %}
+                </span>
+              </button>
+              {% endfor %}
+            </form>
+          </section>
+          {% endif %}
+
+          {% if scene.location_actions %}
+          {% set available_location = scene.location_actions | selectattr('available') | list %}
+          {% if available_location %}
+          <section class="moment-block" aria-label="At this location">
+            <h2>Here</h2>
+            <form method="post" action="/play/{{ scene.save_id }}/location-action" class="here-list">
+              {% for action in scene.location_actions %}
+              {% if action.available %}
+              <button
+                type="submit"
+                name="action_id"
+                value="{{ action.id }}"
+                class="here-item"
+                title="{{ action.description }}"
+              >
+                <span class="choice-label">{{ action.label }}</span>
+                <span class="choice-meta">
+                  {% if action.duration_days %}{{ action.duration_days }} day{% if action.duration_days != 1 %}s{% endif %}{% else %}Instant{% endif %}
+                </span>
+                <span class="choice-desc">{{ action.description }}</span>
+              </button>
+              {% endif %}
+              {% endfor %}
+            </form>
+          </section>
+          {% endif %}
+          {% endif %}
+        </div>
+
+        <p class="footer-links">
+          <a class="button utility btn-utility" href="/play/{{ scene.save_id }}/status">Full character sheet</a>
+          <a class="button utility btn-utility" href="/saves">Back to saves</a>
+        </p>
+      </div>
+
+      <aside class="play-sidebar" aria-label="Character and purpose">
+        {% if scene.aspiration_panel and scene.aspiration_panel.visible %}
+        <section class="aspiration-side" aria-label="Working toward">
+          <h2>Working Toward</h2>
+          {% set toward = scene.aspiration_panel.working_toward %}
+          <p class="aspiration-name">{{ toward.display_name }}</p>
+          <p class="summary">{{ toward.summary }}</p>
+          <p class="fantasy">{{ toward.fantasy }}</p>
+
+          {% if scene.aspiration_panel.fulfilled_previous %}
+          <p class="flash success" style="margin-top: 0.75rem;">
+            Fulfilled: <strong>{{ scene.aspiration_panel.fulfilled_previous.display_name }}</strong>
+          </p>
+          {% endif %}
+
+          {% if scene.aspiration_panel.all_primary_complete %}
+          <p class="flash success" style="margin-top: 0.75rem;">This season’s purpose is fulfilled.</p>
+          {% elif scene.aspiration_panel.current_gaps %}
+          <h3>Current Gaps</h3>
+          <ul>
+            {% for gap in scene.aspiration_panel.current_gaps %}
+            <li>
+              <strong>{{ gap.label }}</strong> — {{ gap.description }}
+              <span class="hint">{{ gap.hint }}</span>
+            </li>
             {% endfor %}
+          </ul>
+          {% if scene.aspiration_panel.possible_paths %}
+          <h3>Possible Paths</h3>
+          <ul>
+            {% for path in scene.aspiration_panel.possible_paths %}
+            <li>{{ path }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          {% endif %}
+
+          {% if scene.aspiration_panel.next_preview and not scene.aspiration_panel.all_primary_complete %}
+          <p class="meta-line" style="margin-top: 0.75rem;">
+            Beyond this: <strong>{{ scene.aspiration_panel.next_preview.display_name }}</strong>
+          </p>
+          {% endif %}
+        </section>
+        {% endif %}
+
+        <details class="side-panel">
+          <summary>Identity</summary>
+          <div class="side-panel-body identity-brief">
+            <p><strong>{{ scene.character_name }}</strong></p>
+            <p>{{ scene.background_display_name }}</p>
+            <p>
+              {{ scene.cultivation.realm_name }}
+              · {{ scene.cultivation.stage_name }}
+            </p>
+            {% if scene.sect_membership %}
+            <p>{{ scene.sect_membership.display_name }} · {{ scene.sect_membership.rank_display_name }}</p>
+            {% endif %}
+            <p class="side-note" style="margin-top: 0.65rem;">
+              Path: {{ scene.cultivation.cultivation_path }}
+            </p>
           </div>
-          {% elif npc.can_greet %}
-          <form method="post" action="/play/{{ scene.save_id }}/npcs/greet" style="margin-top: 0.5rem;">
-            <button type="submit" name="npc_id" value="{{ npc.npc_id }}" class="button">
-              Greet
-            </button>
-          </form>
-          {% endif %}
-        </div>
-        {% endfor %}
-      </div>
-    </section>
-    {% endif %}
+        </details>
 
-    {% if scene.techniques %}
-    <section class="panel actions-panel techniques-panel">
-      <h2>Techniques</h2>
-      <p class="meta-line">Learn and equip arts that influence cultivation sessions.</p>
-      <div class="action-grid">
-        {% for tech in scene.techniques %}
-        <div class="method-button technique-card">
-          <span class="method-label">{{ tech.display_name }}</span>
-          <span class="method-meta">
-            {% if tech.known %}
-              Known{% if tech.equipped %} · Equipped{% endif %} · Rank {{ tech.mastery_rank }}
-            {% elif tech.learnable %}
-              Available to learn
-            {% else %}
-              Locked
+        <details class="side-panel">
+          <summary>Cultivation</summary>
+          <div class="side-panel-body">
+            <div class="cultivation-compact">
+              <div class="row"><span>Realm</span><strong>{{ scene.cultivation.realm_name }}</strong></div>
+              <div class="row"><span>Stage</span><strong>{{ scene.cultivation.stage_name }}</strong></div>
+              <div class="row">
+                <span>Progress</span>
+                <strong>{{ scene.cultivation.cultivation_progress }} / {{ scene.cultivation.cultivation_progress_max }}</strong>
+              </div>
+            </div>
+            <div class="progress-bar" aria-hidden="true">
+              {% set prog_max = scene.cultivation.cultivation_progress_max or 1 %}
+              {% set prog_pct = ((scene.cultivation.cultivation_progress / prog_max) * 100)|int %}
+              <span style="width: {{ prog_pct }}%"></span>
+            </div>
+
+            {% if scene.cultivation_methods %}
+            <p class="side-note">Choose a method to cultivate.</p>
+            {% if not scene.cultivation_available %}
+            <p class="flash warning">{{ scene.cultivation_blocked_reason or "Cultivation is unavailable." }}</p>
             {% endif %}
-          </span>
-          <span class="method-desc">{{ tech.description }}</span>
-          {% if not tech.known and tech.learnable %}
-          <form method="post" action="/play/{{ scene.save_id }}/techniques/learn" style="margin-top: 0.5rem;">
-            <button type="submit" name="technique_id" value="{{ tech.id }}" class="button">
-              Learn
-            </button>
-          </form>
-          {% endif %}
-        </div>
-        {% endfor %}
-      </div>
-    </section>
-    {% endif %}
-
-    {% if scene.spiritual_roots %}
-    <section class="panel actions-panel techniques-panel">
-      <h2>Spiritual Roots</h2>
-      <p class="meta-line">Innate affinities that bias cultivation and omens through the Modifier Framework.</p>
-      <div class="action-grid">
-        {% for root in scene.spiritual_roots %}
-        <div class="method-button technique-card">
-          <span class="method-label">{{ root.display_name }}</span>
-          <span class="method-meta">
-            {{ root.element|capitalize }}
-            {% if root.awakened %}
-              · Awakened · Grade {{ root.owned_grade_rank }}
-            {% else %}
-              · Dormant
+            <form method="post" action="/play/{{ scene.save_id }}/action" class="method-list">
+              {% for method in scene.cultivation_methods %}
+              <button
+                type="submit"
+                name="action_id"
+                value="{{ method.id }}"
+                {% if not scene.cultivation_available %}disabled{% endif %}
+              >
+                <span class="method-label">{{ method.label }}</span>
+                <span class="method-meta">{{ method.time_cost_days }} day · {{ method.risk_level }} risk</span>
+              </button>
+              {% endfor %}
+            </form>
             {% endif %}
-          </span>
-          <span class="method-desc">{{ root.description }}</span>
-        </div>
-        {% endfor %}
-      </div>
-    </section>
-    {% endif %}
 
-    <p class="footer-links">
-      <a class="button secondary" href="/play/{{ scene.save_id }}/status">Character sheet</a>
-      <a class="button secondary" href="/saves">Back to saves</a>
-    </p>
+            <details class="learn-more">
+              <summary>Learn more</summary>
+              <div class="learn-more-body">
+                <p>Qi {{ scene.cultivation.qi_current }} / {{ scene.cultivation.qi_max }} · Foundation {{ scene.cultivation.foundation_stability }} / {{ scene.cultivation.foundation_stability_max }}</p>
+                {% if scene.breakthrough_readiness %}
+                <p>
+                  {% if scene.breakthrough_readiness.target_realm_name %}
+                  Toward {{ scene.breakthrough_readiness.target_realm_name }}
+                  ({{ scene.breakthrough_readiness.target_stage_name }})
+                  {% endif %}
+                </p>
+                <ul>
+                  <li>Progress {{ scene.breakthrough_readiness.progress_current }} / {{ scene.breakthrough_readiness.progress_required }}</li>
+                  <li>Stability {{ scene.breakthrough_readiness.stability_current }} (recommended {{ scene.breakthrough_readiness.stability_recommended }})</li>
+                  {% if scene.breakthrough_readiness.mode != "opening" %}
+                  <li>Chance: {{ scene.breakthrough_readiness.success_chance_band }}</li>
+                  {% else %}
+                  <li>Opening attempt — story-gated</li>
+                  {% endif %}
+                </ul>
+                {% for warning in scene.breakthrough_readiness.warnings %}
+                <p class="flash warning">{{ warning }}</p>
+                {% endfor %}
+                {% if not scene.breakthrough_readiness.eligible %}
+                <p class="flash warning">
+                  {% if scene.breakthrough_readiness.blocking_reasons %}
+                    {{ scene.breakthrough_readiness.blocking_reasons | join(" ") }}
+                  {% else %}
+                    Breakthrough is unavailable.
+                  {% endif %}
+                </p>
+                {% endif %}
+                {% if scene.cultivation_methods %}
+                <form method="post" action="/play/{{ scene.save_id }}/action" style="margin-top: 0.65rem;">
+                  <button
+                    type="submit"
+                    name="action_id"
+                    value="attempt_breakthrough"
+                    class="button primary btn-primary"
+                    style="width: 100%;"
+                    {% if not scene.breakthrough_can_attempt %}disabled{% endif %}
+                  >
+                    Attempt Breakthrough
+                  </button>
+                </form>
+                {% endif %}
+                {% endif %}
+
+                {% if scene.last_cultivation_result %}
+                <p style="margin-top: 0.75rem;">
+                  <strong>Last session:</strong> {{ scene.last_cultivation_result.method_label }}
+                  — {{ scene.last_cultivation_result.summary }}
+                </p>
+                {% endif %}
+                {% if scene.last_breakthrough_result %}
+                <p><strong>Last breakthrough:</strong> {{ scene.last_breakthrough_result.summary }}</p>
+                {% endif %}
+              </div>
+            </details>
+          </div>
+        </details>
+
+        {% if scene.techniques %}
+        <details class="side-panel">
+          <summary>Techniques</summary>
+          <div class="side-panel-body">
+            <ul class="side-list">
+              {% for tech in scene.techniques %}
+              <li>
+                <span class="item-name">{{ tech.display_name }}</span>
+                <span class="item-meta">
+                  {% if tech.known %}
+                    Known{% if tech.equipped %} · Equipped{% endif %}
+                  {% elif tech.learnable %}
+                    Available to learn
+                  {% else %}
+                    Locked
+                  {% endif %}
+                </span>
+                {% if not tech.known and tech.learnable %}
+                <form method="post" action="/play/{{ scene.save_id }}/techniques/learn" style="margin-top: 0.35rem;">
+                  <button type="submit" name="technique_id" value="{{ tech.id }}" class="button secondary btn-secondary" style="width: 100%;">
+                    Learn
+                  </button>
+                </form>
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </details>
+        {% endif %}
+
+        {% if scene.spiritual_roots %}
+        <details class="side-panel">
+          <summary>Spiritual Roots</summary>
+          <div class="side-panel-body">
+            <ul class="side-list">
+              {% for root in scene.spiritual_roots %}
+              <li>
+                <span class="item-name">{{ root.display_name }}</span>
+                <span class="item-meta">
+                  {{ root.element|capitalize }}
+                  · {% if root.awakened %}Awakened{% else %}Dormant{% endif %}
+                </span>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </details>
+        {% endif %}
+
+        {% if scene.sect_membership %}
+        <details class="side-panel">
+          <summary>Sect</summary>
+          <div class="side-panel-body">
+            <p><strong>{{ scene.sect_membership.display_name }}</strong></p>
+            <p class="meta-line">{{ scene.sect_membership.rank_display_name }}</p>
+            <p class="side-note">Standing {{ scene.sect_membership.standing_score }}</p>
+            {% if scene.sect_membership.description %}
+            <p class="side-note">{{ scene.sect_membership.description }}</p>
+            {% endif %}
+          </div>
+        </details>
+        {% endif %}
+
+        <details class="side-panel">
+          <summary>Inventory</summary>
+          <div class="side-panel-body">
+            <p class="side-note">{{ scene.money_copper }} copper</p>
+            <ul class="side-list">
+              {% for item in scene.inventory %}
+              <li>
+                <span class="item-name">{{ item.display_name }}</span>
+                <span class="item-meta">× {{ item.quantity }}</span>
+              </li>
+              {% else %}
+              <li class="meta">Nothing carried.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </details>
+      </aside>
+    </div>
   </main>
+  <script src="/static/js/main.js?v=ui2"></script>
 </body>
 </html>

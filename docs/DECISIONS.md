@@ -261,6 +261,20 @@ Canonical doc: [ASPIRATIONS.md](ASPIRATIONS.md).
 | Non-goals | Duty currency, profession XP, quest journal, combat, Sect Life ticks |
 | Next | Stop for 11b playtest before 11c event density |
 
+### UI/UX — Novel-first presentation (paused gameplay)
+
+| Decision | Choice |
+|----------|--------|
+| Priority | Cultivation novel first; management second |
+| Layout | Two-column play: story (~70%) + collapsible sidebar (~30%) |
+| Story | Primary focus; large reading stage; mechanics contextual |
+| Working Toward | Sidebar, visible when path-confirmed |
+| Collapsible | Cultivation, Techniques, Roots, Sect, Inventory; Identity brief open by default |
+| Button hierarchy | Primary Continue · Secondary Talk/Travel/Here · Utility Character/Saves |
+| Character creation | Wizard steps; background & answer cards (not radio surveys) |
+| Non-goals | No gameplay redesign, architecture changes, or new systems |
+| Gate | Screenshots + review before further Phase 11 content |
+
 ### Schema drift note (Milestone 3 repair)
 
 Older builds called ``Base.metadata.create_all()`` on app startup. That created tables **without** ``alembic_version`` history. Later, stamping to ``0002`` and running ``0003`` under SQLite could apply DDL that survived even if Alembic did not record head—re-running then failed with ``duplicate column name: world_day``. Fix: remove startup ``create_all``, make ``0003`` idempotent, and keep tests on isolated temp DBs only.

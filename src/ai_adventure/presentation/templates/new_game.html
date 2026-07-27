@@ -7,47 +7,79 @@
   <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
-  <main class="shell">
+  <main class="shell vn-shell">
     <p class="breadcrumb"><a href="/">Home</a> / <a href="/saves">Saves</a> / New Game</p>
-    <h1>New Game</h1>
-    <p class="lede">Choose a name, your pre-game life history (background), and answer five personality questions. Answers are stored as-is—no traits or Dao are assigned yet. Boundless Foundation is not available here.</p>
+    <h1>Begin your path</h1>
+    <p class="lede">
+      Choose a name and the life you lived before cultivation.
+      Each answer is kept as memory—not a class or destiny.
+      The Boundless Foundation choice comes later, in the story.
+    </p>
 
     {% if error %}
     <p class="error" role="alert">{{ error }}</p>
     {% endif %}
 
-    <form method="post" action="/new" class="stack-form">
-      <label>
-        Character name
-        <input type="text" name="character_name" maxlength="64" required value="{{ character_name }}">
-      </label>
+    {% set step_count = 2 + (questions|length) %}
+    <div class="vn-progress" id="vn-progress" aria-hidden="true">
+      {% for i in range(step_count) %}
+      <span data-step="{{ i }}"></span>
+      {% endfor %}
+    </div>
 
-      <fieldset>
-        <legend>Background (life before the game)</legend>
-        {% for background in backgrounds %}
-        <label class="choice">
-          <input
-            type="radio"
-            name="background_id"
-            value="{{ background.id }}"
-            required
-            {% if selected_background == background.id %}checked{% endif %}
-          >
-          <span>
-            <strong>{{ background.display_name }}</strong>
-            <small>{{ background.intro_flavor }}</small>
-          </span>
+    <form method="post" action="/new" class="vn-form" id="vn-form">
+      <section class="vn-step is-active" data-step="0" data-required-name="character_name">
+        <p class="vn-step-title">Your name</p>
+        <p class="vn-prompt">How will the world address you?</p>
+        <label class="vn-name-field">
+          <span class="meta">Character name</span>
+          <input type="text" name="character_name" maxlength="64" required value="{{ character_name }}" autocomplete="nickname" autofocus>
         </label>
-        {% endfor %}
-      </fieldset>
+      </section>
 
-      <fieldset>
-        <legend>Personality questions</legend>
-        {% for question in questions %}
-        <div class="question">
-          <p>{{ question.prompt }}</p>
+      <section class="vn-step" data-step="1" data-required-radio="background_id">
+        <p class="vn-step-title">Life before the gate</p>
+        <p class="vn-prompt">Your upbringing opens doors. It does not assign your fate.</p>
+        <div class="bg-grid">
+          {% for background in backgrounds %}
+          {% if background.id == 'alchemists_apprentice' %}
+            {% set accent = '⚗' %}
+          {% elif background.id == 'hunter' %}
+            {% set accent = '🏹' %}
+          {% elif background.id == 'merchant_family' %}
+            {% set accent = '⚖' %}
+          {% else %}
+            {% set accent = '◆' %}
+          {% endif %}
+          <label class="bg-card{% if selected_background == background.id %} is-selected{% endif %}">
+            <input
+              type="radio"
+              name="background_id"
+              value="{{ background.id }}"
+              required
+              {% if selected_background == background.id %}checked{% endif %}
+            >
+            <span class="bg-accent" aria-hidden="true">{{ accent }}</span>
+            <span>
+              <strong>{{ background.display_name }}</strong>
+              <small>{{ background.intro_flavor }}</small>
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+      </section>
+
+      {% for question in questions %}
+      <section
+        class="vn-step"
+        data-step="{{ loop.index + 1 }}"
+        data-required-radio="answer_{{ question.id }}"
+      >
+        <p class="vn-step-title">Question {{ loop.index }} of {{ questions|length }}</p>
+        <p class="vn-prompt">{{ question.prompt }}</p>
+        <div class="answer-grid">
           {% for answer in question.answers %}
-          <label class="choice">
+          <label class="answer-card{% if answers.get(question.id) == answer.id %} is-selected{% endif %}">
             <input
               type="radio"
               name="answer_{{ question.id }}"
@@ -55,15 +87,20 @@
               required
               {% if answers.get(question.id) == answer.id %}checked{% endif %}
             >
-            <span>{{ answer.label }}</span>
+            <span class="answer-label">{{ answer.label }}</span>
           </label>
           {% endfor %}
         </div>
-        {% endfor %}
-      </fieldset>
+      </section>
+      {% endfor %}
 
-      <button type="submit">Begin</button>
+      <div class="vn-nav">
+        <button type="button" class="button secondary btn-secondary" id="vn-back" hidden>Back</button>
+        <button type="button" class="button primary btn-primary" id="vn-next">Continue</button>
+        <button type="submit" class="button primary btn-primary" id="vn-submit" hidden>Enter the world</button>
+      </div>
     </form>
   </main>
+  <script src="/static/js/main.js?v=ui2"></script>
 </body>
 </html>

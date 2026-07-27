@@ -9,9 +9,9 @@
 <body>
   <main class="shell">
     <p class="breadcrumb"><a href="/">Home</a> / Saves</p>
-    <h1>Save slots</h1>
-    <p class="lede">Each save will hold an entire persistent world. Milestone 2 stores player, inventory, history seeds, and events.</p>
-    <p><a class="button" href="/new">New Game</a></p>
+    <h1>Your worlds</h1>
+    <p class="lede">Each save holds a persistent world. Return when you are ready to continue your path.</p>
+    <p><a class="button primary btn-primary" href="/new" style="width: auto;">New Game</a></p>
 
     {% if saves %}
     <ul class="save-list">
@@ -20,19 +20,19 @@
         <div>
           <h2>{{ save.character_name }}</h2>
           <p>{{ save.background_display_name }} · {{ save.current_location_name }}</p>
-          <p class="meta">Created {{ save.created_at }} · Last played {{ save.last_played_at }} · Playtime {{ save.playtime_seconds }}s</p>
+          <p class="meta">Last played {{ save.last_played_at }}</p>
         </div>
         <div class="row-actions">
           <form method="post" action="/saves/{{ save.save_id }}/load">
-            <button type="submit">Load</button>
+            <button type="submit" class="button primary btn-primary">Continue</button>
           </form>
-          <a class="button danger" href="/saves/{{ save.save_id }}/delete">Delete</a>
+          <a class="button secondary btn-secondary" href="/saves/{{ save.save_id }}/delete">Delete</a>
         </div>
       </li>
       {% endfor %}
     </ul>
     {% else %}
-    <p>No saves yet.</p>
+    <p class="meta">No saves yet. Begin a new game to step into the world.</p>
     {% endif %}
   </main>
 </body>

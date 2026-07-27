@@ -8,21 +8,18 @@
 </head>
 <body>
   <main class="shell">
-    <h1>{{ app_name }}</h1>
-    <p class="lede">A persistent cultivation world. Engine decides; AI only narrates later.</p>
+    <div class="home-hero">
+      <h1>{{ app_name }}</h1>
+      <p class="lede">
+        A persistent cultivation world. The engine decides what endures;
+        narration only dresses what already happened.
+      </p>
+    </div>
     <nav class="nav-actions">
-      <a class="button" href="/new">New Game</a>
-      <a class="button secondary" href="/saves">Load Saves</a>
+      <a class="button primary btn-primary" href="/new" style="width: auto;">New Game</a>
+      <a class="button secondary btn-secondary" href="/saves">Load Saves</a>
     </nav>
-    <section class="panel">
-      <h2>Scaffold status</h2>
-      <p><strong>Kind:</strong> {{ outcome_kind }}</p>
-      <p><strong>Summary:</strong> {{ outcome_summary }}</p>
-      <p><strong>Authoritative:</strong> {{ authoritative }}</p>
-      <p><strong>Schema marker:</strong> {{ schema_marker }}</p>
-      <p id="narration">{{ narration }}</p>
-    </section>
   </main>
-  <script src="/static/js/main.js"></script>
+  <script src="/static/js/main.js?v=ui2"></script>
 </body>
 </html>

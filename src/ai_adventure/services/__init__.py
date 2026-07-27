@@ -131,6 +131,9 @@ class PlaySceneModel:
     sect_membership: dict[str, Any] | None = None
     aspiration_panel: dict[str, Any] | None = None
     travel_destinations: list[dict[str, Any]] = field(default_factory=list)
+    inventory: list[dict[str, Any]] = field(default_factory=list)
+    money_copper: int = 0
+    identity_answers: dict[str, str] = field(default_factory=dict)
     message: str | None = None
     opening_complete: bool = False
     cultivation_available: bool = True
@@ -767,6 +770,24 @@ class GameAppService:
         from ai_adventure.services.npcs import NpcService
         from ai_adventure.services.sects import SectService
 
+        inventory_items: list[dict[str, Any]] = []
+        for item in getattr(player, "inventory_items", []) or []:
+            inventory_items.append(
+                {
+                    "item_code": item.item_code,
+                    "display_name": item.display_name,
+                    "quantity": item.quantity,
+                }
+            )
+
+        identity_raw = getattr(player, "identity_answers_json", "{}") or "{}"
+        try:
+            identity_answers = json.loads(identity_raw)
+            if not isinstance(identity_answers, dict):
+                identity_answers = {}
+        except json.JSONDecodeError:
+            identity_answers = {}
+
         with self._session_factory() as root_session:
             spiritual_roots = SpiritualRootService(self._session_factory).list_root_cards(
                 root_session,
@@ -803,6 +824,10 @@ class GameAppService:
                     "location_id": destination.id,
                     "display_name": destination.display_name,
                     "days": int(edge.days),
+                    "tags": list(destination.tags),
+                    "kind": destination.kind,
+                    "environment_tags": list(destination.environment_tags),
+                    "ambience": destination.presentation.ambience,
                 }
             )
 
@@ -826,6 +851,9 @@ class GameAppService:
             sect_membership=sect_membership,
             aspiration_panel=aspiration_panel,
             travel_destinations=travel_destinations,
+            inventory=inventory_items,
+            money_copper=int(getattr(player, "money_copper", 0) or 0),
+            identity_answers={str(k): str(v) for k, v in identity_answers.items()},
             message=message,
             opening_complete=opening_complete,
             cultivation_available=bool(getattr(scene, "cultivation_available", True)),

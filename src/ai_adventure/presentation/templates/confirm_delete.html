@@ -10,7 +10,10 @@
   <main class="shell">
     <p class="breadcrumb"><a href="/">Home</a> / <a href="/saves">Saves</a> / Delete</p>
     <h1>Delete save</h1>
-    <p>This will remove <strong>{{ character_name }}</strong> from the save list. The permanent save id is retained (soft-delete).</p>
+    <p class="lede">
+      This will remove <strong>{{ character_name }}</strong> from the save list.
+      The permanent save id is retained (soft-delete).
+    </p>
     <p>Type <code>{{ confirmation_value }}</code> to confirm.</p>
 
     {% if error %}
@@ -22,8 +25,10 @@
         Confirmation
         <input type="text" name="confirmation" required autocomplete="off">
       </label>
-      <button type="submit" class="danger">Delete permanently from list</button>
-      <a href="/saves">Cancel</a>
+      <div class="nav-actions">
+        <button type="submit" class="button danger">Delete from list</button>
+        <a class="button utility btn-utility" href="/saves">Cancel</a>
+      </div>
     </form>
   </main>
 </body>
