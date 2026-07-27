@@ -1,0 +1,19 @@
+[
+  {
+    "id": "ui-01",
+    "title": "Create story-first play layout",
+    "goal": "Refactor the play scene into a responsive main narrative column and a quieter secondary sidebar without changing gameplay.",
+    "allowed_areas": [
+      "src/ai_adventure/templates",
+      "src/ai_adventure/static",
+      "tests"
+    ],
+    "acceptance_criteria": [
+      "Story and current location are the primary visual focus",
+      "Working Toward remains visible",
+      "Character and cultivation details are collapsible",
+      "Mobile layout remains readable",
+      "All tests pass"
+    ]
+  },
+ ]

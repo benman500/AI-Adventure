@@ -69,3 +69,7 @@ coverage/
 logs/
 tmp/
 temp/
+
+# Automation local artifacts
+automation/runs/
+automation/test_prompt.txt
