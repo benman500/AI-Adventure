@@ -1,0 +1,16 @@
+{
+  "ok": false,
+  "violations": [
+    "File outside allowed areas: automation_v2/runs/20260728-033039-ui-01/cursor_output_0.txt",
+    "File outside allowed areas: automation_v2/runs/20260728-033039-ui-01/cursor_prompt_0.md",
+    "File outside allowed areas: automation_v2/runs/20260728-033039-ui-01/plan.json",
+    "File outside allowed areas: automation_v2/state.json"
+  ],
+  "decision": "human_review",
+  "changed_files": [
+    "automation_v2/runs/20260728-033039-ui-01/cursor_output_0.txt",
+    "automation_v2/runs/20260728-033039-ui-01/cursor_prompt_0.md",
+    "automation_v2/runs/20260728-033039-ui-01/plan.json",
+    "automation_v2/state.json"
+  ]
+}
