@@ -1,0 +1,8 @@
+STDOUT
+======
+..........                                                               [100%]
+10 passed, 293 deselected in 0.99s
+
+
+STDERR
+======

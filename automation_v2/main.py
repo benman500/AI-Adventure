@@ -45,8 +45,23 @@ def make_run_directory(runs_dir: Path, task_id: str) -> Path:
 def build_cursor_prompt(
     plan: ApprovedPlan,
     repair_instructions: list[str] | None = None,
+    *,
+    test_output: str | None = None,
+    changed_files: list[str] | None = None,
 ) -> str:
-    """Build the Cursor agent prompt for an approved plan."""
+    """Build the Cursor agent prompt for an approved plan or repair pass."""
+    presentation_task = any(
+        "presentation" in area.replace("\\", "/")
+        or area.replace("\\", "/").endswith("/templates")
+        or "/templates" in area.replace("\\", "/")
+        or "/static" in area.replace("\\", "/")
+        for area in plan.allowed_areas
+    )
+    character_creation_task = any(
+        token in f"{plan.title}\n{plan.implementation_brief}".lower()
+        for token in ("character creation", "character-creation", "new_game")
+    )
+
     prompt = f"""
 Read AGENTS.md, PROJECT_CONTEXT.md, and CURRENT_MILESTONE.md first.
 
@@ -81,24 +96,87 @@ Instructions:
 7. If blocked or ambiguous, stop and explain in automation_v2/AGENT_REPORT.md.
 8. Write automation_v2/AGENT_REPORT.md when complete.
 
+No silent no-op completions:
+
+9. If every acceptance criterion is already satisfied, provide specific evidence
+   for each criterion in the completion report under a heading named
+   "Already satisfied criteria", with one bullet per criterion in the form:
+   - <criterion text>: <specific evidence from the current code/UI before this run>
+   Otherwise, make meaningful changes to at least one allowed implementation
+   file (templates, CSS, presentation Python/tests, or assets as applicable).
+10. For presentation or UI tasks, modifying only reports, automation state,
+    run logs, or automation framework files does not count as implementing
+    the task.
+
 Temporary files and test execution:
 
-9. Do not create temporary PowerShell, batch, shell, Python, helper, or ad hoc
-   test-runner scripts anywhere in the repository (for example .ps1, .bat,
-   .cmd, .sh, or one-off .py runners).
-10. Do not add project-root scripts (for example run_ui_tests.ps1) or expand
+11. Do not create temporary PowerShell, batch, shell, Python, helper, or ad hoc
+    test-runner scripts anywhere in the repository (for example .ps1, .bat,
+    .cmd, .sh, or one-off .py runners).
+12. Do not add project-root scripts (for example run_ui_tests.ps1) or expand
     allowed areas to include them. Guardrails must not be weakened.
-11. Run approved test commands directly in the terminal
+13. Run approved test commands directly in the terminal
     (for example: python -m pytest -q). Never create a script to wrap tests.
-12. Temporary diagnostic files may only be written inside the current
+14. Temporary diagnostic files may only be written inside the current
     automation_v2 run directory. Never write temporary files to the
     repository root or application directories.
 """
+
+    if presentation_task:
+        prompt += """
+Presentation / UI requirements:
+
+15. Inspect the current templates and CSS in the allowed areas.
+16. Identify concrete presentation deficiencies relative to the acceptance
+    criteria before editing.
+17. Implement the redesign with meaningful template/CSS/test changes unless
+    you can demonstrate every acceptance criterion is already satisfied.
+18. Preserve routes, form field names, submitted values, validation behavior,
+    and gameplay behavior.
+19. Update or add focused presentation tests when necessary.
+20. Run focused tests and the full suite before finishing.
+"""
+
+    if character_creation_task:
+        prompt += """
+Character-creation specifics:
+
+21. Inspect the existing character-creation template(s) and related CSS.
+22. Identify concrete deficiencies (grouping, clickable background cards,
+    answer placement, selected/hover/focus states, responsive layout).
+23. Implement the redesign in those presentation files unless every acceptance
+    criterion is already satisfied with criterion-by-criterion evidence.
+24. Preserve character-creation routes, form field names, submitted values,
+    validation, and gameplay behavior.
+25. Update or add focused presentation tests when necessary, then run focused
+    tests and the full suite.
+"""
+
     if repair_instructions:
         prompt += "\n\nREVIEW REPAIRS REQUIRED:\n"
         prompt += "\n".join(f"- {item}" for item in repair_instructions)
+        prompt += "\n\nORIGINAL ACCEPTANCE CRITERIA:\n"
+        prompt += "\n".join(
+            f"- {item}" for item in plan.acceptance_criteria
+        )
+        if changed_files is not None:
+            prompt += "\n\nCHANGED FILES FROM PREVIOUS ATTEMPT:\n"
+            if changed_files:
+                prompt += "\n".join(f"- {item}" for item in changed_files)
+            else:
+                prompt += (
+                    "- (none — no allowed implementation files changed; "
+                    "this is a silent no-op unless criterion-by-criterion "
+                    "evidence proves the task was already complete)"
+                )
+        if test_output:
+            prompt += "\n\nTEST OUTPUT FROM PREVIOUS ATTEMPT:\n"
+            prompt += test_output[-12000:]
         prompt += (
-            "\nRepair only these findings. Do not broaden the task."
+            "\n\nRepair the implementation rather than merely rewriting the "
+            "report. Make meaningful changes to at least one allowed "
+            "implementation file unless every acceptance criterion is already "
+            "satisfied with specific criterion-by-criterion evidence."
             "\nThe PowerShell/batch/shell/Python script ban and run-directory "
             "diagnostic-file limit above still apply during repair."
         )
@@ -313,6 +391,8 @@ class Orchestrator:
 
         attempt = state.attempt_number
         repair_instructions = list(state.repair_instructions)
+        last_test_output: str | None = None
+        last_changed_files: list[str] | None = None
 
         while attempt <= self.config.max_repair_attempts:
             if _elapsed_hours(start) >= self.config.max_runtime_hours:
@@ -332,7 +412,12 @@ class Orchestrator:
             state.repair_instructions = repair_instructions
             self.state_manager.save(state)
 
-            prompt = build_cursor_prompt(plan, repair_instructions or None)
+            prompt = build_cursor_prompt(
+                plan,
+                repair_instructions or None,
+                test_output=last_test_output,
+                changed_files=last_changed_files,
+            )
             cursor_result = invoke_cursor(
                 prompt=prompt,
                 run_dir=run_dir,
@@ -368,6 +453,7 @@ class Orchestrator:
                 json.dumps(guardrail.to_dict(), indent=2),
                 encoding="utf-8",
             )
+            last_changed_files = list(guardrail.changed_files)
             if not guardrail.ok:
                 state.current_stage = "human_review"
                 state.last_error = "; ".join(guardrail.violations)
@@ -398,6 +484,10 @@ class Orchestrator:
                     indent=2,
                 ),
                 encoding="utf-8",
+            )
+            last_test_output = (
+                f"stdout:\n{tests.stdout[-8000:]}\n\n"
+                f"stderr:\n{tests.stderr[-4000:]}"
             )
             state.last_successful_stage = "testing"
             self.state_manager.save(state)

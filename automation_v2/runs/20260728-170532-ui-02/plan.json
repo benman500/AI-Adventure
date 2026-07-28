@@ -1,0 +1,44 @@
+{
+  "decision": "approve",
+  "title": "Modernize character creation presentation",
+  "implementation_brief": "Inspect the existing character-creation templates, styles, and presentation tests. Redesign only the server-rendered presentation so each question forms a distinct, readable group; background options are fully clickable cards using correctly associated labels and existing form controls; and personality answers remain directly beneath their corresponding question. Add clear selected, hover, and keyboard-focus-visible states, plus responsive styling for desktop and mobile. Preserve every existing route, form action, HTTP method, input name, submitted value, validation path, and gameplay behavior. Prefer existing shared styling patterns and minimal template/CSS changes; do not introduce a JavaScript framework or move logic out of the existing presentation flow. Add or update focused presentation tests without weakening existing assertions. Run focused tests and the full suite, then update automation/AGENT_REPORT.md with files changed, commands and results, risks, and review items.",
+  "allowed_areas": [
+    "src/ai_adventure/presentation/templates",
+    "src/ai_adventure/presentation/static",
+    "tests",
+    "automation/AGENT_REPORT.md"
+  ],
+  "acceptance_criteria": [
+    "Each character-creation question is visually separated, readable, and associated with its own answer group.",
+    "Background choices are fully clickable cards while retaining the existing form controls, field names, and submitted values.",
+    "Personality answers render directly beneath the correct question.",
+    "Choices have clear selected, hover, and keyboard focus-visible states.",
+    "Existing routes, form actions, HTTP methods, field names, submitted values, validation behavior, and gameplay behavior remain unchanged.",
+    "The character-creation page remains usable without horizontal overflow at desktop and mobile widths.",
+    "Focused presentation tests pass.",
+    "The full test suite passes with python -m pytest -q.",
+    "automation/AGENT_REPORT.md records the completed work and test results."
+  ],
+  "forbidden_changes": [
+    "Changing gameplay, character-creation rules, validation rules, or generated character state.",
+    "Changing routes, form actions, HTTP methods, input names, option values, or submission behavior.",
+    "Adding dependencies, JavaScript frameworks, client-side gameplay logic, or new architectural layers.",
+    "Adding database changes, migrations, catalogs, progression systems, or other gameplay systems.",
+    "Converting the page away from the existing server-rendered architecture.",
+    "Editing files outside the listed allowed areas.",
+    "Deleting, skipping, weakening, or rewriting tests solely to make them pass.",
+    "Performing unrelated template, styling, or test refactors."
+  ],
+  "focused_tests": [
+    "python -m pytest -q tests -k \"character_creation or character_creation_page\"",
+    "python -m pytest -q"
+  ],
+  "stop_conditions": [
+    "The requested visual design cannot be implemented without changing existing form names, submitted values, routes, validation, or gameplay behavior.",
+    "Implementation would require a new dependency, framework, architecture change, migration, or edit outside the allowed areas.",
+    "The mapping between personality questions and their answer values is ambiguous in the existing implementation.",
+    "Existing focused tests reveal conflicting product expectations that require choosing new behavior.",
+    "The full test suite fails for reasons caused by the changes and cannot be fixed within the allowed presentation scope.",
+    "More than 25 files would need to be changed."
+  ]
+}

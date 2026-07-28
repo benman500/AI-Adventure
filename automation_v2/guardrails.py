@@ -52,6 +52,46 @@ def collect_runtime_artifacts(changed_files: list[str]) -> list[str]:
     ]
 
 
+def is_report_or_automation_framework_path(path: str) -> bool:
+    """Return True for reports, run logs, state, and automation framework files.
+
+    These never count as implementing a presentation/UI (or similar) task.
+    """
+    normalized = normalize_repo_path(path)
+    if is_runtime_artifact(normalized):
+        return True
+    return normalized.startswith("automation_v2/") or normalized.startswith(
+        "automation/"
+    )
+
+
+def path_in_allowed_areas(path: str, allowed_areas: list[str]) -> bool:
+    """Return True when ``path`` is inside one of the allowed area prefixes."""
+    normalized = normalize_repo_path(path)
+    areas = [area.replace("\\", "/").rstrip("/") for area in allowed_areas]
+    return any(
+        normalized == area or normalized.startswith(area + "/")
+        for area in areas
+    )
+
+
+def filter_substantive_implementation_files(
+    changed_files: list[str],
+    allowed_areas: list[str],
+) -> list[str]:
+    """Return allowed project files that count as real task implementation.
+
+    Excludes reports, automation state, run logs, and automation framework
+    files even when those paths appear in ``allowed_areas``.
+    """
+    return [
+        normalize_repo_path(path)
+        for path in changed_files
+        if not is_report_or_automation_framework_path(path)
+        and path_in_allowed_areas(path, allowed_areas)
+    ]
+
+
 def filter_diff_for_review(
     diff: dict[str, str | list[str] | bool],
 ) -> dict[str, str | list[str] | bool]:

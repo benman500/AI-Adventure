@@ -7,6 +7,10 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from automation_v2.config import AutomationConfig
+from automation_v2.guardrails import (
+    filter_diff_for_review,
+    filter_substantive_implementation_files,
+)
 from automation_v2.models import (
     ApprovedPlan,
     GuardrailResult,
@@ -18,7 +22,6 @@ from automation_v2.planner import (
     OpenAIResponsesClient,
     parse_json_object,
 )
-from automation_v2.guardrails import filter_diff_for_review
 
 
 class ReviewerClient(Protocol):
@@ -32,7 +35,7 @@ REVIEWER_INSTRUCTIONS = """
 You are the supervising reviewer for an existing cultivation RPG.
 
 Judge the implementation only against the approved task, locked architecture,
-test results, changed files, and diff.
+test results, changed files, diff, and the implementation report.
 
 Ignore automation framework runtime artifacts when judging scope. These files
 are produced by the orchestrator for diagnostics and are not implementation
@@ -46,6 +49,18 @@ work. Do not request human review merely because they appear in a raw worktree:
 The supplied changed_files list and diff are already filtered to implementation
 files (templates, CSS, Python, tests, assets, and similar project files).
 Judge allowed-area scope only from that filtered evidence.
+
+For presentation or UI tasks, modifying only reports, automation state, run
+logs, or automation framework files does not count as implementing the task.
+
+If the task required a concrete implementation or redesign, no allowed
+implementation files changed, and the implementation report lacks specific
+criterion-by-criterion evidence that every acceptance criterion was already
+satisfied before the run, you must choose repair.
+
+You may approve a no-change result only when the implementation report contains
+specific evidence for each acceptance criterion showing it was already
+satisfied before the run.
 
 Return JSON only:
 
@@ -62,11 +77,15 @@ Approve only when:
 - tests pass,
 - the task stayed in scope,
 - no architecture or game-rule changes were introduced,
-- no tests were weakened or deleted merely to make the task pass.
+- no tests were weakened or deleted merely to make the task pass,
+- and either allowed implementation files changed, or the report proves every
+  criterion was already satisfied before the run.
 
 Never approve failed tests.
 Never approve scope violations.
 Never approve weakened or deleted tests merely to make the task pass.
+Never approve a silent no-op or report-only completion for an implementation
+or redesign task.
 
 Choose human_review for:
 
@@ -78,6 +97,114 @@ Choose human_review for:
 - suspiciously broad refactors,
 - changes outside allowed areas in the filtered implementation file list.
 """
+
+_IMPLEMENTATION_KEYWORDS = (
+    "redesign",
+    "implement",
+    "modernize",
+    "improve",
+    "create",
+    "update",
+    "refactor",
+    "presentation",
+    "template",
+    "css",
+    "layout",
+    "visual",
+    "ui",
+    "card",
+    "character creation",
+    "character-creation",
+)
+
+_ALREADY_COMPLETE_MARKERS = (
+    "already satisfied criteria",
+    "already satisfied",
+    "already met",
+    "already complete",
+    "already present",
+    "already implemented",
+    "before this run",
+    "before the run",
+)
+
+_REPORT_CANDIDATES = (
+    "automation/AGENT_REPORT.md",
+    "automation_v2/AGENT_REPORT.md",
+)
+
+
+def plan_requires_implementation(plan: ApprovedPlan) -> bool:
+    """Return True when the plan asks for concrete implementation work."""
+    text = " ".join(
+        [
+            plan.title,
+            plan.implementation_brief,
+            *plan.acceptance_criteria,
+        ]
+    ).lower()
+    return any(keyword in text for keyword in _IMPLEMENTATION_KEYWORDS)
+
+
+def load_implementation_report(repository_root: Path) -> str:
+    """Load the newest available agent completion report text."""
+    chunks: list[str] = []
+    for relative in _REPORT_CANDIDATES:
+        path = repository_root / relative
+        if path.is_file():
+            chunks.append(path.read_text(encoding="utf-8"))
+    return "\n\n".join(chunks)
+
+
+def report_has_criterion_by_criterion_evidence(
+    report_text: str,
+    acceptance_criteria: list[str],
+) -> bool:
+    """Return True when the report evidences each criterion as already done."""
+    if not report_text.strip() or not acceptance_criteria:
+        return False
+
+    lower = report_text.lower()
+    if not any(marker in lower for marker in _ALREADY_COMPLETE_MARKERS):
+        return False
+    if "already satisfied criteria" not in lower:
+        return False
+
+    for criterion in acceptance_criteria:
+        key = " ".join(criterion.lower().split())
+        if not key:
+            return False
+        snippet = key[:60]
+        if snippet not in lower:
+            return False
+    return True
+
+
+def silent_noop_repair_result(plan: ApprovedPlan) -> ReviewResult:
+    """Build a deterministic repair decision for empty implementation work."""
+    return ReviewResult(
+        decision="repair",
+        summary=(
+            "The task required implementation, but no allowed implementation "
+            "files changed and the completion report lacks criterion-by-criterion "
+            "evidence that every acceptance criterion was already satisfied."
+        ),
+        repair_instructions=[
+            "Inspect the existing implementation in the allowed areas "
+            "(templates, CSS, presentation tests, and assets as applicable).",
+            "Identify concrete deficiencies relative to each acceptance criterion.",
+            "Make meaningful changes to at least one allowed implementation file. "
+            "Modifying only reports, automation state, run logs, or automation "
+            "framework files does not count.",
+            "Preserve routes, form field names, submitted values, validation, "
+            "and gameplay behavior.",
+            "Update or add focused presentation tests when necessary.",
+            "Run focused tests and the full suite.",
+            "Repair the implementation rather than merely rewriting the report.",
+            *[f"Acceptance criterion: {item}" for item in plan.acceptance_criteria],
+        ],
+        risks=["Silent no-op or report-only completion"],
+    )
 
 
 def validate_review_payload(data: dict[str, Any]) -> ReviewResult:
@@ -113,8 +240,11 @@ def validate_review_payload(data: dict[str, Any]) -> ReviewResult:
 def apply_hard_review_rules(
     result: ReviewResult,
     *,
+    plan: ApprovedPlan,
     tests: TestResult,
     guardrails: GuardrailResult,
+    substantive_files: list[str],
+    report_text: str,
 ) -> ReviewResult:
     """Override model decisions that violate non-negotiable rules."""
     if not tests.passed or tests.timed_out:
@@ -140,6 +270,17 @@ def apply_hard_review_rules(
             repair_instructions=[],
             risks=result.risks + list(guardrails.violations),
         )
+
+    if (
+        plan_requires_implementation(plan)
+        and not substantive_files
+        and not report_has_criterion_by_criterion_evidence(
+            report_text,
+            plan.acceptance_criteria,
+        )
+    ):
+        if result.decision == "approve":
+            return silent_noop_repair_result(plan)
     return result
 
 
@@ -188,6 +329,26 @@ class Reviewer:
                 risks=["Failed or timed-out tests"],
             )
 
+        filtered_diff = filter_diff_for_review(diff)
+        changed = filtered_diff.get("changed_files", [])
+        if not isinstance(changed, list):
+            changed = []
+        substantive_files = filter_substantive_implementation_files(
+            [str(item) for item in changed],
+            plan.allowed_areas,
+        )
+        report_text = load_implementation_report(self._config.repository_root)
+
+        if (
+            plan_requires_implementation(plan)
+            and not substantive_files
+            and not report_has_criterion_by_criterion_evidence(
+                report_text,
+                plan.acceptance_criteria,
+            )
+        ):
+            return silent_noop_repair_result(plan)
+
         payload = {
             "plan": plan.to_dict(),
             "tests": {
@@ -200,7 +361,9 @@ class Reviewer:
                 "log_file": tests.log_file,
             },
             "guardrails": guardrails.to_dict(),
-            "diff": filter_diff_for_review(diff),
+            "diff": filtered_diff,
+            "substantive_implementation_files": substantive_files,
+            "implementation_report": report_text[-20000:],
             "locked_context": context,
         }
         input_text = json.dumps(payload, indent=2)
@@ -225,8 +388,11 @@ class Reviewer:
                 result = validate_review_payload(data)
                 return apply_hard_review_rules(
                     result,
+                    plan=plan,
                     tests=tests,
                     guardrails=guardrails,
+                    substantive_files=substantive_files,
+                    report_text=report_text,
                 )
             except (ValueError, json.JSONDecodeError, TypeError, KeyError) as exc:
                 last_error = str(exc)

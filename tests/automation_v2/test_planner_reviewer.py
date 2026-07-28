@@ -300,6 +300,182 @@ def test_reviewer_filters_runtime_artifacts_from_diff_payload() -> None:
     assert "automation/AGENT_REPORT.md" not in payload["diff"]["changed_files"]
 
 
+def test_reviewer_repairs_silent_noop_without_criterion_evidence(
+    tmp_path: Path,
+) -> None:
+    """UI redesign with no implementation files and no evidence needs repair."""
+    from dataclasses import replace
+
+    config = replace(CONFIG, repository_root=tmp_path)
+    client = ScriptedClient(
+        [
+            '{"decision": "approve", "summary": "looks done", '
+            '"repair_instructions": [], "risks": []}'
+        ]
+    )
+    reviewer = Reviewer(config, client=client)
+    plan = ApprovedPlan(
+        decision="approve",
+        title="Modernize character creation",
+        implementation_brief="Redesign the character-creation presentation.",
+        allowed_areas=list(TASK.allowed_areas),
+        acceptance_criteria=[
+            "Each character-creation question is visually separated",
+            "Background choices are fully clickable cards",
+        ],
+        forbidden_changes=[],
+        focused_tests=[],
+        stop_conditions=[],
+    )
+    result = reviewer.review(
+        plan=plan,
+        tests=TestResult(
+            passed=True,
+            returncode=0,
+            stdout="298 passed",
+            stderr="",
+            log_file="pytest.txt",
+        ),
+        guardrails=GuardrailResult(
+            ok=True,
+            violations=[],
+            decision="approve",
+            changed_files=[],
+        ),
+        diff={"stat": "", "diff": "", "changed_files": []},
+        context="ctx",
+    )
+    assert result.decision == "repair"
+    assert client.calls == 0
+    assert "no allowed implementation files changed" in result.summary.lower()
+    assert any(
+        "meaningful changes" in item.lower()
+        for item in result.repair_instructions
+    )
+
+
+def test_reviewer_report_only_changes_do_not_satisfy_ui_task(
+    tmp_path: Path,
+) -> None:
+    """Report/automation-only edits are not substantive UI implementation."""
+    from dataclasses import replace
+
+    from automation_v2.guardrails import filter_substantive_implementation_files
+
+    config = replace(CONFIG, repository_root=tmp_path)
+    report_only = [
+        "automation/AGENT_REPORT.md",
+        "automation_v2/AGENT_REPORT.md",
+        "automation_v2/state.json",
+        "automation_v2/runs/x/cursor_log_0.txt",
+    ]
+    assert (
+        filter_substantive_implementation_files(
+            report_only,
+            list(TASK.allowed_areas) + ["automation/AGENT_REPORT.md"],
+        )
+        == []
+    )
+
+    client = ScriptedClient([])
+    reviewer = Reviewer(config, client=client)
+    plan = ApprovedPlan(
+        decision="approve",
+        title="Modernize character creation",
+        implementation_brief="Redesign character-creation templates and CSS.",
+        allowed_areas=list(TASK.allowed_areas) + ["automation/AGENT_REPORT.md"],
+        acceptance_criteria=["Background choices are fully clickable cards"],
+        forbidden_changes=[],
+        focused_tests=[],
+        stop_conditions=[],
+    )
+    result = reviewer.review(
+        plan=plan,
+        tests=TestResult(
+            passed=True,
+            returncode=0,
+            stdout="ok",
+            stderr="",
+            log_file="pytest.txt",
+        ),
+        guardrails=GuardrailResult(
+            ok=True,
+            violations=[],
+            decision="approve",
+            changed_files=[],
+            runtime_artifacts=report_only,
+        ),
+        diff={"changed_files": report_only},
+        context="ctx",
+    )
+    assert result.decision == "repair"
+    assert client.calls == 0
+
+
+def test_reviewer_may_approve_already_complete_with_criterion_evidence(
+    tmp_path: Path,
+) -> None:
+    """No-change approval is allowed when every criterion has evidence."""
+    from dataclasses import replace
+
+    report_dir = tmp_path / "automation"
+    report_dir.mkdir(parents=True)
+    criteria = [
+        "Each character-creation question is visually separated",
+        "Background choices are fully clickable cards",
+    ]
+    (report_dir / "AGENT_REPORT.md").write_text(
+        "# Report\n\n"
+        "## Already satisfied criteria\n"
+        f"- {criteria[0]}: questions already use distinct fieldset groups "
+        "with legends in new_game.html before this run.\n"
+        f"- {criteria[1]}: background options already use fully clickable "
+        "label.bg-card wrappers around existing inputs before this run.\n",
+        encoding="utf-8",
+    )
+    config = replace(CONFIG, repository_root=tmp_path)
+    client = ScriptedClient(
+        [
+            '{"decision": "approve", "summary": "already complete with evidence", '
+            '"repair_instructions": [], "risks": []}'
+        ]
+    )
+    reviewer = Reviewer(config, client=client)
+    plan = ApprovedPlan(
+        decision="approve",
+        title="Modernize character creation",
+        implementation_brief="Redesign character-creation presentation.",
+        allowed_areas=list(TASK.allowed_areas),
+        acceptance_criteria=criteria,
+        forbidden_changes=[],
+        focused_tests=[],
+        stop_conditions=[],
+    )
+    result = reviewer.review(
+        plan=plan,
+        tests=TestResult(
+            passed=True,
+            returncode=0,
+            stdout="298 passed",
+            stderr="",
+            log_file="pytest.txt",
+        ),
+        guardrails=GuardrailResult(
+            ok=True,
+            violations=[],
+            decision="approve",
+            changed_files=[],
+        ),
+        diff={"changed_files": []},
+        context="ctx",
+    )
+    assert result.decision == "approve"
+    assert client.calls == 1
+    assert "already complete" in client.last_input_text.lower() or (
+        "already satisfied criteria" in client.last_input_text.lower()
+    )
+
+
 def test_validate_review_payload_rejects_unknown_decision() -> None:
     """Review decisions are limited to approve/repair/human_review."""
     try:

@@ -67,6 +67,13 @@ Rules:
 - Keep the work inside the current milestone.
 - Choose human_review if the task requires migrations, architecture changes,
   new dependencies, unclear product decisions, or gameplay-rule changes.
+- For concrete implementation or redesign tasks (especially presentation/UI),
+  write an implementation_brief that requires Cursor to inspect the current
+  templates/CSS/tests, identify concrete deficiencies, and make meaningful
+  changes to at least one allowed implementation file. Updating only reports,
+  automation state, run logs, or automation framework files is not enough.
+- Require criterion-by-criterion evidence in the completion report only when
+  claiming every acceptance criterion is already satisfied before the run.
 """
 
 
