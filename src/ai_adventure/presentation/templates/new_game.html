@@ -29,44 +29,52 @@
 
     <form method="post" action="/new" class="vn-form" id="vn-form">
       <section class="vn-step is-active" data-step="0" data-required-name="character_name">
-        <p class="vn-step-title">Your name</p>
-        <p class="vn-prompt">How will the world address you?</p>
-        <label class="vn-name-field">
-          <span class="meta">Character name</span>
-          <input type="text" name="character_name" maxlength="64" required value="{{ character_name }}" autocomplete="nickname" autofocus>
-        </label>
+        <fieldset class="vn-fieldset">
+          <legend class="vn-legend">
+            <span class="vn-step-title">Your name</span>
+            <span class="vn-prompt">How will the world address you?</span>
+          </legend>
+          <label class="vn-name-field">
+            <span class="meta">Character name</span>
+            <input type="text" name="character_name" maxlength="64" required value="{{ character_name }}" autocomplete="nickname" autofocus>
+          </label>
+        </fieldset>
       </section>
 
       <section class="vn-step" data-step="1" data-required-radio="background_id">
-        <p class="vn-step-title">Life before the gate</p>
-        <p class="vn-prompt">Your upbringing opens doors. It does not assign your fate.</p>
-        <div class="bg-grid">
-          {% for background in backgrounds %}
-          {% if background.id == 'alchemists_apprentice' %}
-            {% set accent = '⚗' %}
-          {% elif background.id == 'hunter' %}
-            {% set accent = '🏹' %}
-          {% elif background.id == 'merchant_family' %}
-            {% set accent = '⚖' %}
-          {% else %}
-            {% set accent = '◆' %}
-          {% endif %}
-          <label class="bg-card{% if selected_background == background.id %} is-selected{% endif %}">
-            <input
-              type="radio"
-              name="background_id"
-              value="{{ background.id }}"
-              required
-              {% if selected_background == background.id %}checked{% endif %}
-            >
-            <span class="bg-accent" aria-hidden="true">{{ accent }}</span>
-            <span>
-              <strong>{{ background.display_name }}</strong>
-              <small>{{ background.intro_flavor }}</small>
-            </span>
-          </label>
-          {% endfor %}
-        </div>
+        <fieldset class="vn-fieldset">
+          <legend class="vn-legend">
+            <span class="vn-step-title">Life before the gate</span>
+            <span class="vn-prompt">Your upbringing opens doors. It does not assign your fate.</span>
+          </legend>
+          <div class="bg-grid">
+            {% for background in backgrounds %}
+            {% if background.id == 'alchemists_apprentice' %}
+              {% set accent = '⚗' %}
+            {% elif background.id == 'hunter' %}
+              {% set accent = '🏹' %}
+            {% elif background.id == 'merchant_family' %}
+              {% set accent = '⚖' %}
+            {% else %}
+              {% set accent = '◆' %}
+            {% endif %}
+            <label class="bg-card{% if selected_background == background.id %} is-selected{% endif %}">
+              <input
+                type="radio"
+                name="background_id"
+                value="{{ background.id }}"
+                required
+                {% if selected_background == background.id %}checked{% endif %}
+              >
+              <span class="bg-accent" aria-hidden="true">{{ accent }}</span>
+              <span class="bg-card-body">
+                <strong>{{ background.display_name }}</strong>
+                <small>{{ background.intro_flavor }}</small>
+              </span>
+            </label>
+            {% endfor %}
+          </div>
+        </fieldset>
       </section>
 
       {% for question in questions %}
@@ -75,22 +83,26 @@
         data-step="{{ loop.index + 1 }}"
         data-required-radio="answer_{{ question.id }}"
       >
-        <p class="vn-step-title">Question {{ loop.index }} of {{ questions|length }}</p>
-        <p class="vn-prompt">{{ question.prompt }}</p>
-        <div class="answer-grid">
-          {% for answer in question.answers %}
-          <label class="answer-card{% if answers.get(question.id) == answer.id %} is-selected{% endif %}">
-            <input
-              type="radio"
-              name="answer_{{ question.id }}"
-              value="{{ answer.id }}"
-              required
-              {% if answers.get(question.id) == answer.id %}checked{% endif %}
-            >
-            <span class="answer-label">{{ answer.label }}</span>
-          </label>
-          {% endfor %}
-        </div>
+        <fieldset class="vn-fieldset" data-question-id="{{ question.id }}">
+          <legend class="vn-legend">
+            <span class="vn-step-title">Question {{ loop.index }} of {{ questions|length }}</span>
+            <span class="vn-prompt">{{ question.prompt }}</span>
+          </legend>
+          <div class="answer-grid">
+            {% for answer in question.answers %}
+            <label class="answer-card{% if answers.get(question.id) == answer.id %} is-selected{% endif %}">
+              <input
+                type="radio"
+                name="answer_{{ question.id }}"
+                value="{{ answer.id }}"
+                required
+                {% if answers.get(question.id) == answer.id %}checked{% endif %}
+              >
+              <span class="answer-label">{{ answer.label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </fieldset>
       </section>
       {% endfor %}
 
@@ -101,6 +113,6 @@
       </div>
     </form>
   </main>
-  <script src="/static/js/main.js?v=ui2"></script>
+  <script src="/static/js/main.js?v=ui3"></script>
 </body>
 </html>

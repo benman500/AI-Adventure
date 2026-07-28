@@ -127,11 +127,24 @@ function firstIncompleteStep(steps) {
 }
 
 function focusStep(step) {
-  const focusable = step.querySelector(
-    "input:not([type='radio']), textarea, .answer-card, .bg-card"
-  );
-  if (focusable && typeof focusable.focus === "function") {
-    focusable.focus({ preventScroll: true });
+  const nameField = step.querySelector('input[name="character_name"]');
+  if (nameField) {
+    nameField.focus({ preventScroll: true });
+    return;
+  }
+  const radioName = step.dataset.requiredRadio;
+  if (radioName) {
+    const preferred =
+      step.querySelector(`input[name="${radioName}"]:checked`) ||
+      step.querySelector(`input[name="${radioName}"]`);
+    if (preferred) {
+      preferred.focus({ preventScroll: true });
+      return;
+    }
+  }
+  const fallback = step.querySelector("input, textarea, button");
+  if (fallback) {
+    fallback.focus({ preventScroll: true });
   }
 }
 
