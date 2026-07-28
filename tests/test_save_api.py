@@ -27,7 +27,7 @@ async def test_new_game_load_delete_flow(tmp_path: Path) -> None:
         form_page = await client.get("/new")
         assert form_page.status_code == 200
         assert b"Merchant Family" in form_page.content
-        assert b"not available" in form_page.content.lower()
+        assert b"Boundless Foundation" in form_page.content
 
         create = await client.post(
             "/new",

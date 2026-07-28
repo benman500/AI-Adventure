@@ -40,14 +40,21 @@ def run_command(
     *,
     timeout: int | None = None,
 ) -> subprocess.CompletedProcess[str]:
-    """Run a command in the project directory and capture its output."""
+    """Run a command using UTF-8 and safely replace invalid output characters."""
+    environment = os.environ.copy()
+    environment["PYTHONUTF8"] = "1"
+    environment["PYTHONIOENCODING"] = "utf-8"
+
     return subprocess.run(
         args,
         cwd=ROOT,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         capture_output=True,
         timeout=timeout,
         shell=False,
+        env=environment,
     )
 
 
@@ -306,11 +313,16 @@ def run_tests(run_dir: Path) -> dict[str, Any]:
 
 def collect_diff() -> dict[str, Any]:
     stat = run_command(["git", "diff", "--stat"])
-    diff = run_command(["git", "diff", "--", ".", ":(exclude)automation/runs"])
+    diff = run_command(
+        ["git", "diff", "--", ".", ":(exclude)automation/runs"]
+    )
+
+    stat_output = stat.stdout or ""
+    diff_output = diff.stdout or ""
 
     return {
-        "stat": stat.stdout,
-        "diff_tail": diff.stdout[-60000:],
+        "stat": stat_output,
+        "diff_tail": diff_output[-60000:],
         "changed_files": changed_files(),
     }
 

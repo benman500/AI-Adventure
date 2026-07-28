@@ -191,7 +191,9 @@ def test_cultivation_ui_methods_and_disabled_states(tmp_path: Path) -> None:
 
     early = client.get(f"/play/{save_id}")
     assert early.status_code == 200
-    assert b"Cultivate" not in early.content
+    assert b"<summary>Cultivation</summary>" in early.content
+    assert b'value="cautious"' not in early.content
+    assert b"Cautious" not in early.content
 
     # Walk to hall via service sharing the same DB URL is awkward; use story actions.
     client.post(f"/play/{save_id}/action", data={"action_id": "check_snares"})
@@ -209,7 +211,7 @@ def test_cultivation_ui_methods_and_disabled_states(tmp_path: Path) -> None:
 
     hall = client.get(f"/play/{save_id}")
     assert hall.status_code == 200
-    assert b"Cultivate" in hall.content
+    assert b"<summary>Cultivation</summary>" in hall.content
     assert b"Cautious" in hall.content
     assert b"Balanced" in hall.content
     assert b"Aggressive" in hall.content

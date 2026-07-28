@@ -26,6 +26,6 @@ async def test_health_and_home(tmp_path: Path) -> None:
 
         home = await client.get("/")
         assert home.status_code == 200
-        assert b"Scaffold status" in home.content
         assert b"New Game" in home.content
-        assert b"Narration" in home.content or b"Engine ready" in home.content
+        assert b"Load Saves" in home.content
+        assert b"cultivation" in home.content.lower()
