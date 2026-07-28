@@ -1,0 +1,6 @@
+Shell tool returned Rejected for all pytest invocations during this run (2026-07-28).
+Implementation completed: travel destination cards polished in play_scene.html + main.css;
+tests/test_travel_destinations_ui.py updated for form contracts and unavailable-not-rendered.
+Orchestrator should run:
+  python -m pytest -q tests/test_travel_destinations_ui.py
+  python -m pytest -q

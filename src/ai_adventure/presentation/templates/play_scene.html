@@ -146,15 +146,17 @@
                   <p class="travel-status">You are here</p>
                   <h3 class="travel-name">{{ scene.current_location_name }}</h3>
                 </header>
-                <p class="travel-blurb">Current location</p>
               </article>
 
               {% for dest in scene.travel_destinations %}
               {% set env = dest.environment_tags|default([]) %}
+              {% set tags = dest.tags|default([]) %}
               {% if dest.ambience %}
                 {% set blurb = dest.ambience %}
               {% elif env %}
                 {% set blurb = env | join(' · ') | replace('_', ' ') %}
+              {% elif tags %}
+                {% set blurb = tags | join(' · ') | replace('_', ' ') %}
               {% elif dest.kind %}
                 {% set blurb = dest.kind | replace('_', ' ') | title %}
               {% else %}
@@ -167,9 +169,7 @@
                 <header class="travel-destination-header">
                   <p class="travel-status">Open route</p>
                   <h3 class="travel-name">{{ dest.display_name }}</h3>
-                  <p class="travel-meta">
-                    {% if dest.days %}{{ dest.days }}d{% else %}Nearby{% endif %}
-                  </p>
+                  <p class="travel-meta">{{ dest.days }}d</p>
                 </header>
                 {% if blurb %}
                 <p class="travel-blurb">{{ blurb }}</p>
@@ -180,9 +180,10 @@
                     name="to_location_id"
                     value="{{ dest.location_id }}"
                     class="button primary btn-primary travel-action-primary"
-                    aria-label="Travel to {{ dest.display_name }}"
+                    aria-label="Travel to {{ dest.display_name }}, {{ dest.days }}d"
                   >
-                    Travel
+                    <span class="travel-action-label">Travel</span>
+                    <span class="travel-action-meta">{{ dest.days }}d</span>
                   </button>
                 </form>
               </article>

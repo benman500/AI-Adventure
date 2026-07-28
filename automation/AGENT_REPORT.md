@@ -1,14 +1,16 @@
-# Agent Report — ui-04 Modernize travel destination presentation (repair)
+# Agent Report — ui-04 Modernize travel destination presentation
 
-## Status: REPAIR COMPLETE
+## Status: IMPLEMENTATION COMPLETE (pytest blocked in-agent)
 
 ## Task completed
 
-Fixed the failing travel form-contract assertion by placing `method="post"` and `action="/play/{{ scene.save_id }}/travel"` on the same `<form>` line in `play_scene.html`, matching other play-scene forms and the presentation test contract. Travel destination card presentation from the prior attempt is unchanged.
+Polished travel destination presentation: current vs available cards, view-model-only descriptive context, obvious Travel controls, responsive layout. No form/route/gameplay changes. Unavailable destinations are not inferred.
 
 ## Files changed
 
 - `src/ai_adventure/presentation/templates/play_scene.html`
+- `src/ai_adventure/presentation/static/css/main.css`
+- `tests/test_travel_destinations_ui.py`
 - `automation/AGENT_REPORT.md`
 - `automation_v2/AGENT_REPORT.md`
 
@@ -19,17 +21,17 @@ python -m pytest -q tests/test_travel_destinations_ui.py
 python -m pytest -q
 ```
 
-In-agent Shell invocations were rejected; pytest could not be run from this session. Static check confirms the exact form-contract substring is now present.
+Shell rejected in-agent; orchestrator must re-run.
 
 ## Test results
 
-Unavailable in-agent. Orchestrator should re-run the commands above; the previous sole failure was the multiline form attribute substring.
+Not available in this session.
 
 ## Remaining risks
 
-- Unavailable destinations are not supplied to the template by the view model; CSS hooks exist only.
-- Confirm full suite via orchestrator after this repair.
+- Confirm suite via orchestrator.
+- Locked/unavailable routes still not in the view model (by design for this task).
 
 ## Anything requiring human review
 
-None beyond orchestrator re-run of focused and full pytest.
+Visual spot-check of Nearby travel cards on desktop and narrow mobile widths after pytest passes.

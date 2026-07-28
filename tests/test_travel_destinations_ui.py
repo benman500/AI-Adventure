@@ -44,11 +44,16 @@ def test_travel_destination_template_hierarchy_and_form_contracts() -> None:
     assert 'class="travel-list"' in template
     assert "travel-destination--current" in template
     assert "travel-destination--available" in template
+    assert "travel-destination--unavailable" not in template
     assert 'class="travel-destination-header"' in template
     assert 'class="travel-name"' in template
     assert 'class="travel-blurb"' in template
     assert 'class="travel-status"' in template
+    assert 'class="travel-meta"' in template
+    assert "{{ dest.days }}d" in template
     assert "travel-action-primary" in template
+    assert 'class="travel-action-label"' in template
+    assert 'class="travel-action-meta"' in template
 
     assert 'method="post" action="/play/{{ scene.save_id }}/travel"' in template
     assert 'name="to_location_id"' in template
@@ -57,16 +62,25 @@ def test_travel_destination_template_hierarchy_and_form_contracts() -> None:
     # Descriptive context uses supplied fields only (no invented flavor strings).
     assert "dest.ambience" in template
     assert "dest.environment_tags" in template
+    assert "dest.tags" in template
+    assert "dest.kind" in template
+    assert "Current location" not in template
     assert "Medicinal herbs and quiet paths." not in template
     assert "The heart of instruction." not in template
 
     assert ".travel-destination--current" in css
     assert ".travel-destination--available" in css
-    assert ".travel-destination--unavailable" in css
+    assert ".travel-destination--unavailable" not in css
     assert ".travel-action-primary" in css
+    assert ".travel-action-label" in css
+    assert ".travel-actions" in css
     assert "@media (max-width: 560px)" in css
     assert re.search(
         r"@media \(max-width: 560px\)[\s\S]*\.travel-destination\s*\{",
+        css,
+    )
+    assert re.search(
+        r"@media \(max-width: 560px\)[\s\S]*\.travel-action-primary\s*\{",
         css,
     )
 
@@ -119,10 +133,12 @@ async def test_travel_destinations_render_current_and_available_cards(
         assert 'aria-current="location"' in html
         assert "You are here" in html
         assert scene.current_location_name in html
+        assert "travel-destination--unavailable" not in html
 
         assert "travel-destination--available" in html
         assert "Open route" in html
         assert "travel-action-primary" in html
+        assert "travel-action-label" in html
         assert f'action="/play/{save_id}/travel"' in html
         assert 'name="to_location_id"' in html
 
@@ -130,6 +146,14 @@ async def test_travel_destinations_render_current_and_available_cards(
         assert f'data-location-id="{first["location_id"]}"' in html
         assert f'value="{first["location_id"]}"' in html
         assert first["display_name"] in html
+        assert f'{first["days"]}d' in html
+
+        # Descriptive context comes only from view-model fields already supplied.
+        if first.get("ambience"):
+            assert str(first["ambience"]) in html
+        elif first.get("environment_tags"):
+            for tag in first["environment_tags"]:
+                assert tag.replace("_", " ") in html
 
         # Each available destination keeps an independent travel submit control.
         assert html.count('name="to_location_id"') == len(scene.travel_destinations)

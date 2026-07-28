@@ -1,0 +1,42 @@
+{
+  "decision": "approve",
+  "title": "Modernize travel destination presentation",
+  "implementation_brief": "Read the required project documentation, then inspect the current travel/location templates, shared CSS, view-model data, and presentation tests. Identify concrete readability, hierarchy, and responsive-layout deficiencies in the existing travel interface. Update at least one allowed template or static implementation file so existing travel options render as clear destination cards or rows using only descriptive context already supplied by the view model. Visually distinguish the current location from available destinations, make the existing primary travel controls obvious, and ensure the layout remains usable at desktop and mobile widths. Preserve all route URLs, form methods/actions, location IDs, submitted field names and values, requirements, costs, and travel behavior exactly. Do not display or infer unavailable destinations when they are not supplied by the existing view model. Add or update focused presentation tests for the rendered travel structure and preserved form contracts, then update automation/AGENT_REPORT.md with files changed, tests run, results, risks, and review items.",
+  "allowed_areas": [
+    "src/ai_adventure/presentation/templates",
+    "src/ai_adventure/presentation/static",
+    "tests",
+    "automation/AGENT_REPORT.md"
+  ],
+  "acceptance_criteria": [
+    "Travel options are presented as readable destination cards or destination rows.",
+    "Each destination clearly displays its existing name and descriptive context without inventing new content.",
+    "The current location and available destinations are visually distinguishable; unavailable destinations are neither inferred nor added when absent from the existing view model.",
+    "Primary travel actions are easy to identify and use.",
+    "Existing location IDs, route URLs, form methods/actions, submitted field names and values, requirements, costs, and travel behavior remain unchanged.",
+    "The travel presentation is usable at desktop and mobile widths without obscured controls or horizontal overflow.",
+    "Focused presentation tests and the full test suite pass.",
+    "At least one travel-related template or static stylesheet is meaningfully changed; report-only or test-only changes are insufficient."
+  ],
+  "forbidden_changes": [
+    "Gameplay rules, travel calculations, requirements, costs, availability, or progression",
+    "Location IDs, route definitions, form contracts, or submitted values",
+    "Backend services, engines, persistence, catalogs, or view-model architecture",
+    "Inferring or implementing unavailable destinations not supplied by the existing view model",
+    "Database migrations or save-format changes",
+    "New dependencies, frameworks, systems, or client-side application architecture",
+    "Deployment, secrets, or environment files",
+    "Unrelated UI refactors"
+  ],
+  "focused_tests": [
+    "tests -q -k \"travel or destination or location\"",
+    "tests"
+  ],
+  "stop_conditions": [
+    "The requested presentation cannot be implemented without changing travel mechanics, routes, form contracts, backend services, or view-model architecture.",
+    "Existing descriptive context or current-location state is ambiguous or unavailable and would need to be invented.",
+    "A database migration, new dependency, architecture change, catalog change, or gameplay-rule decision appears necessary.",
+    "The required work would exceed the allowed areas or become a large unrelated refactor.",
+    "Focused tests reveal an existing product-behavior ambiguity that cannot be resolved from current templates, implementation, tests, and documentation."
+  ]
+}
