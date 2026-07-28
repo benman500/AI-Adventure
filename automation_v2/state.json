@@ -1,11 +1,14 @@
 {
-  "task_id": null,
-  "current_stage": "queued",
-  "attempt_number": 0,
-  "last_successful_stage": null,
-  "last_error": null,
-  "started_at": null,
+  "task_id": "ui-02",
+  "current_stage": "human_review",
+  "attempt_number": 3,
+  "last_successful_stage": "repairing",
+  "last_error": "File outside allowed areas: run_ui_tests.ps1",
+  "started_at": "2026-07-28T17:59:05+00:00",
   "completed_tasks": [],
-  "run_dir": null,
-  "repair_instructions": []
+  "run_dir": "C:\\Users\\benjamyn\\Desktop\\ai-projects\\AI- Adventure\\automation_v2\\runs\\20260728-135905-ui-02",
+  "repair_instructions": [
+    "Fix failing tests without weakening or deleting them.",
+    "Re-run focused tests and the full suite."
+  ]
 }

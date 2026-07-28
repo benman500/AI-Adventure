@@ -1,0 +1,10 @@
+STDOUT
+======
+
+no tests ran in 0.73s
+
+
+STDERR
+======
+ERROR: Wrong expression passed to '-k': "character and creation": at column 1: expected not OR left parenthesis OR identifier; got string literal
+

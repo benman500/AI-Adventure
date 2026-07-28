@@ -80,11 +80,28 @@ Instructions:
 6. Do not commit, push, merge, migrate, or install dependencies.
 7. If blocked or ambiguous, stop and explain in automation_v2/AGENT_REPORT.md.
 8. Write automation_v2/AGENT_REPORT.md when complete.
+
+Temporary files and test execution:
+
+9. Do not create temporary PowerShell, batch, shell, Python, helper, or ad hoc
+   test-runner scripts anywhere in the repository (for example .ps1, .bat,
+   .cmd, .sh, or one-off .py runners).
+10. Do not add project-root scripts (for example run_ui_tests.ps1) or expand
+    allowed areas to include them. Guardrails must not be weakened.
+11. Run approved test commands directly in the terminal
+    (for example: python -m pytest -q). Never create a script to wrap tests.
+12. Temporary diagnostic files may only be written inside the current
+    automation_v2 run directory. Never write temporary files to the
+    repository root or application directories.
 """
     if repair_instructions:
         prompt += "\n\nREVIEW REPAIRS REQUIRED:\n"
         prompt += "\n".join(f"- {item}" for item in repair_instructions)
-        prompt += "\nRepair only these findings. Do not broaden the task."
+        prompt += (
+            "\nRepair only these findings. Do not broaden the task."
+            "\nThe PowerShell/batch/shell/Python script ban and run-directory "
+            "diagnostic-file limit above still apply during repair."
+        )
     return prompt
 
 
