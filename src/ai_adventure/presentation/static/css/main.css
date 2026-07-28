@@ -76,6 +76,7 @@ a:hover {
 .play-shell {
   max-width: var(--shell-max);
   padding-top: 1.5rem;
+  overflow-x: clip;
 }
 
 h1,

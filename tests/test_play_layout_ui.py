@@ -49,6 +49,8 @@ def test_play_scene_template_keeps_working_toward_visible() -> None:
     assert "@media (max-width: 960px)" in css
     assert "order: 1" in css
     assert "order: 2" in css
+    assert "overflow-x: clip" in css
+    assert ".play-secondary" in css
 
 
 @pytest.mark.asyncio
