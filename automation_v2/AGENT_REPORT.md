@@ -1,55 +1,67 @@
-# Agent Report — ui-02 Modernize character creation presentation
+# Agent Report — ui-02 Modernize character creation
 
 ## Status: IMPLEMENTATION COMPLETE — pytest blocked (shell rejected)
 
 ## Task completed
 
-Review repair for empty implementation diff: applied character-creation presentation redesign within allowed areas only.
+Modernized the server-rendered character-creation page within allowed areas only.
 
-### Acceptance mapping
+### Concrete deficiencies addressed
+
+- Validation alert used only a generic `.error` style with weak form association
+- Selected card state lacked a distinct indicator beyond border/background
+- Hover/focus states were present but less distinct from each other
+- Incomplete wizard steps gave focus only, with no visual incomplete cue
+- Primary nav actions needed clearer hierarchy vs Back
+
+### Implementation
 
 | Criterion | Implementation |
 |-----------|----------------|
-| Distinct question groups | Each step is `fieldset.vn-fieldset.vn-question-group` with legend (title + prompt) |
-| Background clickable cards | `label.bg-card` with `for`/`id` around existing `input[name=background_id]` |
+| Distinct question groups | Each step uses `fieldset.vn-fieldset.vn-question-group` with legend (title + prompt) |
+| Background clickable cards | `label.bg-card` with matching `for`/`id` around existing `input[name=background_id]` |
 | Personality answers under question | Answers nested in the same fieldset as `data-question-id` / prompt; `aria-labelledby` on radiogroup |
-| Selected / hover / focus-visible | CSS `:has(input:checked)`, `:hover`, `:has(input:focus-visible)` (+ `.is-selected` JS sync preserved) |
+| Selected / hover / focus-visible | Left accent bar, selected marker `::after`, `:hover`, `:has(input:focus-visible)` (+ `.is-selected`) |
+| Validation clarity | `vn-error` alert, `aria-describedby` on form, `.is-incomplete` fieldset cue (JS presentation only) |
 | Form contract | `POST /new`, `character_name`, `background_id`, `answer_{{ question.id }}` unchanged |
 | Responsive / no overflow | `@media (max-width: 560px)`; `overflow-x: clip`; `overflow-wrap: anywhere`; `minmax(0, 1fr)` |
-| Focused tests | Existing assertions retained; added label association + overflow CSS checks |
 
 ## Files changed
 
 - `src/ai_adventure/presentation/templates/new_game.html`
 - `src/ai_adventure/presentation/static/css/main.css`
+- `src/ai_adventure/presentation/static/js/main.js`
 - `tests/test_character_creation_ui.py`
 - `automation/AGENT_REPORT.md`
 - `automation_v2/AGENT_REPORT.md`
-- `automation_v2/runs/20260728-170532-ui-02/shell_block_note.txt`
+- `automation_v2/runs/20260728-172644-ui-02/shell_block_note.txt` (diagnostic only)
 
 ## Tests run
 
-**Not executed.** Shell tool rejected all commands (empty `Rejected:`), including smart-mode approval retries and a best-of-n-runner subagent.
+**Not executed in-agent.** Shell tool rejected all commands (empty `Rejected:`), including probes and a best-of-n-runner subagent.
 
 Intended approved commands:
 
-1. `python -m pytest -q tests/test_character_creation_ui.py`
-2. `python -m pytest -q tests -k "character_creation or character_creation_page"`
-3. `python -m pytest -q`
+```text
+python -m pytest -q tests/test_character_creation_ui.py
+python -m pytest -q tests -k "character_creation or character_creation_page or create_character"
+python -m pytest -q
+```
 
 ## Test results
 
-Unavailable in-agent. Acceptance criteria “focused tests pass” and “full suite passes” cannot be confirmed here.
+Unavailable in-agent. Acceptance criterion “focused tests and the full suite pass” cannot be confirmed here.
 
 **Stop condition note:** environment cannot run approved test commands from the agent shell. Implementation edits are complete and ready for orchestrator pytest.
 
 ## Remaining risks
 
-- Unverified pytest green status for this repair diff.
-- Visual QA of hover / selected / focus-visible and mobile overflow still recommended.
+- Unverified pytest status for this diff until orchestrator re-runs tests
+- Visual QA of selected marker / incomplete cue / mobile overflow still recommended
+- Client-side `.is-incomplete` requires JS; noscript path relies on native required + server `vn-error`
 
 ## Human / orchestrator review
 
-1. Re-run the pytest commands above and treat results as gate.
-2. Spot-check `/new` on desktop and mobile widths.
-3. No migrations, dependencies, or gameplay edits were required or performed.
+1. Re-run the three pytest commands above and treat results as gate
+2. Spot-check `/new` at desktop and ~360px widths
+3. No migrations, dependencies, routes, field names, submitted values, or gameplay edits

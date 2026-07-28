@@ -136,6 +136,8 @@ def test_new_game_template_groups_choices_under_fieldsets() -> None:
     assert 'id="{{ answer_input_id }}"' in template
     assert 'aria-labelledby="background-legend"' in template
     assert 'aria-labelledby="question-legend-{{ question.id }}"' in template
+    assert 'class="error vn-error"' in template
+    assert 'id="vn-form-error"' in template
 
     # Answers render inside the same fieldset as the question legend/prompt.
     answer_loop = template.index("{% for answer in question.answers %}")
@@ -166,6 +168,12 @@ def test_new_game_template_groups_choices_under_fieldsets() -> None:
     assert "overflow-x: clip" in css
     assert "overflow-wrap: anywhere" in css
     assert "minmax(0, 1fr)" in css
+    assert ".vn-error" in css
+    assert ".is-incomplete" in css
+    assert "border-left-color: var(--gold)" in css
+    assert ".bg-card:has(input:checked)::after" in css
+    assert ".answer-card:has(input:checked)::after" in css
+    assert "outline-offset: 3px" in css
 
 
 def test_new_game_template_associates_choice_labels_with_controls() -> None:
@@ -318,3 +326,34 @@ async def test_new_game_form_contract_and_question_grouping(tmp_path: Path) -> N
         assert "btn-secondary" in html
         assert 'role="radiogroup"' in html
         assert html.count('role="radiogroup"') >= 1 + len(questions)
+
+
+@pytest.mark.asyncio
+async def test_new_game_validation_error_presentation(tmp_path: Path) -> None:
+    """Server validation errors keep the form contract and surface vn-error styling."""
+
+    app = make_test_app(tmp_path, filename="character_creation_ui_error.db")
+    payload = {
+        "character_name": "Test Wanderer",
+        "background_id": "not_a_real_background",
+        **{f"answer_{qid}": aid for qid, aid in VALID_IDENTITY_ANSWERS.items()},
+    }
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+        follow_redirects=False,
+    ) as client:
+        response = await client.post("/new", data=payload)
+        assert response.status_code == 400
+        html = response.text
+        assert 'id="vn-form-error"' in html
+        assert 'class="error vn-error"' in html
+        assert 'role="alert"' in html
+        assert 'aria-describedby="vn-form-error"' in html
+        assert 'action="/new"' in html
+        assert 'name="character_name"' in html
+        assert 'name="background_id"' in html
+        assert 'value="Test Wanderer"' in html
+        for question_id in VALID_IDENTITY_ANSWERS:
+            assert f'name="answer_{question_id}"' in html

@@ -47,28 +47,46 @@ function initCreationWizard() {
     submitBtn.hidden = !last;
   }
 
+  function clearIncomplete(step) {
+    const group = step.querySelector(".vn-fieldset, .vn-question-group");
+    if (group) {
+      group.classList.remove("is-incomplete");
+    }
+  }
+
+  function markIncomplete(step) {
+    const group = step.querySelector(".vn-fieldset, .vn-question-group");
+    if (group) {
+      group.classList.add("is-incomplete");
+    }
+  }
+
   function validateCurrent() {
     const step = steps[index];
     const nameField = step.querySelector('input[name="character_name"]');
     if (nameField) {
       const value = nameField.value.trim();
       if (!value) {
+        markIncomplete(step);
         nameField.focus();
         return false;
       }
       nameField.value = value;
+      clearIncomplete(step);
       return true;
     }
     const radioName = step.dataset.requiredRadio;
     if (radioName) {
       const checked = step.querySelector(`input[name="${radioName}"]:checked`);
       if (!checked) {
+        markIncomplete(step);
         const first = step.querySelector(`input[name="${radioName}"]`);
         if (first) {
           first.focus();
         }
         return false;
       }
+      clearIncomplete(step);
     }
     return true;
   }
@@ -163,6 +181,13 @@ function initSelectableCards() {
           parent.classList.toggle("is-selected", radio.checked);
         }
       });
+      const step = card.closest(".vn-step");
+      if (step && input.checked) {
+        const group = step.querySelector(".vn-fieldset, .vn-question-group");
+        if (group) {
+          group.classList.remove("is-incomplete");
+        }
+      }
     };
     input.addEventListener("change", sync);
     sync();

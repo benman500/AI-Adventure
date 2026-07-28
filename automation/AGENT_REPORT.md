@@ -1,52 +1,65 @@
-# Agent Report — ui-02 Modernize character creation presentation
+# Agent Report — ui-02 Modernize character creation
 
 ## Status: IMPLEMENTATION COMPLETE — pytest blocked (shell rejected)
 
 ## Task completed
 
-Repaired the prior no-diff review failure by implementing presentation-only character-creation changes:
+Modernized the server-rendered character-creation page within allowed areas only.
 
-- Distinct `fieldset.vn-question-group` per question with answers nested beneath the legend/prompt
-- Background and personality choices as fully clickable `label` cards with matching `for`/`id` pairs around existing radios
-- Clear selected (`:has(input:checked)` / `.is-selected`), hover, and `:focus-visible` card states
-- Responsive no-overflow hardening (`overflow-x: clip`, `overflow-wrap: anywhere`, `minmax(0, 1fr)`)
-- Strengthened focused presentation tests for markup associations (no weakened assertions)
+### Concrete deficiencies addressed
 
-Form contract preserved: `POST /new`, `character_name`, `background_id`, `answer_{{ question.id }}`, option values unchanged.
+- Validation alert used only a generic `.error` style with weak form association
+- Selected card state lacked a distinct indicator beyond border/background
+- Hover/focus states were present but less distinct from each other
+- Incomplete wizard steps gave focus only, with no visual incomplete cue
+- Primary nav actions needed clearer hierarchy vs Back
+
+### Implementation
+
+| Criterion | Implementation |
+|-----------|----------------|
+| Distinct question groups | Each step uses `fieldset.vn-fieldset.vn-question-group` with legend (title + prompt) |
+| Background clickable cards | `label.bg-card` with matching `for`/`id` around existing `input[name=background_id]` |
+| Personality answers under question | Answers nested in the same fieldset as `data-question-id` / prompt; `aria-labelledby` on radiogroup |
+| Selected / hover / focus-visible | Left accent bar, selected marker `::after`, `:hover`, `:has(input:focus-visible)` (+ `.is-selected`) |
+| Validation clarity | `vn-error` alert, `aria-describedby` on form, `.is-incomplete` fieldset cue (JS presentation only) |
+| Form contract | `POST /new`, `character_name`, `background_id`, `answer_{{ question.id }}` unchanged |
+| Responsive / no overflow | `@media (max-width: 560px)`; `overflow-x: clip`; `overflow-wrap: anywhere`; `minmax(0, 1fr)` |
 
 ## Files changed
 
 - `src/ai_adventure/presentation/templates/new_game.html`
 - `src/ai_adventure/presentation/static/css/main.css`
+- `src/ai_adventure/presentation/static/js/main.js`
 - `tests/test_character_creation_ui.py`
 - `automation/AGENT_REPORT.md`
 - `automation_v2/AGENT_REPORT.md`
-- `automation_v2/runs/20260728-170532-ui-02/shell_block_note.txt` (diagnostic only)
+- `automation_v2/runs/20260728-172644-ui-02/shell_block_note.txt` (diagnostic only)
 
 ## Tests run
 
-Shell rejected every command in this repair run (parent + best-of-n-runner + smart-mode approval retries). Commands not executed in-agent:
+**Not executed in-agent.** Shell tool rejected all commands (empty `Rejected:`), including probes and a best-of-n-runner subagent.
+
+Intended approved commands:
 
 ```text
 python -m pytest -q tests/test_character_creation_ui.py
-python -m pytest -q tests -k "character_creation or character_creation_page"
+python -m pytest -q tests -k "character_creation or character_creation_page or create_character"
 python -m pytest -q
 ```
 
 ## Test results
 
-Not available in-agent. **Blocked on shell execution.**
-
-Prior orchestrator run (before this repair’s template/CSS/test edits) recorded 10 focused / 303 full passing; those results do **not** cover this repair diff.
+Unavailable in-agent. Acceptance criterion “focused tests and the full suite pass” cannot be confirmed here.
 
 ## Remaining risks
 
-- Suite status for the repair diff is unverified until orchestrator re-runs pytest.
-- Manual visual check of focus rings and narrow viewports still useful.
-- Noscript stacked layout vs JS wizard step flow unchanged.
+- Unverified pytest status for this diff until orchestrator re-runs tests
+- Visual QA of selected marker / incomplete cue / mobile overflow still recommended
+- Client-side `.is-incomplete` requires JS; noscript path relies on native required + server `vn-error`
 
-## Review items
+## Human / orchestrator review
 
-1. Re-run the three pytest commands above and treat results as gate.
-2. Confirm `/new` shows distinct question groups, fully clickable background cards, and answers under each personality prompt.
-3. No migrations, dependencies, gameplay, route, or form-contract changes were made.
+1. Re-run the three pytest commands above and treat results as gate
+2. Spot-check `/new` at desktop and ~360px widths
+3. No migrations, dependencies, routes, field names, submitted values, or gameplay edits

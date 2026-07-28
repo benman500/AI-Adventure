@@ -1,0 +1,42 @@
+{
+  "decision": "approve",
+  "title": "Modernize character creation",
+  "implementation_brief": "Read the required project documents, then inspect the current character-creation templates, shared/static CSS, form markup, validation rendering, and relevant presentation tests. Identify concrete presentation deficiencies and redesign the existing server-rendered character-creation page within the allowed areas. Make meaningful changes to at least one character-creation template or stylesheet: visually group each question with its answers, render background radio choices as fully clickable cards using labels, place personality answers directly beneath their associated questions, and provide clear selected, hover, and keyboard-focus states. Improve spacing, typography, action hierarchy, validation clarity, and responsive behavior at desktop and mobile widths. Preserve the existing form action, HTTP method, routes, field names, submitted values, validation behavior, question-to-answer mapping, and gameplay behavior. Use the existing frontend approach without adding dependencies, frameworks, systems, or mechanics. Add or update focused presentation tests where appropriate, run focused tests and the complete pytest suite, and update automation/AGENT_REPORT.md with the required completion details.",
+  "allowed_areas": [
+    "src/ai_adventure/presentation/templates",
+    "src/ai_adventure/presentation/static",
+    "tests",
+    "automation/AGENT_REPORT.md"
+  ],
+  "acceptance_criteria": [
+    "Each character-creation question is visually separated and easy to understand.",
+    "Background choices are fully clickable cards while retaining the existing input names and values.",
+    "Each personality answer is rendered directly beneath the question it answers, with the existing question-to-answer mapping preserved.",
+    "Selected, hovered, and keyboard-focused choices have clear and accessible visual states.",
+    "Existing form field names, submitted values, form action, routes, and validation behavior remain unchanged.",
+    "The page remains usable without horizontal overflow or obscured controls at desktop and mobile widths.",
+    "At least one allowed character-creation template or stylesheet receives a meaningful implementation change; report-only or test-only changes are insufficient.",
+    "Focused presentation tests and the full test suite pass."
+  ],
+  "forbidden_changes": [
+    "Gameplay, progression, engine, service, validation-rule, or persistence changes",
+    "Database or migration changes",
+    "Route, form action, HTTP method, field name, or submitted-value changes",
+    "New catalogs, systems, architecture, dependencies, or JavaScript frameworks",
+    "Conversion away from the existing server-rendered presentation architecture",
+    "Changes outside the allowed areas",
+    "Weakening, deleting, or skipping existing tests",
+    "Large unrelated refactors or changes to more than 25 files"
+  ],
+  "focused_tests": [
+    "python -m pytest -q tests -k \"character_creation or character_creation_page or create_character\"",
+    "python -m pytest -q"
+  ],
+  "stop_conditions": [
+    "The current form contract or question-to-answer mapping cannot be determined from the existing templates, handlers, and tests.",
+    "Meeting the goal would require changing routes, submitted values, validation behavior, gameplay rules, services, persistence, or files outside the allowed areas.",
+    "The work would require a migration, new dependency, architectural change, new framework, or product decision not specified by the task.",
+    "Relevant existing tests reveal conflicting requirements that cannot be resolved without changing behavior.",
+    "The implementation would exceed 25 changed files or require a large unrelated refactor."
+  ]
+}

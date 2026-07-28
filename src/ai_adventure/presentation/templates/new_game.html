@@ -30,7 +30,7 @@
     </p>
 
     {% if error %}
-    <p class="error" role="alert">{{ error }}</p>
+    <p class="error vn-error" id="vn-form-error" role="alert">{{ error }}</p>
     {% endif %}
 
     {% set step_count = 2 + (questions|length) %}
@@ -40,7 +40,13 @@
       {% endfor %}
     </div>
 
-    <form method="post" action="/new" class="vn-form" id="vn-form">
+    <form
+      method="post"
+      action="/new"
+      class="vn-form"
+      id="vn-form"
+      {% if error %}aria-describedby="vn-form-error"{% endif %}
+    >
       <section class="vn-step is-active" data-step="0" data-required-name="character_name">
         <fieldset class="vn-fieldset vn-question-group">
           <legend class="vn-legend">
@@ -149,6 +155,6 @@
       </div>
     </form>
   </main>
-  <script src="/static/js/main.js?v=ui4"></script>
+  <script src="/static/js/main.js?v=ui5"></script>
 </body>
 </html>

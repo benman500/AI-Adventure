@@ -988,6 +988,14 @@ button.danger {
   min-width: 0;
 }
 
+.vn-error {
+  margin: 0 0 1.25rem;
+  padding: 0.95rem 1.1rem;
+  border-left: 3px solid var(--danger);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
 .vn-progress {
   display: flex;
   gap: 0.35rem;
@@ -1028,6 +1036,13 @@ button.danger {
   border-radius: var(--radius-lg);
   background: rgba(28, 34, 24, 0.55);
   box-sizing: border-box;
+  transition: border-color var(--ease), box-shadow var(--ease);
+}
+
+.vn-fieldset.is-incomplete,
+.vn-question-group.is-incomplete {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 2px rgba(168, 90, 74, 0.28);
 }
 
 .vn-question-group + .vn-question-group,
@@ -1097,6 +1112,11 @@ button.danger {
   box-shadow: 0 0 0 3px var(--gold-soft);
 }
 
+.vn-fieldset.is-incomplete .vn-name-field input {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 2px rgba(168, 90, 74, 0.25);
+}
+
 .bg-grid,
 .answer-grid {
   display: flex;
@@ -1129,8 +1149,10 @@ button.danger {
   width: 100%;
   box-sizing: border-box;
   padding: 1.1rem 1.15rem;
+  padding-right: 2.75rem;
   background: var(--ink-panel);
   border: 1px solid var(--line);
+  border-left: 3px solid transparent;
   border-radius: var(--radius-lg);
   cursor: pointer;
   overflow-wrap: anywhere;
@@ -1153,12 +1175,14 @@ button.danger {
 .bg-card:hover,
 .answer-card:hover {
   border-color: var(--line-soft);
+  border-left-color: var(--jade);
   background: var(--ink-hover);
   transform: translateY(-1px);
 }
 
 .answer-card:hover {
   border-color: var(--jade);
+  border-left-color: var(--jade);
 }
 
 .bg-card:has(input:checked),
@@ -1166,8 +1190,24 @@ button.danger {
 .answer-card:has(input:checked),
 .answer-card.is-selected {
   border-color: var(--gold);
+  border-left-color: var(--gold);
   background: linear-gradient(145deg, var(--gold-soft), transparent 55%), var(--ink-panel);
   box-shadow: var(--shadow-soft);
+}
+
+.bg-card:has(input:checked)::after,
+.bg-card.is-selected::after,
+.answer-card:has(input:checked)::after,
+.answer-card.is-selected::after {
+  content: "";
+  position: absolute;
+  top: 1.15rem;
+  right: 1.05rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 999px;
+  background: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft);
 }
 
 .bg-card:has(input:checked):hover,
@@ -1175,20 +1215,23 @@ button.danger {
 .answer-card:has(input:checked):hover,
 .answer-card.is-selected:hover {
   border-color: #d4b888;
+  border-left-color: #d4b888;
   background: linear-gradient(145deg, rgba(196, 165, 116, 0.28), transparent 55%), var(--ink-hover);
 }
 
 .bg-card:has(input:focus-visible),
 .answer-card:has(input:focus-visible) {
   border-color: var(--jade);
+  border-left-color: var(--jade);
   box-shadow: 0 0 0 3px rgba(111, 143, 97, 0.35), var(--shadow-soft);
   outline: 2px solid var(--jade);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 .bg-card:has(input:checked:focus-visible),
 .answer-card:has(input:checked:focus-visible) {
   border-color: var(--gold);
+  border-left-color: var(--gold);
   box-shadow: 0 0 0 3px rgba(196, 165, 116, 0.4), var(--shadow-soft);
   outline-color: var(--gold);
 }
@@ -1254,10 +1297,14 @@ button.danger {
 
 .vn-nav .btn-secondary {
   margin-right: auto;
+  min-width: 6.5rem;
+  font-weight: 500;
 }
 
 .vn-nav .btn-primary {
-  min-width: 9rem;
+  min-width: 10.5rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
 }
 
 .stack-form label {
@@ -1323,10 +1370,20 @@ button.danger {
     grid-template-columns: 2.1rem minmax(0, 1fr);
     gap: 0.7rem;
     padding: 0.95rem 0.95rem;
+    padding-right: 2.4rem;
   }
 
   .answer-card {
     padding: 1rem 1.05rem;
+    padding-right: 2.4rem;
+  }
+
+  .bg-card:has(input:checked)::after,
+  .bg-card.is-selected::after,
+  .answer-card:has(input:checked)::after,
+  .answer-card.is-selected::after {
+    top: 1rem;
+    right: 0.9rem;
   }
 
   .vn-nav {
