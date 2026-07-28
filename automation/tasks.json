@@ -6,7 +6,8 @@
     "allowed_areas": [
       "src/ai_adventure/presentation/templates",
       "src/ai_adventure/presentation/static",
-      "tests"
+      "tests",
+      "automation/AGENT_REPORT.md"
     ],
     "acceptance_criteria": [
       "Story and current location are the primary visual focus",

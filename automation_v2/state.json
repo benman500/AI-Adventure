@@ -1,11 +1,11 @@
 {
-  "task_id": null,
-  "current_stage": "failed",
+  "task_id": "ui-01",
+  "current_stage": "human_review",
   "attempt_number": 0,
   "last_successful_stage": null,
-  "last_error": "Git has uncommitted changes. Commit or stash them before starting.",
-  "started_at": null,
+  "last_error": "The UI refactor itself is bounded and milestone-aligned, but AGENTS.md requires updating automation/AGENT_REPORT.md at completion while the queued task does not permit edits under automation. Obtain approval either to add automation/AGENT_REPORT.md to the allowed scope or to waive that reporting requirement for this task. Once resolved, inspect the existing play-scene templates, styles, and tests; refactor only server-rendered markup and existing CSS so the story and current location occupy the primary responsive column, Working Toward remains visible in a quieter secondary area, and character and cultivation details use accessible collapsible presentation. Preserve all routes, forms, action names, submitted values, template context contracts, and gameplay behavior. Add or adjust only presentation-focused tests without weakening existing coverage.",
+  "started_at": "2026-07-28T17:15:40+00:00",
   "completed_tasks": [],
-  "run_dir": null,
+  "run_dir": "C:\\Users\\benjamyn\\Desktop\\ai-projects\\AI- Adventure\\automation_v2\\runs\\20260728-131540-ui-01",
   "repair_instructions": []
 }
