@@ -1,52 +1,57 @@
-# Agent Report — ui-01 Create story-first play layout
+# Agent Report — ui-02 Modernize character creation presentation (repair)
 
 ## Task completed
 
-Story-first play presentation is in place and presentation tests were aligned to it:
+Repaired character-creation presentation test failures that blocked orchestrator approval.
 
-- Primary column (`play-main`): location kicker + title + narrative + moment actions (Continue / People / Travel / Here)
-- Secondary column (`play-sidebar play-secondary`): Working Toward always visible when present (not inside `<details>`); quieter styling via `.aspiration-side`
-- Collapsible native `<details>` panels for Identity (open by default), Cultivation (methods + nested Learn more / breakthrough), Techniques, Roots, Sect, Inventory
-- Narrow viewports (`max-width: 960px`): single column with `play-main` order 1 before secondary order 2
-- No gameplay, route, service, persistence, catalog, or template-context contract changes
+### 1) Assertion repair (retained)
+
+`test_new_game_form_contract_and_question_grouping` failed on prompts with apostrophes (`elder's` → Jinja `&#39;`). Document-order check now scopes to the question fieldset and searches `html.unescape(...)`. Form contract assertions unchanged.
+
+### 2) Focused-run exit 4 (this pass)
+
+Plan focused command: `python -m pytest -q tests -k "character and creation"`.
+
+On Windows, `automation_v2` uses `shlex.split(..., posix=False)`, which keeps quote characters inside the `-k` value. Pytest then errors (`string literal`, exit 4, `no tests ran`) even when the full suite is green.
+
+**In-scope fix:** strip one matching surrounding quote layer from `config.option.keyword` in `tests/conftest.py` (also `pytest_configure`), helper in `tests/pytest_keyword_utils.py`, unit test in `test_character_creation_ui.py`.
+
+Presentation modernization already present: fieldsets/legends, answers under questions, clickable `bg-card` labels, hover/selected/`focus-visible`, responsive CSS, preserved `POST /new` contract.
 
 ## Files changed
 
-- `src/ai_adventure/presentation/templates/play_scene.html` (layout structure; already present, retained)
-- `src/ai_adventure/presentation/static/css/main.css` (story-first / sidebar / responsive play styles; retained)
-- `tests/test_play_layout_ui.py` (structure checks for story-first DOM + template Working Toward visibility)
-- `tests/test_cultivation_sessions.py` (UI assertions updated for Cultivation `<details>` + method buttons)
-- `tests/test_cultivation_breakthroughs.py` (UI assertions updated for Learn more / Attempt Breakthrough)
-- `tests/test_api.py` (home copy assertion updated off obsolete “Scaffold status”)
-- `tests/test_save_api.py` (new-game copy assertion updated off obsolete “not available”)
-- `automation/AGENT_REPORT.md` (this file)
+- `tests/conftest.py` (new)
+- `tests/pytest_keyword_utils.py` (new)
+- `tests/test_character_creation_ui.py`
+- `src/ai_adventure/presentation/templates/new_game.html` (prior)
+- `src/ai_adventure/presentation/static/css/main.css` (prior)
+- `src/ai_adventure/presentation/static/js/main.js` (prior)
+- `automation/AGENT_REPORT.md`
+- `automation_v2/AGENT_REPORT.md`
+
+Note: `run_ui_tests.ps1` may exist at repo root from a blocked subagent; safe to delete (outside task scope).
 
 ## Tests run
 
-**Blocked in this agent session:** every `Shell` invocation was rejected before execution (including focused pytest and the full suite). No in-agent pass/fail results are available.
+Shell is blocked in this agent session — pytest could not be executed here.
 
-Expected orchestrator / local verification:
+Prior artifact `automation_v2/runs/20260728-135905-ui-02/pytest.txt`: **293 passed** (after apostrophe repair, before quote-strip conftest).
+Prior focused: exit **4** (`pytest_focused.txt`).
 
-```powershell
-python -m pytest -q tests/test_play_layout_ui.py tests/test_cultivation_sessions.py::test_cultivation_ui_methods_and_disabled_states tests/test_cultivation_breakthroughs.py::test_breakthrough_ui_disabled_states tests/test_api.py::test_health_and_home tests/test_save_api.py::test_new_game_load_delete_flow
-python -m pytest -q
-```
-
-Prior orchestrator run (`automation/runs/20260727-155448-ui-01`) failed 4 presentation-string assertions after the layout change; those assertions were updated in this pass to match the current rendered structure without weakening mechanical coverage.
+Orchestrator should re-run focused + full suite after this repair.
 
 ## Test results
 
-Not verified in-agent (shell unavailable). Prior suite baseline after layout: 243 passed, 4 failed (all HTML copy/structure assertions now updated).
+Not re-verified in-agent. Expected: focused exit 0; full suite exit 0 (~294 tests with new unit test).
 
 ## Remaining risks
 
-- Full suite must be confirmed by the orchestrator or a local pytest run.
-- Visual weight of Working Toward vs story column should be screenshot-reviewed at desktop and ~360–960px.
-- Cultivation method buttons remain inside the collapsed Cultivation panel (per `docs/DECISIONS.md` novel-first UI); primary story actions stay in the main column.
-- Home / new-game assertion updates address pre-existing UI copy drift on this branch; they are presentation-only.
+- Confirm via orchestrator/human pytest re-run.
+- Long-term fix belongs in `automation_v2/test_runner.py` (outside allowed areas).
+- `:has()` focus/selected CSS plus JS `.is-selected` fallback.
 
-## Anything requiring human review
+## Human review needed
 
-1. Confirm focused + full pytest pass once shell/orchestrator runs tests.
-2. Screenshot review: story dominance, visible Working Toward, mobile stack order.
-3. Confirm Identity remaining `open` by default matches intended UX (`docs/DECISIONS.md`).
+1. Confirm focused + full pytest pass.
+2. Optional `/new` keyboard and mobile check.
+3. Delete `run_ui_tests.ps1` if present.

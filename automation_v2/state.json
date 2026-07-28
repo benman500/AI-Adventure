@@ -1,9 +1,9 @@
 {
   "task_id": null,
-  "current_stage": "queued",
+  "current_stage": "failed",
   "attempt_number": 0,
   "last_successful_stage": null,
-  "last_error": null,
+  "last_error": "Git has uncommitted changes. Commit or stash them before starting.",
   "started_at": null,
   "completed_tasks": [],
   "run_dir": null,
