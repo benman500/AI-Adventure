@@ -1,0 +1,11 @@
+{
+  "task_id": null,
+  "current_stage": "queued",
+  "attempt_number": 0,
+  "last_successful_stage": null,
+  "last_error": null,
+  "started_at": null,
+  "completed_tasks": [],
+  "run_dir": null,
+  "repair_instructions": []
+}
