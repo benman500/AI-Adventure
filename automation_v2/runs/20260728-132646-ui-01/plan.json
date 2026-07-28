@@ -1,0 +1,38 @@
+{
+  "decision": "approve",
+  "title": "Story-first responsive play layout",
+  "implementation_brief": "After reading the required project documents and inspecting the existing play-scene templates, styles, and presentation tests, refactor only the existing server-rendered play layout. Give the story and current location a prominent main narrative column, retain Working Toward as visible information, and place character and cultivation details in a quieter secondary sidebar using accessible collapsible markup. Add or adjust existing CSS for clear action hierarchy, comfortable spacing, and a readable single-column mobile layout. Preserve all existing routes, form actions, template context variables, gameplay behavior, and presentation content. Update or add narrowly scoped presentation tests only where needed, then update automation/AGENT_REPORT.md if that file is within the permitted template/static/tests scope; otherwise stop and report the scope conflict.",
+  "allowed_areas": [
+    "src/ai_adventure/presentation/templates",
+    "src/ai_adventure/presentation/static",
+    "tests"
+  ],
+  "acceptance_criteria": [
+    "Story content and current location are the primary visual focus of the play scene.",
+    "Working Toward remains visible without requiring expansion.",
+    "Character and cultivation details are accessible through collapsible secondary UI.",
+    "The layout becomes a readable single-column presentation on mobile-sized screens.",
+    "Existing routes, form submissions, template data, and gameplay behavior are unchanged.",
+    "All focused presentation tests and the full pytest suite pass."
+  ],
+  "forbidden_changes": [
+    "Gameplay, progression, engine, service, validation, event, persistence, or catalog changes.",
+    "Database or save-format changes.",
+    "New dependencies, JavaScript frameworks, or architectural layers.",
+    "Conversion away from server-rendered templates.",
+    "Route, endpoint, form-action, or template-context contract changes.",
+    "Unrelated template or styling refactors.",
+    "Weakening, skipping, deleting, or rewriting tests solely to make them pass."
+  ],
+  "focused_tests": [
+    "python -m pytest -q tests",
+    "python -m pytest -q"
+  ],
+  "stop_conditions": [
+    "The play-scene template or its styling cannot be identified unambiguously after inspecting the repository.",
+    "Meeting the layout requirements would require backend, gameplay-rule, route, persistence, or template-context changes.",
+    "Accessible collapsing would require a new dependency or framework.",
+    "Required edits fall outside the allowed path prefixes, including automation/AGENT_REPORT.md.",
+    "Existing tests reveal that the requested visual hierarchy conflicts with locked presentation or gameplay behavior."
+  ]
+}

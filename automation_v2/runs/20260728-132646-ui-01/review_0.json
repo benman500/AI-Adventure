@@ -1,0 +1,16 @@
+{
+  "decision": "human_review",
+  "summary": "The test suite passes (291 tests), but the submitted changes are entirely outside the approved templates/static/tests scope. No in-scope implementation or test changes were made. The diff modifies automation_v2/AGENT_REPORT.md and automation_v2/state.json, while additional automation_v2 run artifacts are listed as changed. This conflicts with the task's explicit stop condition and cannot be approved despite claims that the desired layout already existed.",
+  "repair_instructions": [
+    "Revert or exclude all changes under automation_v2, including state.json, AGENT_REPORT.md, and generated run artifacts.",
+    "Have a human determine whether the already-committed play layout is the intended deliverable or whether an in-scope change is still required.",
+    "Resolve the conflict between the required automation/AGENT_REPORT.md update and the allowed path prefixes before another implementation attempt.",
+    "Ensure the completion report accurately reflects the supplied test run; it currently claims tests could not be run and cites 280 prior passes, while the review evidence reports 291 passing tests."
+  ],
+  "risks": [
+    "Changes outside the allowed areas constitute a scope violation.",
+    "The submitted diff contains no actual play-layout implementation, making task attribution and acceptance ambiguous.",
+    "The changed-files evidence is inconsistent: guardrails report no changed files, while the diff and changed_files list show multiple automation_v2 files.",
+    "Automation state and generated run artifacts may be destructive or operationally significant and require human handling."
+  ]
+}

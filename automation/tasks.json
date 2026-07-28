@@ -1,8 +1,8 @@
 [
   {
-    "id": "ui-01",
-    "title": "Create story-first play layout",
-    "goal": "Refactor the play scene into a responsive main narrative column and a quieter secondary sidebar without changing gameplay.",
+    "id": "ui-02",
+    "title": "Modernize character creation",
+    "goal": "Redesign the existing character-creation presentation so backgrounds and personality answers feel like meaningful RPG choices rather than a plain web form. Preserve all existing routes, submitted values, validation, and gameplay behavior.",
     "allowed_areas": [
       "src/ai_adventure/presentation/templates",
       "src/ai_adventure/presentation/static",
@@ -10,11 +10,114 @@
       "automation/AGENT_REPORT.md"
     ],
     "acceptance_criteria": [
-      "Story and current location are the primary visual focus",
-      "Working Toward remains visible",
-      "Character and cultivation details are collapsible",
-      "Mobile layout remains readable",
-      "All tests pass"
+      "Each character-creation question is visually separated and easy to understand",
+      "Background choices are presented as fully clickable cards",
+      "Personality answers appear directly beneath the correct question",
+      "Selected, hovered, and keyboard-focused choices have clear visual states",
+      "Existing form field names, submitted values, routes, and validation remain unchanged",
+      "The page remains usable at desktop and mobile widths",
+      "Focused presentation tests and the full test suite pass"
+    ]
+  },
+  {
+    "id": "ui-03",
+    "title": "Modernize NPC interaction cards",
+    "goal": "Improve the presentation of NPCs and their available interactions so NPCs feel like characters rather than database entries. Preserve all existing interaction identifiers, forms, routes, requirements, and rewards.",
+    "allowed_areas": [
+      "src/ai_adventure/presentation/templates",
+      "src/ai_adventure/presentation/static",
+      "tests",
+      "automation/AGENT_REPORT.md"
+    ],
+    "acceptance_criteria": [
+      "Each visible NPC has a clear name, role, and readable description hierarchy",
+      "NPC interactions are visually grouped with the NPC they belong to",
+      "Primary and secondary NPC interactions are visually distinguishable",
+      "Unavailable interactions remain understandable and accessible when already supported",
+      "Existing interaction IDs, form actions, submitted values, and gameplay behavior remain unchanged",
+      "NPC cards remain readable at desktop and mobile widths",
+      "Focused presentation tests and the full test suite pass"
+    ]
+  },
+  {
+    "id": "ui-04",
+    "title": "Modernize travel and destination presentation",
+    "goal": "Improve the existing travel interface so locations feel like destinations rather than raw menu entries. Preserve all location IDs, routes, travel rules, requirements, costs, and gameplay behavior.",
+    "allowed_areas": [
+      "src/ai_adventure/presentation/templates",
+      "src/ai_adventure/presentation/static",
+      "tests",
+      "automation/AGENT_REPORT.md"
+    ],
+    "acceptance_criteria": [
+      "Travel options are presented as readable destination cards or destination rows",
+      "Each destination clearly displays its name and existing descriptive context",
+      "Current location, available destinations, and unavailable destinations are visually distinguishable",
+      "Primary travel actions are easy to identify",
+      "Existing location IDs, form actions, submitted values, and travel behavior remain unchanged",
+      "The travel presentation remains usable at desktop and mobile widths",
+      "Focused presentation tests and the full test suite pass"
+    ]
+  },
+  {
+    "id": "ui-05",
+    "title": "Improve action hierarchy and controls",
+    "goal": "Create a consistent visual hierarchy for existing gameplay actions so important decisions stand out while utility and secondary actions remain quieter. Do not add, remove, rename, or reorder actions in a way that changes gameplay.",
+    "allowed_areas": [
+      "src/ai_adventure/presentation/templates",
+      "src/ai_adventure/presentation/static",
+      "tests",
+      "automation/AGENT_REPORT.md"
+    ],
+    "acceptance_criteria": [
+      "Primary actions are visually distinct from secondary and utility actions",
+      "Buttons and action controls no longer appear as an undifferentiated wall of identical rectangles",
+      "Hover, active, disabled, and keyboard-focus states are clear",
+      "Existing action names, routes, form methods, field names, and submitted values remain unchanged",
+      "Controls remain accessible and readable at mobile widths",
+      "Reduced-motion preferences are respected for any transitions",
+      "Focused presentation tests and the full test suite pass"
+    ]
+  },
+  {
+    "id": "ui-06",
+    "title": "Polish typography spacing and visual consistency",
+    "goal": "Perform a restrained presentation polish pass across the existing player-facing screens. Improve typography, spacing, section hierarchy, borders, and visual consistency without changing content, behavior, architecture, or gameplay.",
+    "allowed_areas": [
+      "src/ai_adventure/presentation/templates",
+      "src/ai_adventure/presentation/static",
+      "tests",
+      "automation/AGENT_REPORT.md"
+    ],
+    "acceptance_criteria": [
+      "Location titles, section headings, body text, helper text, and labels have a clear hierarchy",
+      "Paragraphs, cards, sections, and controls use consistent spacing",
+      "The dark cultivation theme uses restrained parchment, gold, and muted natural accents",
+      "Different content types remain visually distinguishable without excessive borders",
+      "No existing text, form behavior, routes, or gameplay behavior are removed or changed",
+      "Contrast and keyboard-focus visibility remain adequate",
+      "Focused presentation tests and the full test suite pass"
+    ]
+  },
+  {
+    "id": "ui-07",
+    "title": "Final responsive and accessibility audit",
+    "goal": "Audit the completed UI milestone for responsive behavior, keyboard usability, focus visibility, overflow, alignment, and reduced-motion support. Correct presentation defects only; do not redesign mechanics or architecture.",
+    "allowed_areas": [
+      "src/ai_adventure/presentation/templates",
+      "src/ai_adventure/presentation/static",
+      "tests",
+      "automation/AGENT_REPORT.md"
+    ],
+    "acceptance_criteria": [
+      "Player-facing pages remain usable at narrow mobile, tablet, and desktop widths",
+      "No important text, cards, controls, or panels overlap or create unintended horizontal scrolling",
+      "Interactive elements have visible keyboard-focus states",
+      "Clickable cards remain usable by keyboard where applicable",
+      "Collapsed and expanded sections remain understandable and accessible",
+      "Reduced-motion preferences disable or minimize nonessential transitions",
+      "Existing routes, field names, submitted values, and gameplay behavior remain unchanged",
+      "Focused presentation tests and the full test suite pass"
     ]
   }
- ]
+]
