@@ -10,7 +10,9 @@ from automation_v2.cursor_runner import (
     CursorNotFoundError,
     build_cursor_command,
     invoke_cursor,
+    resolve_cursor_argv_prefix,
     resolve_cursor_executable,
+    unwrap_windows_cmd_wrapper,
 )
 from automation_v2.models import CommandResult
 
@@ -40,7 +42,6 @@ def test_build_cursor_command_places_prompt_immediately_after_dash_p() -> None:
     for arg in CONFIG.cursor_print_args:
         assert arg in command
 
-    # Remaining print args follow the prompt.
     assert command[prompt_index + 1 :] == [
         arg for arg in CONFIG.cursor_print_args if arg != "-p"
     ]
@@ -59,6 +60,17 @@ def test_build_cursor_command_keeps_multiline_prompt_as_one_argument() -> None:
     assert "<prompt>" not in command
 
 
+def test_build_cursor_command_rejects_placeholder_prompt() -> None:
+    """Literal placeholders must never become the -p argument."""
+    for bad in ("<prompt>", "{prompt}", "prompt_file"):
+        try:
+            build_cursor_command("agent", bad, CONFIG)
+            raised = False
+        except ValueError:
+            raised = True
+        assert raised is True
+
+
 def test_missing_agent_executable() -> None:
     """A missing agent executable is detected clearly."""
     with patch("automation_v2.cursor_runner.shutil.which", return_value=None):
@@ -68,6 +80,42 @@ def test_missing_agent_executable() -> None:
         except CursorNotFoundError:
             raised = True
     assert raised is True
+
+
+def test_unwrap_windows_cmd_wrapper_finds_node_and_index(tmp_path: Path) -> None:
+    """Windows CMD wrappers resolve to node.exe + index.js."""
+    versions = tmp_path / "versions" / "2026.07.23-abc1234"
+    versions.mkdir(parents=True)
+    node = versions / "node.exe"
+    index = versions / "index.js"
+    node.write_bytes(b"")
+    index.write_text("// stub", encoding="utf-8")
+    cmd = tmp_path / "agent.CMD"
+    cmd.write_text("@echo off\n", encoding="utf-8")
+
+    resolved = unwrap_windows_cmd_wrapper(cmd)
+    assert resolved == [str(node.resolve()), str(index.resolve())]
+
+
+def test_resolve_cursor_argv_prefix_unwraps_cmd(tmp_path: Path) -> None:
+    """resolve_cursor_argv_prefix avoids launching through agent.CMD."""
+    versions = tmp_path / "versions" / "2026.07.23-abc1234"
+    versions.mkdir(parents=True)
+    node = versions / "node.exe"
+    index = versions / "index.js"
+    node.write_bytes(b"")
+    index.write_text("// stub", encoding="utf-8")
+    cmd = tmp_path / "agent.CMD"
+    cmd.write_text("@echo off\n", encoding="utf-8")
+
+    with patch(
+        "automation_v2.cursor_runner.resolve_cursor_executable",
+        return_value=str(cmd),
+    ):
+        prefix = resolve_cursor_argv_prefix(CONFIG)
+
+    assert prefix == [str(node.resolve()), str(index.resolve())]
+    assert not any(part.lower().endswith(".cmd") for part in prefix)
 
 
 def test_invoke_cursor_passes_file_contents_not_placeholder(
@@ -88,6 +136,10 @@ def test_invoke_cursor_passes_file_contents_not_placeholder(
             return_value="agent",
         ),
         patch(
+            "automation_v2.cursor_runner.resolve_cursor_argv_prefix",
+            return_value=["agent"],
+        ),
+        patch(
             "automation_v2.cursor_runner.run_command",
             return_value=fake,
         ) as mocked_run,
@@ -105,8 +157,9 @@ def test_invoke_cursor_passes_file_contents_not_placeholder(
     assert result.log_file.exists()
     log_text = result.log_file.read_text(encoding="utf-8")
     assert "done" in log_text
-    # Log may redact the prompt body; the real argv must not.
+    # Displayed log may redact the prompt body.
     assert "<prompt>" in log_text
+    assert "COMMAND (displayed; prompt redacted)" in log_text
 
     mocked_run.assert_called_once()
     args, kwargs = mocked_run.call_args
@@ -119,3 +172,4 @@ def test_invoke_cursor_passes_file_contents_not_placeholder(
     assert "<prompt>" not in command
     assert "{prompt}" not in command
     assert "prompt_file" not in command
+    assert "\n" in command[command.index("-p") + 1]
