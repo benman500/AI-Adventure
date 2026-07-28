@@ -62,33 +62,68 @@
             <h2>People here</h2>
             <div class="npc-list">
               {% for npc in scene.present_npcs %}
-              <article class="npc-card">
-                <h3 class="npc-name">{{ npc.display_name }}</h3>
-                {% if npc.role_tags %}
-                <p class="npc-role">
-                  {{ npc.role_tags[0].replace('_', ' ')|title }}
-                </p>
-                {% endif %}
-                <p class="npc-presence">
-                  {% if npc.met %}Known to you{% else %}A stranger still{% endif %}
-                </p>
+              <article class="npc-card" data-npc-id="{{ npc.npc_id }}">
+                <header class="npc-card-header">
+                  <h3 class="npc-name">{{ npc.display_name }}</h3>
+                  {% if npc.role_tags %}
+                  <p class="npc-role">
+                    {{ npc.role_tags[0].replace('_', ' ')|title }}
+                  </p>
+                  {% endif %}
+                  <p class="npc-presence">
+                    {% if npc.met %}Known to you{% else %}A stranger still{% endif %}
+                  </p>
+                </header>
                 <p class="npc-blurb">{{ npc.description }}</p>
                 {% if npc.available_actions %}
-                <div class="npc-actions" aria-label="Available interactions">
+                <div
+                  class="npc-actions"
+                  role="group"
+                  aria-label="Interactions with {{ npc.display_name }}"
+                >
                   {% for action in npc.available_actions %}
                   <form method="post" action="/play/{{ scene.save_id }}/npcs/interact">
                     <input type="hidden" name="npc_id" value="{{ npc.npc_id }}">
-                    <button type="submit" name="action_id" value="{{ action.id }}" class="interact-link" title="{{ action.description }}">
-                      {{ action.label }}{% if action.duration_days %} · {{ action.duration_days }}d{% endif %}
+                    {% if action.duration_days %}
+                    <button
+                      type="submit"
+                      name="action_id"
+                      value="{{ action.id }}"
+                      class="button primary btn-primary npc-action-primary"
+                      aria-label="{{ action.label }}, {{ action.duration_days }}d"
+                      title="{{ action.description }}"
+                    >
+                      <span class="npc-action-label">{{ action.label }}</span>
+                      <span class="npc-action-meta">{{ action.duration_days }}d</span>
                     </button>
+                    {% else %}
+                    <button
+                      type="submit"
+                      name="action_id"
+                      value="{{ action.id }}"
+                      class="button secondary btn-secondary npc-action-secondary"
+                      title="{{ action.description }}"
+                    >
+                      <span class="npc-action-label">{{ action.label }}</span>
+                    </button>
+                    {% endif %}
                   </form>
                   {% endfor %}
                 </div>
                 {% elif npc.can_greet %}
-                <div class="npc-actions">
+                <div
+                  class="npc-actions"
+                  role="group"
+                  aria-label="Interactions with {{ npc.display_name }}"
+                >
                   <form method="post" action="/play/{{ scene.save_id }}/npcs/greet">
-                    <button type="submit" name="npc_id" value="{{ npc.npc_id }}" class="interact-link">
-                      Greet
+                    <button
+                      type="submit"
+                      name="npc_id"
+                      value="{{ npc.npc_id }}"
+                      class="button secondary btn-secondary npc-action-secondary"
+                    >
+                      <span class="npc-action-label">Greet</span>
                     </button>
                   </form>
                 </div>

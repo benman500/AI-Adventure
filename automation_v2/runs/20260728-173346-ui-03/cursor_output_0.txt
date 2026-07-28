@@ -1,0 +1,39 @@
+COMMAND (displayed; prompt redacted)
+====================================
+C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\node.exe C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\index.js -p <prompt> --output-format text
+
+ARGV NOTES
+==========
+executable_resolved=C:\Users\benjamyn\AppData\Local\cursor-agent\agent.CMD
+argv_prefix=['C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\node.exe', 'C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\index.js']
+prompt_chars=6380
+prompt_follows_-p=True
+
+
+STDOUT
+======
+NPC interaction cards are modernized within the allowed UI areas. Shell execution is blocked in this environment, so pytest could not be run here.
+
+### Changes
+- **Hierarchy:** Each NPC uses `npc-card-header` (name → role → presence), then description.
+- **Grouping:** Actions stay inside `article.npc-card` in a tinted `npc-actions` tray with a per-NPC `role="group"` label.
+- **Primary vs secondary:** Uses existing `duration_days` — time-cost actions get `btn-primary`; instant ones get `btn-secondary`. Forms/routes/fields unchanged.
+- **Unavailable:** No change — the UI only shows eligible actions today.
+- **Responsive:** Overflow wrapping + mobile padding tweaks for cards/actions.
+- **Tests:** Added `tests/test_npc_cards_ui.py`.
+
+### Files
+- `play_scene.html`, `main.css`, `tests/test_npc_cards_ui.py`
+- Reports in `automation/AGENT_REPORT.md` and `automation_v2/AGENT_REPORT.md`
+
+### Blocker
+Shell returned empty `Rejected:` for all commands (including `echo` and a subagent). Please run:
+
+```text
+python -m pytest -q tests/test_npc_cards_ui.py
+python -m pytest -q
+```
+
+
+STDERR
+======

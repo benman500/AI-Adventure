@@ -1,0 +1,43 @@
+{
+  "decision": "approve",
+  "title": "Modernize NPC interaction cards",
+  "implementation_brief": "Read the required project documents, then inspect the current NPC templates, shared layout/partials, CSS, and relevant presentation tests. Identify concrete hierarchy, grouping, action-emphasis, unavailable-state, and responsive-layout deficiencies. Make meaningful changes to at least one NPC-related template or stylesheet within the allowed areas so each NPC\u2019s existing name, role, and description are clearly structured; interactions are visibly contained with their NPC; and existing semantic cues distinguish primary from secondary actions. Improve unavailable interaction presentation only where the current UI already supports unavailable interactions, preserving their existing accessibility and behavior. Add or update focused presentation tests for the rendered structure and preserved form contracts. Do not fabricate NPC facts or infer new gameplay states. Preserve every existing interaction identifier, route, form action and method, field name, submitted value, requirement, reward, and service behavior. Use the current server-rendered architecture and existing styling approach. Verify desktop and mobile readability, run focused NPC tests and the full test suite, then update automation/AGENT_REPORT.md with the required completion details.",
+  "allowed_areas": [
+    "src/ai_adventure/presentation/templates",
+    "src/ai_adventure/presentation/static",
+    "tests",
+    "automation/AGENT_REPORT.md"
+  ],
+  "acceptance_criteria": [
+    "Each visible NPC presents its existing name, role, and description with a clear readable hierarchy.",
+    "Every NPC interaction is visually grouped with the NPC to which it belongs.",
+    "Primary and secondary interactions are visually distinguishable using existing semantics without changing behavior.",
+    "Interactions already represented as unavailable remain understandable and accessible, without introducing new availability rules.",
+    "Existing interaction IDs, routes, form actions and methods, field names, submitted values, requirements, rewards, and gameplay behavior remain unchanged.",
+    "NPC cards and their actions remain readable and usable at desktop and mobile widths.",
+    "Focused presentation tests cover the relevant NPC rendering and form contracts.",
+    "The focused tests and the complete pytest suite pass.",
+    "automation/AGENT_REPORT.md records files changed, tests run, results, remaining risks, and any human-review needs."
+  ],
+  "forbidden_changes": [
+    "Gameplay rules, interaction availability logic, requirements, rewards, or progression",
+    "Interaction identifiers, routes, form actions or methods, submitted field names, or submitted values",
+    "Database models, migrations, catalogs, services, engines, or transaction boundaries",
+    "New dependencies, JavaScript frameworks, architecture, or client-rendered conversion",
+    "Invented NPC roles, descriptions, facts, or mechanical states",
+    "Unrelated UI refactors or changes outside the allowed areas",
+    "Completion consisting only of tests, reports, logs, or automation-file updates"
+  ],
+  "focused_tests": [
+    "tests -k npc",
+    "tests"
+  ],
+  "stop_conditions": [
+    "The current templates do not expose an existing role or equivalent presentation fact for an NPC, and satisfying the role requirement would require inventing data or changing gameplay/catalog code.",
+    "Primary versus secondary interaction status cannot be determined from existing presentation data or semantics without a new product or gameplay decision.",
+    "Preserving unavailable-interaction accessibility would require changing availability rules, services, routes, or form behavior.",
+    "The work requires a migration, new dependency, architecture change, deployment change, or edits outside the allowed areas.",
+    "The implementation would require more than 25 changed files.",
+    "Focused or full-suite failures reveal a required gameplay-rule change or an unrelated issue that cannot be resolved within scope."
+  ]
+}
