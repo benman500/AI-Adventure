@@ -1,45 +1,5 @@
 [
   {
-    "id": "ui-02",
-    "title": "Modernize character creation",
-    "goal": "Redesign the existing character-creation presentation so backgrounds and personality answers feel like meaningful RPG choices rather than a plain web form. Preserve all existing routes, submitted values, validation, and gameplay behavior.",
-    "allowed_areas": [
-      "src/ai_adventure/presentation/templates",
-      "src/ai_adventure/presentation/static",
-      "tests",
-      "automation/AGENT_REPORT.md"
-    ],
-    "acceptance_criteria": [
-      "Each character-creation question is visually separated and easy to understand",
-      "Background choices are presented as fully clickable cards",
-      "Personality answers appear directly beneath the correct question",
-      "Selected, hovered, and keyboard-focused choices have clear visual states",
-      "Existing form field names, submitted values, routes, and validation remain unchanged",
-      "The page remains usable at desktop and mobile widths",
-      "Focused presentation tests and the full test suite pass"
-    ]
-  },
-  {
-    "id": "ui-03",
-    "title": "Modernize NPC interaction cards",
-    "goal": "Improve the presentation of NPCs and their available interactions so NPCs feel like characters rather than database entries. Preserve all existing interaction identifiers, forms, routes, requirements, and rewards.",
-    "allowed_areas": [
-      "src/ai_adventure/presentation/templates",
-      "src/ai_adventure/presentation/static",
-      "tests",
-      "automation/AGENT_REPORT.md"
-    ],
-    "acceptance_criteria": [
-      "Each visible NPC has a clear name, role, and readable description hierarchy",
-      "NPC interactions are visually grouped with the NPC they belong to",
-      "Primary and secondary NPC interactions are visually distinguishable",
-      "Unavailable interactions remain understandable and accessible when already supported",
-      "Existing interaction IDs, form actions, submitted values, and gameplay behavior remain unchanged",
-      "NPC cards remain readable at desktop and mobile widths",
-      "Focused presentation tests and the full test suite pass"
-    ]
-  },
-  {
     "id": "ui-04",
     "title": "Modernize travel and destination presentation",
     "goal": "Improve the existing travel interface so locations feel like destinations rather than raw menu entries. Preserve all location IDs, routes, travel rules, requirements, costs, and gameplay behavior.",
@@ -52,7 +12,7 @@
     "acceptance_criteria": [
       "Travel options are presented as readable destination cards or destination rows",
       "Each destination clearly displays its name and existing descriptive context",
-      "Current location, available destinations, and unavailable destinations are visually distinguishable",
+      "Current location and available destinations are visually distinguishable. If unavailable destinations are not provided by the existing view model, do not implement or infer them.",
       "Primary travel actions are easy to identify",
       "Existing location IDs, form actions, submitted values, and travel behavior remain unchanged",
       "The travel presentation remains usable at desktop and mobile widths",

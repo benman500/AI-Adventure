@@ -1,0 +1,40 @@
+COMMAND (displayed; prompt redacted)
+====================================
+C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\node.exe C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\index.js -p <prompt> --output-format text
+
+ARGV NOTES
+==========
+executable_resolved=C:\Users\benjamyn\AppData\Local\cursor-agent\agent.CMD
+argv_prefix=['C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\node.exe', 'C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\index.js']
+prompt_chars=10580
+prompt_follows_-p=True
+
+
+STDOUT
+======
+Repaired the failing form-contract check.
+
+**Cause:** The travel form had `method` and `action` on separate lines, so this exact assertion failed:
+
+`method="post" action="/play/{{ scene.save_id }}/travel"`
+
+**Fix:** In `play_scene.html`, collapsed the form to match other play-scene forms:
+
+```html
+<form method="post" action="/play/{{ scene.save_id }}/travel" class="travel-actions">
+```
+
+No test changes, no gameplay/route/field changes. Destination card presentation from the prior attempt is intact.
+
+**Tests:** Shell is blocked in this session (`Rejected` on every pytest call). Orchestrator should re-run:
+
+```text
+python -m pytest -q tests/test_travel_destinations_ui.py
+python -m pytest -q
+```
+
+Reports updated in `automation/AGENT_REPORT.md` and `automation_v2/AGENT_REPORT.md`.
+
+
+STDERR
+======

@@ -1,0 +1,37 @@
+COMMAND (displayed; prompt redacted)
+====================================
+C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\node.exe C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\index.js -p <prompt> --output-format text
+
+ARGV NOTES
+==========
+executable_resolved=C:\Users\benjamyn\AppData\Local\cursor-agent\agent.CMD
+argv_prefix=['C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\node.exe', 'C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\index.js']
+prompt_chars=6162
+prompt_follows_-p=True
+
+
+STDOUT
+======
+Travel destinations are now structured cards with clear current vs available states. Form contracts are unchanged.
+
+### Changes
+- **`play_scene.html`** — Nearby is a card list: current location (`You are here`), then available destinations with name, day cost, catalog context (`ambience` → `environment_tags` → `kind`), and a primary **Travel** button. Removed invented emoji/flavor blurbs. Same `POST …/travel` + `to_location_id`.
+- **`main.css`** — Card styling with gold (current) / jade (available) accents; unavailable CSS hooks; mobile stacking at 560px.
+- **`tests/test_travel_destinations_ui.py`** — Template contract + rendered hierarchy tests.
+
+### Unavailable destinations
+The view model only lists unlocked routes, so unavailable destinations cannot be rendered without backend changes. Current vs available are distinguished; `.travel-destination--unavailable` is prepared only.
+
+### Tests
+Shell execution was rejected in this session (same as the prior UI agent). Please run:
+
+```powershell
+python -m pytest -q tests/test_travel_destinations_ui.py
+python -m pytest -q
+```
+
+Reports: `automation/AGENT_REPORT.md` and `automation_v2/AGENT_REPORT.md`.
+
+
+STDERR
+======

@@ -1,0 +1,4 @@
+Shell tool returned Rejected for all pytest invocations during repair (2026-07-28).
+Repair applied: travel form method+action collapsed to one line in play_scene.html
+to satisfy test_travel_destination_template_hierarchy_and_form_contracts.
+Orchestrator should re-run focused + full pytest.

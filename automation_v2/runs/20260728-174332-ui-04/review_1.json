@@ -1,0 +1,10 @@
+{
+  "decision": "human_review",
+  "summary": "Tests pass and the template/CSS changes meaningfully improve current and available destination presentation without changing travel contracts. However, a required acceptance criterion is not satisfied: unavailable destinations are never rendered. The implementation report confirms they are not supplied by the existing view model, while the added unavailable-state CSS is only an unused hook. Satisfying this would require either widening scope to expose unavailable destinations or revising the approved criterion, triggering the stated stop condition.",
+  "repair_instructions": [],
+  "risks": [
+    "Players cannot see or distinguish unavailable destinations because no unavailable destination markup is rendered.",
+    "The unavailable-state styling is untested in actual rendered output and may conceal an unmet product requirement.",
+    "Exposing blocked routes may require backend/view-model changes that are forbidden by the approved task."
+  ]
+}

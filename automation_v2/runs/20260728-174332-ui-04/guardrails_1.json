@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "violations": [],
+  "decision": "approve",
+  "changed_files": [
+    "src/ai_adventure/presentation/static/css/main.css",
+    "src/ai_adventure/presentation/templates/play_scene.html",
+    "tests/test_travel_destinations_ui.py"
+  ],
+  "runtime_artifacts": [
+    "automation/AGENT_REPORT.md",
+    "automation_v2/AGENT_REPORT.md",
+    "automation_v2/runs/20260728-174332-ui-04/cursor_output_0.txt",
+    "automation_v2/runs/20260728-174332-ui-04/cursor_output_1.txt",
+    "automation_v2/runs/20260728-174332-ui-04/cursor_prompt_0.md",
+    "automation_v2/runs/20260728-174332-ui-04/cursor_prompt_1.md",
+    "automation_v2/runs/20260728-174332-ui-04/guardrails_0.json",
+    "automation_v2/runs/20260728-174332-ui-04/plan.json",
+    "automation_v2/runs/20260728-174332-ui-04/pytest.txt",
+    "automation_v2/runs/20260728-174332-ui-04/pytest_focused.txt",
+    "automation_v2/runs/20260728-174332-ui-04/review_0.json",
+    "automation_v2/runs/20260728-174332-ui-04/shell_block_note.txt",
+    "automation_v2/runs/20260728-174332-ui-04/tests_0.json",
+    "automation_v2/state.json"
+  ]
+}

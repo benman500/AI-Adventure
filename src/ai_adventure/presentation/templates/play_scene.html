@@ -135,58 +135,59 @@
           {% endif %}
 
           {% if scene.travel_destinations %}
-          <section class="moment-block" aria-label="Travel">
+          <section class="moment-block travel-section" aria-label="Travel">
             <h2>Nearby</h2>
-            <form method="post" action="/play/{{ scene.save_id }}/travel" class="travel-list">
-              {% for dest in scene.travel_destinations %}
-              {% set tags = dest.tags|default([]) %}
-              {% set env = dest.environment_tags|default([]) %}
-              {% set lid = dest.location_id %}
-              {% if 'herb' in lid or 'herb' in tags or 'herbs' in tags or 'garden' in env %}
-                {% set icon = '🌿' %}
-                {% set blurb = 'Medicinal herbs and quiet paths.' %}
-              {% elif 'hall' in tags or 'foundation' in lid or 'cultivation' in lid or 'lecture' in lid %}
-                {% set icon = '🏛' %}
-                {% set blurb = 'The heart of instruction.' %}
-              {% elif 'quarters' in lid or 'home' in tags %}
-                {% set icon = '🏠' %}
-                {% set blurb = 'Your residence among the outer disciples.' %}
-              {% elif 'road' in lid or 'path' in lid or 'approach' in lid %}
-                {% set icon = '🛤' %}
-                {% set blurb = 'A road that carries you onward.' %}
-              {% elif 'workshop' in lid or 'ember' in lid %}
-                {% set icon = '🔥' %}
-                {% set blurb = 'Smoke, tools, and patient craft.' %}
-              {% elif 'grove' in lid or 'mist' in lid %}
-                {% set icon = '🌫' %}
-                {% set blurb = 'A quieter place, half-hidden.' %}
-              {% elif 'registration' in lid %}
-                {% set icon = '📜' %}
-                {% set blurb = 'Where names are taken and paths begin.' %}
-              {% elif dest.ambience %}
-                {% set icon = '◆' %}
-                {% set blurb = dest.ambience %}
-              {% else %}
-                {% set icon = '◆' %}
-                {% set blurb = 'A place along your path.' %}
-              {% endif %}
-              <button
-                type="submit"
-                name="to_location_id"
-                value="{{ dest.location_id }}"
-                class="travel-card"
+            <div class="travel-list">
+              <article
+                class="travel-destination travel-destination--current"
+                aria-current="location"
               >
-                <span class="travel-icon" aria-hidden="true">{{ icon }}</span>
-                <span>
-                  <span class="travel-name">{{ dest.display_name }}</span>
-                  <span class="travel-blurb">{{ blurb }}</span>
-                </span>
-                <span class="travel-meta">
-                  {% if dest.days %}{{ dest.days }}d{% else %}Nearby{% endif %}
-                </span>
-              </button>
+                <header class="travel-destination-header">
+                  <p class="travel-status">You are here</p>
+                  <h3 class="travel-name">{{ scene.current_location_name }}</h3>
+                </header>
+                <p class="travel-blurb">Current location</p>
+              </article>
+
+              {% for dest in scene.travel_destinations %}
+              {% set env = dest.environment_tags|default([]) %}
+              {% if dest.ambience %}
+                {% set blurb = dest.ambience %}
+              {% elif env %}
+                {% set blurb = env | join(' · ') | replace('_', ' ') %}
+              {% elif dest.kind %}
+                {% set blurb = dest.kind | replace('_', ' ') | title %}
+              {% else %}
+                {% set blurb = none %}
+              {% endif %}
+              <article
+                class="travel-destination travel-destination--available"
+                data-location-id="{{ dest.location_id }}"
+              >
+                <header class="travel-destination-header">
+                  <p class="travel-status">Open route</p>
+                  <h3 class="travel-name">{{ dest.display_name }}</h3>
+                  <p class="travel-meta">
+                    {% if dest.days %}{{ dest.days }}d{% else %}Nearby{% endif %}
+                  </p>
+                </header>
+                {% if blurb %}
+                <p class="travel-blurb">{{ blurb }}</p>
+                {% endif %}
+                <form method="post" action="/play/{{ scene.save_id }}/travel" class="travel-actions">
+                  <button
+                    type="submit"
+                    name="to_location_id"
+                    value="{{ dest.location_id }}"
+                    class="button primary btn-primary travel-action-primary"
+                    aria-label="Travel to {{ dest.display_name }}"
+                  >
+                    Travel
+                  </button>
+                </form>
+              </article>
               {% endfor %}
-            </form>
+            </div>
           </section>
           {% endif %}
 

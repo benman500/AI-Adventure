@@ -598,59 +598,117 @@ button.danger {
 .travel-list {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
-.travel-card {
-  display: grid;
-  grid-template-columns: 2.1rem 1fr auto;
-  gap: 0.75rem 0.9rem;
-  align-items: start;
-  width: 100%;
-  text-align: left;
-  padding: 0.95rem 1.05rem;
-  background: var(--ink-raised);
+.travel-destination {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 1.05rem 1.15rem 1rem;
+  background: linear-gradient(160deg, rgba(36, 42, 32, 0.95), rgba(24, 28, 22, 0.92));
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  color: var(--parchment);
-  cursor: pointer;
-  transition: border-color var(--ease), background var(--ease), transform var(--ease);
+  box-shadow: var(--shadow-soft);
+  overflow-wrap: anywhere;
+  transition: border-color var(--ease), transform var(--ease);
 }
 
-.travel-card:hover {
-  border-color: var(--jade);
-  background: var(--ink-hover);
+.travel-destination--current {
+  border-left: 3px solid var(--gold);
+  background: linear-gradient(160deg, rgba(42, 38, 28, 0.92), rgba(24, 28, 22, 0.9));
+  opacity: 0.92;
+}
+
+.travel-destination--available {
+  border-left: 3px solid var(--jade);
+}
+
+.travel-destination--available:hover {
+  border-color: var(--line-soft);
+  border-left-color: var(--jade);
   transform: translateX(2px);
 }
 
-.travel-icon {
-  font-size: 1.25rem;
-  line-height: 1.4;
-  opacity: 0.9;
+.travel-destination--unavailable {
+  border-left: 3px solid var(--line-soft);
+  opacity: 0.72;
+  filter: grayscale(0.2);
+}
+
+.travel-destination--unavailable .travel-action-primary,
+.travel-destination--unavailable button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.travel-destination-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.2rem 0.85rem;
+  align-items: start;
+  min-width: 0;
+}
+
+.travel-status {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.travel-destination--current .travel-status {
+  color: var(--gold);
+}
+
+.travel-destination--available .travel-status {
+  color: var(--jade);
+}
+
+.travel-destination--unavailable .travel-status {
+  color: var(--muted);
 }
 
 .travel-name {
-  display: block;
+  margin: 0;
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: clamp(1.15rem, 2.4vw, 1.35rem);
   color: var(--parchment);
-  margin-bottom: 0.15rem;
+  line-height: 1.25;
 }
 
 .travel-blurb {
-  display: block;
-  font-size: 0.9rem;
-  color: var(--muted);
-  line-height: 1.4;
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--parchment-soft);
+  line-height: 1.5;
 }
 
 .travel-meta {
+  margin: 0;
   font-size: 0.78rem;
   color: var(--muted);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
-  padding-top: 0.2rem;
+  padding-top: 0.15rem;
+  justify-self: end;
+}
+
+.travel-actions {
+  margin: 0.35rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.travel-action-primary {
+  width: 100%;
+  justify-content: center;
 }
 
 /* ——— Location actions ——— */
@@ -1463,13 +1521,21 @@ button.danger {
     min-width: 0;
   }
 
-  .travel-card {
-    grid-template-columns: 1.8rem 1fr;
+  .travel-destination {
+    padding: 0.95rem 1rem 0.9rem;
+  }
+
+  .travel-destination-header {
+    grid-template-columns: 1fr;
   }
 
   .travel-meta {
-    grid-column: 2;
+    justify-self: start;
     padding-top: 0;
+  }
+
+  .travel-action-primary {
+    min-height: 2.75rem;
   }
 
   .npc-card {

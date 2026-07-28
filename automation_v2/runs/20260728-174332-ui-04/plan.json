@@ -1,0 +1,42 @@
+{
+  "decision": "approve",
+  "title": "Modernize travel destination presentation",
+  "implementation_brief": "Read the required project documentation, then inspect the existing travel/location templates, shared CSS or static assets, and relevant presentation tests. Identify concrete readability, hierarchy, state-distinction, and responsive-layout deficiencies. Make meaningful changes to at least one existing template or static implementation file so travel options appear as destination cards or structured rows using only descriptive context and availability state already supplied by the application. Clearly distinguish the current location, available destinations, and unavailable destinations; emphasize primary travel controls; and provide usable desktop and mobile layouts consistent with the existing visual system. Preserve every location ID, route, form action, submitted value, requirement, cost, and travel behavior exactly. Add or update bounded presentation tests for stable rendering and form-contract details where appropriate. Do not alter backend mechanics to obtain additional presentation data. Run focused tests and the full suite, then update automation/AGENT_REPORT.md with the required completion report.",
+  "allowed_areas": [
+    "src/ai_adventure/presentation/templates",
+    "src/ai_adventure/presentation/static",
+    "tests",
+    "automation/AGENT_REPORT.md"
+  ],
+  "acceptance_criteria": [
+    "Travel options are presented as readable destination cards or structured destination rows.",
+    "Each destination clearly displays its existing name and descriptive context without introducing new gameplay facts.",
+    "The current location, available destinations, and unavailable destinations are visually distinguishable.",
+    "Primary travel actions are easy to identify while unavailable actions are clearly represented.",
+    "Existing location IDs, routes, form actions, submitted values, requirements, costs, and travel behavior remain unchanged.",
+    "The travel presentation remains usable at desktop and mobile widths.",
+    "At least one allowed template or static implementation file receives a meaningful presentation change; report-only or test-only changes are insufficient.",
+    "Focused presentation tests and the full test suite pass."
+  ],
+  "forbidden_changes": [
+    "Changing travel rules, destination availability, requirements, costs, progression, or any other gameplay behavior.",
+    "Changing location IDs, route definitions, form actions, field names, or submitted values.",
+    "Adding backend-derived presentation data or modifying files outside the allowed areas.",
+    "Adding catalogs, authored destinations, gameplay systems, migrations, dependencies, or architecture.",
+    "Introducing a JavaScript framework or converting away from server-rendered templates.",
+    "Weakening, deleting, or skipping existing tests.",
+    "Large unrelated visual refactors or changes spanning more than 25 files."
+  ],
+  "focused_tests": [
+    "python -m pytest -q tests -k \"travel or location\"",
+    "python -m pytest -q"
+  ],
+  "stop_conditions": [
+    "The required visual states or descriptive context are not available to the existing templates and exposing them would require backend or service changes.",
+    "Preserving existing IDs, routes, form actions, submitted values, requirements, costs, or behavior is not possible within the allowed areas.",
+    "The current implementation makes the intended distinction between current, available, and unavailable destinations ambiguous as a product decision.",
+    "The work would require a migration, new dependency, architecture change, gameplay-rule change, deployment change, or edits outside the allowed areas.",
+    "The bounded task would require changing more than 25 files.",
+    "Focused or full-suite failures indicate a behavioral regression that cannot be resolved without widening scope."
+  ]
+}
