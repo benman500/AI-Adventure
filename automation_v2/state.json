@@ -1,14 +1,11 @@
 {
-  "task_id": "ui-01",
-  "current_stage": "human_review",
-  "attempt_number": 1,
-  "last_successful_stage": "testing",
-  "last_error": "Repair limit reached",
-  "started_at": "2026-07-28T08:12:21+00:00",
+  "task_id": null,
+  "current_stage": "failed",
+  "attempt_number": 0,
+  "last_successful_stage": null,
+  "last_error": "Git has uncommitted changes. Commit or stash them before starting.",
+  "started_at": null,
   "completed_tasks": [],
-  "run_dir": "C:\\Users\\benjamyn\\Desktop\\ai-projects\\AI- Adventure\\automation_v2\\runs\\20260728-041221-ui-01",
-  "repair_instructions": [
-    "Fix failing tests without weakening or deleting them.",
-    "Re-run focused tests and the full suite."
-  ]
+  "run_dir": null,
+  "repair_instructions": []
 }
