@@ -47,6 +47,19 @@ def test_normalize_plain_target() -> None:
     ]
 
 
+def test_normalize_path_with_k_expression() -> None:
+    """Path plus -k expression becomes separate argv elements."""
+    entry = 'tests -k "character_creation or character_create"'
+    tokens = normalize_focused_test_entry(entry)
+    assert tokens == [
+        "tests",
+        "-k",
+        "character_creation or character_create",
+    ]
+    assert entry not in tokens
+    assert 'tests -k "character_creation or character_create"' not in tokens
+
+
 def test_normalize_keeps_node_id_as_one_target() -> None:
     """Pytest node ids remain a single argv element."""
     node = "tests/test_play_layout_ui.py::test_specific_behavior"
@@ -60,12 +73,45 @@ def test_normalize_multiple_focused_targets() -> None:
             "tests/test_play_layout_ui.py",
             "python -m pytest -q tests/test_other.py",
             "tests/test_play_layout_ui.py::test_specific_behavior",
+            'tests -k "character_creation or character_create"',
         ]
     )
     assert targets == [
         "tests/test_play_layout_ui.py",
         "tests/test_other.py",
         "tests/test_play_layout_ui.py::test_specific_behavior",
+        "tests",
+        "-k",
+        "character_creation or character_create",
+    ]
+
+
+def test_run_focused_tests_splits_k_expression_args(tmp_path: Path) -> None:
+    """Focused runner must not pass the whole -k spec as one path."""
+    captured: dict[str, list[str]] = {}
+
+    def fake_run(args: list[str], **kwargs: object) -> CommandResult:
+        captured["args"] = list(args)
+        return _fake_result(args)
+
+    with patch("automation_v2.test_runner.run_command", side_effect=fake_run):
+        result = run_focused_tests(
+            ['tests -k "character_creation or character_create"'],
+            run_dir=tmp_path,
+            config=CONFIG,
+        )
+
+    assert result is not None
+    assert result.passed is True
+    args = captured["args"]
+    assert args == [
+        sys.executable,
+        "-m",
+        "pytest",
+        "-q",
+        "tests",
+        "-k",
+        "character_creation or character_create",
     ]
 
 

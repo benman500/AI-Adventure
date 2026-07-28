@@ -44,6 +44,26 @@ _PYTHON_NAMES = frozenset(
 
 _QUIET_FLAGS = frozenset({"-q", "--quiet"})
 
+_SAFE_OPTION_FLAGS = frozenset(
+    {
+        "-k",
+        "-m",
+        "-x",
+        "-v",
+        "-vv",
+        "-vvv",
+        "-s",
+        "-q",
+        "--quiet",
+        "--lf",
+        "--ff",
+        "--nf",
+        "--basetemp",
+    }
+)
+
+_OPTIONS_WITH_VALUE = frozenset({"-k", "-m", "--basetemp"})
+
 
 def _contains_unsafe_shell_syntax(entry: str) -> bool:
     """Return True when an entry includes shell metacharacters we refuse."""
@@ -57,6 +77,13 @@ def _program_name(token: str) -> str:
     return Path(token).name.lower()
 
 
+def _unwrap_quotes(token: str) -> str:
+    """Remove one layer of surrounding quotes kept by Windows shlex."""
+    if len(token) >= 2 and token[0] == token[-1] and token[0] in {'"', "'"}:
+        return token[1:-1]
+    return token
+
+
 def _looks_like_pytest_command(entry: str) -> bool:
     lower = entry.lower().strip()
     if lower.startswith("pytest"):
@@ -68,11 +95,59 @@ def _looks_like_pytest_command(entry: str) -> bool:
     return False
 
 
+def _is_safe_option_token(token: str) -> bool:
+    if token in _SAFE_OPTION_FLAGS:
+        return True
+    if token.startswith("--tb"):
+        return True
+    if "=" in token and token.startswith("-"):
+        return _is_safe_option_token(token.split("=", 1)[0])
+    return False
+
+
+def _validate_pytest_spec_tokens(tokens: list[str], *, entry: str) -> None:
+    """Reject forbidden programs and unsupported options in a pytest spec."""
+    index = 0
+    while index < len(tokens):
+        token = tokens[index]
+        if token.startswith("-"):
+            if not _is_safe_option_token(token):
+                raise ValueError(
+                    f"Unsupported pytest option in focused test entry: {entry!r}"
+                )
+            if token in _OPTIONS_WITH_VALUE and "=" not in token:
+                index += 1
+                if index >= len(tokens):
+                    raise ValueError(
+                        f"Option {token!r} requires a value in focused test "
+                        f"entry: {entry!r}"
+                    )
+            index += 1
+            continue
+
+        if _program_name(token) in _FORBIDDEN_PROGRAMS:
+            raise ValueError(
+                f"Forbidden program in focused test entry: {entry!r}"
+            )
+        index += 1
+
+
+def _split_pytest_spec(raw: str) -> list[str]:
+    """Split a path/options pytest specification with shlex."""
+    tokens = [
+        _unwrap_quotes(token)
+        for token in shlex.split(raw, posix=False)
+        if token
+    ]
+    return [token for token in tokens if token not in _QUIET_FLAGS]
+
+
 def normalize_focused_test_entry(entry: str) -> list[str]:
     """Normalize one planner focused-test entry into pytest argv fragments.
 
-    Preferred input is a bare target or node id. Full ``python -m pytest ...``
-    command strings are accepted only after stripping the executable prefix.
+    Preferred input is a bare target, node id, or path plus safe options such
+    as ``tests -k "expression"``. Full ``python -m pytest ...`` command
+    strings are accepted only after stripping the executable prefix.
 
     Raises:
         ValueError: When the entry is unsafe or not a pytest invocation.
@@ -87,15 +162,26 @@ def normalize_focused_test_entry(entry: str) -> list[str]:
         )
 
     if not _looks_like_pytest_command(raw):
-        program = _program_name(raw.split()[0])
-        if program in _FORBIDDEN_PROGRAMS:
+        first_token = _unwrap_quotes(shlex.split(raw, posix=False)[0])
+        if _program_name(first_token) in _FORBIDDEN_PROGRAMS:
             raise ValueError(
                 f"Forbidden program in focused test entry: {entry!r}"
             )
-        # Keep node ids and paths as a single argv element.
-        return [raw]
+        # Single path / node id: keep as one argv element.
+        if " " not in raw and "\t" not in raw:
+            return [raw]
+        # Path plus options (for example: tests -k "a or b").
+        tokens = _split_pytest_spec(raw)
+        if not tokens:
+            return []
+        _validate_pytest_spec_tokens(tokens, entry=entry)
+        return tokens
 
-    tokens = shlex.split(raw, posix=False)
+    tokens = [
+        _unwrap_quotes(token)
+        for token in shlex.split(raw, posix=False)
+        if token
+    ]
     if not tokens:
         return []
 
@@ -135,6 +221,8 @@ def normalize_focused_test_entry(entry: str) -> list[str]:
         for token in tokens[index:]
         if token not in _QUIET_FLAGS
     ]
+    if remaining:
+        _validate_pytest_spec_tokens(remaining, entry=entry)
     return remaining
 
 

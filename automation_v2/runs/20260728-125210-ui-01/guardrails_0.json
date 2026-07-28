@@ -1,9 +1,0 @@
-{
-  "ok": true,
-  "violations": [],
-  "decision": "approve",
-  "changed_files": [
-    "src/ai_adventure/presentation/static/css/main.css",
-    "tests/test_play_layout_ui.py"
-  ]
-}
