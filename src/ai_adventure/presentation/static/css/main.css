@@ -338,8 +338,9 @@ button.danger {
 
 .play-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--sidebar-w);
-  gap: 2rem 2.25rem;
+  /* Story ~70% / secondary ~30% on wide viewports */
+  grid-template-columns: minmax(0, 7fr) minmax(15.5rem, 3fr);
+  gap: 2rem 2.5rem;
   align-items: start;
 }
 
@@ -348,13 +349,18 @@ button.danger {
   max-width: var(--story-max);
 }
 
-.play-sidebar {
+.play-sidebar,
+.play-secondary {
   min-width: 0;
   position: sticky;
   top: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.55rem;
+}
+
+.story-header {
+  margin: 0 0 1rem;
 }
 
 .location-kicker {
@@ -367,14 +373,14 @@ button.danger {
 }
 
 .play-title {
-  margin: 0 0 1rem;
+  margin: 0;
   font-size: clamp(1.85rem, 3.8vw, 2.45rem);
   color: var(--parchment);
   line-height: 1.12;
 }
 
 .story-stage {
-  margin: 0 0 1.75rem;
+  margin: 0 0 1.85rem;
   padding: 0;
   background: none;
   border: none;
@@ -695,41 +701,43 @@ button.danger {
 }
 
 .aspiration-side {
-  background: linear-gradient(165deg, rgba(90, 122, 78, 0.16), transparent 70%),
-    rgba(28, 34, 24, 0.85);
-  border: 1px solid #3f4a38;
+  /* Quieter secondary panel — visible without competing with story */
+  background: rgba(24, 28, 22, 0.55);
+  border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 1rem 1.05rem;
+  padding: 0.85rem 0.95rem;
 }
 
 .aspiration-side h2 {
-  margin: 0 0 0.35rem;
-  font-size: 0.72rem;
+  margin: 0 0 0.3rem;
+  font-size: 0.7rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--jade);
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .aspiration-side .aspiration-name {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.2rem;
-  color: var(--parchment);
+  font-size: 1.05rem;
+  color: var(--parchment-soft);
 }
 
 .aspiration-side .summary {
-  margin: 0.45rem 0 0;
-  color: var(--parchment-soft);
-  font-size: 0.92rem;
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
   line-height: 1.45;
 }
 
 .aspiration-side .fantasy {
-  margin: 0.4rem 0 0;
+  margin: 0.35rem 0 0;
   color: var(--muted);
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   font-style: italic;
   line-height: 1.4;
+  opacity: 0.9;
 }
 
 .aspiration-side h3 {
@@ -1181,13 +1189,15 @@ button.danger {
     gap: 1.75rem;
   }
 
-  .play-sidebar {
-    position: static;
-    order: 2;
+  .play-main {
+    order: 1;
+    max-width: none;
   }
 
-  .play-main {
-    max-width: none;
+  .play-sidebar,
+  .play-secondary {
+    position: static;
+    order: 2;
   }
 }
 

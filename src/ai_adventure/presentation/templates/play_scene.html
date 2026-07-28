@@ -32,10 +32,12 @@
 
     <div class="play-layout">
       <div class="play-main">
-        <p class="location-kicker">{{ scene.current_location_name }}</p>
-        <h1 class="play-title">{{ scene.title }}</h1>
+        <header class="story-header">
+          <p class="location-kicker">{{ scene.current_location_name }}</p>
+          <h1 class="play-title">{{ scene.title }}</h1>
+        </header>
 
-        <article class="story-stage">
+        <article class="story-stage" aria-label="Story">
           <div class="story-text" id="narration">{{ scene.narrative }}</div>
         </article>
 
@@ -188,7 +190,7 @@
         </p>
       </div>
 
-      <aside class="play-sidebar" aria-label="Character and purpose">
+      <aside class="play-sidebar play-secondary" aria-label="Purpose and character">
         {% if scene.aspiration_panel and scene.aspiration_panel.visible %}
         <section class="aspiration-side" aria-label="Working toward">
           <h2>Working Toward</h2>
@@ -233,7 +235,7 @@
         </section>
         {% endif %}
 
-        <details class="side-panel">
+        <details class="side-panel" open>
           <summary>Identity</summary>
           <div class="side-panel-body identity-brief">
             <p><strong>{{ scene.character_name }}</strong></p>
