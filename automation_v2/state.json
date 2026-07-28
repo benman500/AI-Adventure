@@ -1,17 +1,11 @@
 {
-  "task_id": "ui-02",
-  "current_stage": "repairing",
-  "attempt_number": 1,
-  "last_successful_stage": "testing",
-  "last_error": null,
-  "started_at": "2026-07-28T21:05:32+00:00",
+  "task_id": null,
+  "current_stage": "failed",
+  "attempt_number": 0,
+  "last_successful_stage": null,
+  "last_error": "Git has uncommitted changes. Commit or stash them before starting.",
+  "started_at": null,
   "completed_tasks": [],
-  "run_dir": "C:\\Users\\benjamyn\\Desktop\\ai-projects\\AI- Adventure\\automation_v2\\runs\\20260728-170532-ui-02",
-  "repair_instructions": [
-    "Implement the character-creation template and CSS changes within the approved presentation directories.",
-    "Ensure each question has a distinct answer group, background options use correctly associated labels as fully clickable cards, and personality answers remain beneath their corresponding questions.",
-    "Add selected, hover, focus-visible, and responsive no-overflow styling while preserving all existing form behavior and values.",
-    "Add or update focused presentation tests that verify the required markup associations and grouping without weakening existing tests.",
-    "Run the focused tests and the full test suite again, and record the completed implementation and results in automation/AGENT_REPORT.md."
-  ]
+  "run_dir": null,
+  "repair_instructions": []
 }

@@ -117,6 +117,7 @@ def test_new_game_template_groups_choices_under_fieldsets() -> None:
     assert 'name="character_name"' in template
     assert 'name="background_id"' in template
     assert 'class="bg-card' in template
+    assert "vn-question-group" in template
     assert "<fieldset" in template
     assert "<legend" in template
     assert 'data-question-id="{{ question.id }}"' in template
@@ -129,6 +130,12 @@ def test_new_game_template_groups_choices_under_fieldsets() -> None:
     assert "btn-secondary" in template
     assert "<noscript>" in template
     assert 'role="radiogroup"' in template
+    assert 'for="{{ bg_input_id }}"' in template
+    assert 'id="{{ bg_input_id }}"' in template
+    assert 'for="{{ answer_input_id }}"' in template
+    assert 'id="{{ answer_input_id }}"' in template
+    assert 'aria-labelledby="background-legend"' in template
+    assert 'aria-labelledby="question-legend-{{ question.id }}"' in template
 
     # Answers render inside the same fieldset as the question legend/prompt.
     answer_loop = template.index("{% for answer in question.answers %}")
@@ -142,6 +149,7 @@ def test_new_game_template_groups_choices_under_fieldsets() -> None:
     assert "{{ question.prompt }}" in question_block
     assert "answer-card" in question_block
     assert 'name="answer_{{ question.id }}"' in question_block
+    assert 'for="{{ answer_input_id }}"' in question_block
     assert question_block.index("{{ question.prompt }}") < question_block.index(
         "{% for answer in question.answers %}"
     )
@@ -152,8 +160,34 @@ def test_new_game_template_groups_choices_under_fieldsets() -> None:
     assert ":has(input:focus-visible)" in css
     assert "@media (max-width: 560px)" in css
     assert ".vn-fieldset" in css
+    assert ".vn-question-group" in css
     assert ".vn-nav .btn-secondary" in css
     assert ".vn-nav .btn-primary" in css
+    assert "overflow-x: clip" in css
+    assert "overflow-wrap: anywhere" in css
+    assert "minmax(0, 1fr)" in css
+
+
+def test_new_game_template_associates_choice_labels_with_controls() -> None:
+    """Background and answer cards use matching for/id pairs around native radios."""
+
+    template = NEW_GAME_TEMPLATE.read_text(encoding="utf-8")
+
+    bg_label_idx = template.index('for="{{ bg_input_id }}"')
+    bg_input_idx = template.index('id="{{ bg_input_id }}"', bg_label_idx)
+    bg_name_idx = template.index('name="background_id"', bg_input_idx)
+    assert bg_label_idx < bg_input_idx < bg_name_idx
+    assert 'class="bg-card' in template[bg_label_idx - 120 : bg_label_idx]
+
+    answer_label_idx = template.index('for="{{ answer_input_id }}"')
+    answer_input_idx = template.index('id="{{ answer_input_id }}"', answer_label_idx)
+    answer_name_idx = template.index(
+        'name="answer_{{ question.id }}"',
+        answer_input_idx,
+    )
+    assert answer_label_idx < answer_input_idx < answer_name_idx
+    assert 'class="answer-card' in template[answer_label_idx - 120 : answer_label_idx]
+
 
 @pytest.mark.asyncio
 async def test_new_game_form_contract_and_question_grouping(tmp_path: Path) -> None:
@@ -188,6 +222,30 @@ async def test_new_game_form_contract_and_question_grouping(tmp_path: Path) -> N
             if input_type == "radio" and name == "background_id"
         }
         assert set(EXPECTED_BACKGROUNDS) <= background_values
+
+        for background_id in EXPECTED_BACKGROUNDS:
+            bg_input_id = f"background-{background_id}"
+            assert re.search(
+                rf'<label[^>]*\bclass="[^"]*\bbg-card\b[^"]*"[^>]*\bfor="{re.escape(bg_input_id)}"',
+                html,
+            )
+            assert re.search(
+                rf'<input\b[^>]*\bid="{re.escape(bg_input_id)}"[^>]*>',
+                html,
+            )
+            assert re.search(
+                rf'<input\b[^>]*\bname="background_id"[^>]*\bvalue="{re.escape(background_id)}"'
+                rf'|<input\b[^>]*\bvalue="{re.escape(background_id)}"[^>]*\bname="background_id"',
+                html,
+            )
+            # Same control carries both the stable id and the submitted background value.
+            input_match = re.search(
+                rf'<input\b[^>]*\bid="{re.escape(bg_input_id)}"[^>]*>',
+                html,
+            )
+            assert input_match is not None
+            assert f'value="{background_id}"' in input_match.group(0)
+            assert 'name="background_id"' in input_match.group(0)
 
         for question in questions:
             field_name = f"answer_{question.id}"
@@ -231,8 +289,27 @@ async def test_new_game_form_contract_and_question_grouping(tmp_path: Path) -> N
             )
             assert prompt_idx < first_answer_idx
 
+            legend_id = f"question-legend-{question.id}"
+            assert f'id="{legend_id}"' in fieldset_match.group(0) or (
+                f'id="{legend_id}"' in fieldset_html
+            )
+            assert f'aria-labelledby="{legend_id}"' in fieldset_html
+
+            for option in question.answers:
+                answer_id = f"answer-{question.id}-{option.id}"
+                assert re.search(
+                    rf'<label[^>]*\bclass="[^"]*\banswer-card\b[^"]*"[^>]*\bfor="{re.escape(answer_id)}"',
+                    fieldset_html,
+                )
+                assert (
+                    f'id="{answer_id}"' in fieldset_html
+                    and f'name="{field_name}"' in fieldset_html
+                    and f'value="{option.id}"' in fieldset_html
+                )
+
         assert re.search(r'class="[^"]*\bbg-card\b', html)
         assert re.search(r'class="[^"]*\banswer-card\b', html)
+        assert re.search(r'class="[^"]*\bvn-question-group\b', html)
         assert html.count("<fieldset") >= 2 + len(questions)
         assert html.count("<legend") >= 2 + len(questions)
         assert 'id="vn-next"' in html

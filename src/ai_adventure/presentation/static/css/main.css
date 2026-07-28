@@ -971,6 +971,21 @@ button.danger {
 
 .vn-shell {
   max-width: 40rem;
+  width: 100%;
+  overflow-x: clip;
+}
+
+.vn-form,
+.vn-step,
+.vn-fieldset,
+.bg-grid,
+.answer-grid,
+.bg-card,
+.answer-card,
+.bg-card-body,
+.answer-label {
+  max-width: 100%;
+  min-width: 0;
 }
 
 .vn-progress {
@@ -1005,21 +1020,30 @@ button.danger {
   display: block;
 }
 
-.vn-fieldset {
+.vn-fieldset,
+.vn-question-group {
   margin: 0;
   padding: 1.15rem 1.2rem 1.25rem;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: rgba(28, 34, 24, 0.55);
-  min-width: 0;
+  box-sizing: border-box;
+}
+
+.vn-question-group + .vn-question-group,
+.vn-step + .vn-step .vn-question-group {
+  margin-top: 0;
 }
 
 .vn-legend {
   display: block;
   float: left;
   width: 100%;
+  max-width: 100%;
   padding: 0;
   margin: 0 0 1.15rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .vn-legend + * {
@@ -1042,14 +1066,19 @@ button.danger {
   font-size: clamp(1.45rem, 3.4vw, 1.9rem);
   line-height: 1.28;
   color: var(--parchment);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .vn-name-field {
   display: block;
+  max-width: 100%;
 }
 
 .vn-name-field input {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   margin-top: 0.55rem;
   padding: 0.9rem 1rem;
   font-family: var(--font-ui);
@@ -1073,6 +1102,7 @@ button.danger {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  width: 100%;
 }
 
 /* Visually hidden native control; label card remains the hit target. */
@@ -1096,11 +1126,15 @@ button.danger {
   display: grid;
   gap: 0.85rem;
   align-items: start;
+  width: 100%;
+  box-sizing: border-box;
   padding: 1.1rem 1.15rem;
   background: var(--ink-panel);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   cursor: pointer;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   transition:
     border-color var(--ease),
     background var(--ease),
@@ -1109,11 +1143,11 @@ button.danger {
 }
 
 .bg-card {
-  grid-template-columns: 2.5rem 1fr;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
 }
 
 .answer-card {
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .bg-card:hover,
@@ -1169,10 +1203,13 @@ button.danger {
   border: 1px solid var(--line-soft);
   color: var(--jade);
   font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
 .bg-card-body {
   min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .bg-card strong {
@@ -1181,6 +1218,8 @@ button.danger {
   font-size: 1.25rem;
   color: var(--parchment);
   margin-bottom: 0.3rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .bg-card small {
@@ -1188,13 +1227,18 @@ button.danger {
   color: var(--muted);
   font-size: 0.92rem;
   line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .answer-card .answer-label {
+  display: block;
   font-family: var(--font-display);
   font-size: 1.15rem;
   color: var(--parchment);
   line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .vn-nav {
@@ -1205,6 +1249,7 @@ button.danger {
   margin-top: 1.75rem;
   padding-top: 1.15rem;
   border-top: 1px solid var(--line);
+  max-width: 100%;
 }
 
 .vn-nav .btn-secondary {
@@ -1262,9 +1307,11 @@ button.danger {
 
   .vn-shell {
     max-width: none;
+    overflow-x: clip;
   }
 
-  .vn-fieldset {
+  .vn-fieldset,
+  .vn-question-group {
     padding: 1rem 0.9rem 1.1rem;
   }
 
@@ -1273,7 +1320,7 @@ button.danger {
   }
 
   .bg-card {
-    grid-template-columns: 2.1rem 1fr;
+    grid-template-columns: 2.1rem minmax(0, 1fr);
     gap: 0.7rem;
     padding: 0.95rem 0.95rem;
   }

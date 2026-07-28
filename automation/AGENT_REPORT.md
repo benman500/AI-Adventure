@@ -1,56 +1,52 @@
-# Agent Report — ui-02 Modernize character creation
+# Agent Report — ui-02 Modernize character creation presentation
+
+## Status: IMPLEMENTATION COMPLETE — pytest blocked (shell rejected)
 
 ## Task completed
 
-Modernized server-rendered character creation presentation only (templates/CSS/JS contract preserved).
+Repaired the prior no-diff review failure by implementing presentation-only character-creation changes:
 
-### Presentation changes
+- Distinct `fieldset.vn-question-group` per question with answers nested beneath the legend/prompt
+- Background and personality choices as fully clickable `label` cards with matching `for`/`id` pairs around existing radios
+- Clear selected (`:has(input:checked)` / `.is-selected`), hover, and `:focus-visible` card states
+- Responsive no-overflow hardening (`overflow-x: clip`, `overflow-wrap: anywhere`, `minmax(0, 1fr)`)
+- Strengthened focused presentation tests for markup associations (no weakened assertions)
 
-- Each creation step remains a semantic `fieldset`/`legend`; personality answers stay nested under their question (`data-question-id`, `answer_{{ question.id }}`).
-- Background and personality options remain fully clickable `label` cards wrapping existing radio controls (`bg-card` / `answer-card`).
-- Clearer selected, hover, and keyboard `focus-visible` states (including selected+hover and selected+focus).
-- Action hierarchy: secondary Back left-aligned; primary Continue / Enter the world right-aligned.
-- Mobile rules retained under `@media (max-width: 560px)`.
-- `<noscript>` fallback shows all question blocks and the submit button so the form remains usable without the wizard JS.
-- `role="radiogroup"` added on choice grids for accessibility labeling (no field-name or value changes).
-- Existing wizard JS unchanged in behavior (selection sync + step flow).
-
-### Form / gameplay contract preserved
-
-- `POST /new`, `character_name`, `background_id`, `answer_<question_id>` values, validation path, and routes untouched.
+Form contract preserved: `POST /new`, `character_name`, `background_id`, `answer_{{ question.id }}`, option values unchanged.
 
 ## Files changed
 
 - `src/ai_adventure/presentation/templates/new_game.html`
 - `src/ai_adventure/presentation/static/css/main.css`
-- `tests/test_character_creation_ui.py` (assertions added; none removed/weakened)
+- `tests/test_character_creation_ui.py`
 - `automation/AGENT_REPORT.md`
 - `automation_v2/AGENT_REPORT.md`
-- `automation_v2/runs/20260728-165113-ui-02/shell_block_note.txt` (diagnostic only)
-
-Unchanged but in-scope from prior work on branch: `src/ai_adventure/presentation/static/js/main.js`, `tests/conftest.py`, `tests/pytest_keyword_utils.py`.
+- `automation_v2/runs/20260728-170532-ui-02/shell_block_note.txt` (diagnostic only)
 
 ## Tests run
 
-**Not executed.** Every Shell invocation in this session (and a subagent) was rejected before any command ran. No pytest output was produced.
+Shell rejected every command in this repair run (parent + best-of-n-runner + smart-mode approval retries). Commands not executed in-agent:
 
-Intended commands (from plan):
-
-1. `python -m pytest -q tests -k "character_creation or character_creation_page"`
-2. `python -m pytest -q`
+```text
+python -m pytest -q tests/test_character_creation_ui.py
+python -m pytest -q tests -k "character_creation or character_creation_page"
+python -m pytest -q
+```
 
 ## Test results
 
-Unavailable in-agent. Orchestrator/human must re-run the commands above.
+Not available in-agent. **Blocked on shell execution.**
+
+Prior orchestrator run (before this repair’s template/CSS/test edits) recorded 10 focused / 303 full passing; those results do **not** cover this repair diff.
 
 ## Remaining risks
 
-- Full acceptance hinges on orchestrator pytest re-run after this UI polish.
-- `:has()` selected/focus styling plus JS `.is-selected` fallback for older browsers.
-- Noscript path stacks all steps; visual QA recommended with JS on and off.
+- Suite status for the repair diff is unverified until orchestrator re-runs pytest.
+- Manual visual check of focus rings and narrow viewports still useful.
+- Noscript stacked layout vs JS wizard step flow unchanged.
 
-## Human review needed
+## Review items
 
-1. Run focused + full pytest and confirm green.
-2. Spot-check `/new` on desktop/mobile: card click, keyboard focus ring, Back/Continue/Submit hierarchy.
-3. Optional: confirm noscript stacked form still posts the same fields.
+1. Re-run the three pytest commands above and treat results as gate.
+2. Confirm `/new` shows distinct question groups, fully clickable background cards, and answers under each personality prompt.
+3. No migrations, dependencies, gameplay, route, or form-contract changes were made.

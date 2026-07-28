@@ -42,25 +42,34 @@
 
     <form method="post" action="/new" class="vn-form" id="vn-form">
       <section class="vn-step is-active" data-step="0" data-required-name="character_name">
-        <fieldset class="vn-fieldset">
+        <fieldset class="vn-fieldset vn-question-group">
           <legend class="vn-legend">
             <span class="vn-step-title">Your name</span>
             <span class="vn-prompt">How will the world address you?</span>
           </legend>
-          <label class="vn-name-field">
+          <label class="vn-name-field" for="character-name-input">
             <span class="meta">Character name</span>
-            <input type="text" name="character_name" maxlength="64" required value="{{ character_name }}" autocomplete="nickname" autofocus>
+            <input
+              id="character-name-input"
+              type="text"
+              name="character_name"
+              maxlength="64"
+              required
+              value="{{ character_name }}"
+              autocomplete="nickname"
+              autofocus
+            >
           </label>
         </fieldset>
       </section>
 
       <section class="vn-step" data-step="1" data-required-radio="background_id">
-        <fieldset class="vn-fieldset">
-          <legend class="vn-legend">
+        <fieldset class="vn-fieldset vn-question-group">
+          <legend class="vn-legend" id="background-legend">
             <span class="vn-step-title">Life before the gate</span>
             <span class="vn-prompt">Your upbringing opens doors. It does not assign your fate.</span>
           </legend>
-          <div class="bg-grid" role="radiogroup" aria-label="Background">
+          <div class="bg-grid" role="radiogroup" aria-labelledby="background-legend">
             {% for background in backgrounds %}
             {% if background.id == 'alchemists_apprentice' %}
               {% set accent = '⚗' %}
@@ -71,8 +80,13 @@
             {% else %}
               {% set accent = '◆' %}
             {% endif %}
-            <label class="bg-card{% if selected_background == background.id %} is-selected{% endif %}">
+            {% set bg_input_id = 'background-' ~ background.id %}
+            <label
+              class="bg-card{% if selected_background == background.id %} is-selected{% endif %}"
+              for="{{ bg_input_id }}"
+            >
               <input
+                id="{{ bg_input_id }}"
                 type="radio"
                 name="background_id"
                 value="{{ background.id }}"
@@ -96,15 +110,24 @@
         data-step="{{ loop.index + 1 }}"
         data-required-radio="answer_{{ question.id }}"
       >
-        <fieldset class="vn-fieldset" data-question-id="{{ question.id }}">
-          <legend class="vn-legend">
+        <fieldset class="vn-fieldset vn-question-group" data-question-id="{{ question.id }}">
+          <legend class="vn-legend" id="question-legend-{{ question.id }}">
             <span class="vn-step-title">Question {{ loop.index }} of {{ questions|length }}</span>
             <span class="vn-prompt">{{ question.prompt }}</span>
           </legend>
-          <div class="answer-grid" role="radiogroup" aria-label="{{ question.prompt }}">
+          <div
+            class="answer-grid"
+            role="radiogroup"
+            aria-labelledby="question-legend-{{ question.id }}"
+          >
             {% for answer in question.answers %}
-            <label class="answer-card{% if answers.get(question.id) == answer.id %} is-selected{% endif %}">
+            {% set answer_input_id = 'answer-' ~ question.id ~ '-' ~ answer.id %}
+            <label
+              class="answer-card{% if answers.get(question.id) == answer.id %} is-selected{% endif %}"
+              for="{{ answer_input_id }}"
+            >
               <input
+                id="{{ answer_input_id }}"
                 type="radio"
                 name="answer_{{ question.id }}"
                 value="{{ answer.id }}"
