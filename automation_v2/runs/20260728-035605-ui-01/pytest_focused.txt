@@ -1,0 +1,24 @@
+STDOUT
+======
+........................................................................ [ 26%]
+........................................................................ [ 52%]
+........................................................................ [ 78%]
+............................................................             [100%]
+============================== warnings summary ===============================
+tests/test_alchemy_phase8.py: 1 warning
+tests/test_alembic_migrations.py: 3 warnings
+tests/test_event_engine_phase4a.py: 1 warning
+tests/test_locations_phase5a.py: 1 warning
+tests/test_npcs_phase9b.py: 1 warning
+tests/test_sects_phase9d.py: 1 warning
+tests/test_spiritual_roots_phase7.py: 1 warning
+tests/test_techniques_phase6c.py: 1 warning
+  C:\Users\benjamyn\Desktop\ai-projects\AI- Adventure\.venv\Lib\site-packages\alembic\config.py:612: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+276 passed, 10 warnings in 37.68s
+
+
+STDERR
+======

@@ -1,0 +1,18 @@
+{
+  "decision": "human_review",
+  "summary": "No approved UI implementation was made. The diff contains only automation state/run artifacts outside the allowed areas, while no templates, static styles, or tests were changed. Passing tests therefore do not demonstrate satisfaction of the layout acceptance criteria.",
+  "repair_instructions": [
+    "Remove or exclude the automation_v2 state and run artifacts from the task diff.",
+    "Implement the story-first play layout within src/ai_adventure/presentation/templates and src/ai_adventure/presentation/static.",
+    "Ensure Working Toward remains visible, character and cultivation details use accessible collapsible sections, and mobile ordering places narrative first.",
+    "Preserve all existing forms, links, actions, routes, identifiers, template contracts, and gameplay behavior.",
+    "Add narrowly scoped presentation tests if needed, then rerun focused tests and the full pytest suite.",
+    "Provide a diff whose changed-file report consistently reflects the actual implementation."
+  ],
+  "risks": [
+    "The acceptance criteria are currently unimplemented.",
+    "Files were changed outside the explicitly allowed areas.",
+    "The guardrail report says no files changed, but the supplied diff lists automation artifacts, indicating inconsistent change reporting.",
+    "Passing tests may reflect the unchanged application rather than validation of the requested UI behavior."
+  ]
+}

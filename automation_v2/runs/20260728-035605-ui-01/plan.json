@@ -1,0 +1,36 @@
+{
+  "decision": "approve",
+  "title": "Create story-first play layout",
+  "implementation_brief": "Read the required project documentation, then inspect the existing play-scene templates, styles, and relevant tests. Refactor only the server-rendered markup and existing static CSS needed to present the current location and story in a dominant responsive narrative column, with a visually quieter secondary sidebar. Keep Working Toward visible without requiring expansion. Place character and cultivation details in accessible collapsible sections, using existing project patterns or native HTML controls where practical. On narrow screens, stack content in a readable order with the narrative first. Preserve all existing template data contracts, forms, actions, links, routes, identifiers used by tests, and gameplay behavior. Add or adjust narrowly scoped presentation tests only where needed; do not weaken existing assertions.",
+  "allowed_areas": [
+    "src/ai_adventure/presentation/templates",
+    "src/ai_adventure/presentation/static",
+    "tests"
+  ],
+  "acceptance_criteria": [
+    "The current location and story content are the dominant visual focus of the play scene.",
+    "Working Toward remains visible without opening a collapsed section.",
+    "Character and cultivation details are available in accessible collapsible sections.",
+    "The layout is readable on mobile, with the narrative appearing before secondary information.",
+    "Existing actions, forms, navigation, and gameplay behavior remain unchanged.",
+    "All focused tests and the full pytest suite pass."
+  ],
+  "forbidden_changes": [
+    "Gameplay rules, progression, calculations, or engine behavior",
+    "Routes, services, persistence, database schema, or migrations",
+    "Template context contracts or action semantics",
+    "New catalogs, systems, dependencies, or JavaScript frameworks",
+    "Conversion away from server-rendered templates",
+    "Unrelated refactors or test weakening"
+  ],
+  "focused_tests": [
+    "tests"
+  ],
+  "stop_conditions": [
+    "The layout cannot be completed without changing backend behavior, route contracts, or template data contracts.",
+    "A database migration, new dependency, new framework, or gameplay-rule change appears necessary.",
+    "The intended play-scene template or ownership of existing UI behavior is ambiguous after inspection.",
+    "The work would require edits outside the allowed areas or expand beyond the queued layout goal.",
+    "The implementation would affect more than 25 files."
+  ]
+}

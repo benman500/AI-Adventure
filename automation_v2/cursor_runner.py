@@ -46,10 +46,38 @@ def build_cursor_command(
 ) -> list[str]:
     """Build the argv list for headless print mode.
 
-    Argument prefixes come from ``config.cursor_print_args`` so CLI syntax
-    changes can be adjusted in ``config.py`` / environment variables.
+    The complete prompt string is placed immediately after ``-p`` (or
+    ``--print``). Remaining items from ``config.cursor_print_args`` follow.
+
+    Intended shape::
+
+        [executable, "-p", prompt_text, "--output-format", "text"]
     """
-    return [executable, *config.cursor_print_args, prompt_text]
+    command: list[str] = [executable]
+    print_args = list(config.cursor_print_args)
+    prompt_inserted = False
+
+    for arg in print_args:
+        command.append(arg)
+        if arg in {"-p", "--print"} and not prompt_inserted:
+            command.append(prompt_text)
+            prompt_inserted = True
+
+    if not prompt_inserted:
+        command.append(prompt_text)
+
+    return command
+
+
+def _command_for_log(command: list[str], prompt_text: str) -> str:
+    """Render argv for logs with the prompt redacted (not sent to the CLI)."""
+    redacted: list[str] = []
+    for arg in command:
+        if arg == prompt_text:
+            redacted.append("<prompt>")
+        else:
+            redacted.append(arg)
+    return " ".join(redacted)
 
 
 def invoke_cursor(
@@ -62,14 +90,17 @@ def invoke_cursor(
     """Write the prompt file, run Cursor, and capture a log.
 
     Never uses ``shell=True`` and does not route through PowerShell.
+    The prompt file is written for debugging, then its UTF-8 contents are
+    read back and passed as the ``-p`` argument.
     """
     run_dir.mkdir(parents=True, exist_ok=True)
     prompt_file = run_dir / f"cursor_prompt_{attempt}.md"
     log_file = run_dir / f"cursor_output_{attempt}.txt"
     prompt_file.write_text(prompt, encoding="utf-8")
+    prompt_text = prompt_file.read_text(encoding="utf-8")
 
     executable = resolve_cursor_executable(config)
-    command = build_cursor_command(executable, prompt, config)
+    command = build_cursor_command(executable, prompt_text, config)
 
     result = run_command(
         command,
@@ -80,7 +111,7 @@ def invoke_cursor(
     log_file.write_text(
         "COMMAND\n"
         "=======\n"
-        + " ".join(command[: len(command) - 1] + ["<prompt>"])
+        + _command_for_log(command, prompt_text)
         + "\n\nSTDOUT\n"
         "======\n"
         + result.stdout
