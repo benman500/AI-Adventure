@@ -1,0 +1,15 @@
+{
+  "decision": "human_review",
+  "summary": "The focused and full suites passed (298 tests), and the presentation changes appear to preserve the character-creation form contract. However, multiple files under automation_v2 were changed outside the explicitly allowed areas. The guardrail report lists only four changed files and incorrectly reports no violations, while the supplied diff and changed-files list include automation_v2 reports, state, and run artifacts. Additionally, automation/AGENT_REPORT.md says tests were not executed and results were unavailable, conflicting with the provided successful test results and failing the reporting acceptance criterion.",
+  "repair_instructions": [
+    "Revert or exclude all task-authored changes under automation_v2, including automation_v2/AGENT_REPORT.md and automation_v2/state.json; retain run artifacts only if they are generated and managed externally rather than part of the implementation change.",
+    "Update automation/AGENT_REPORT.md to record the actual focused and full test commands and successful results, including the full-suite result of 298 passed with 10 warnings.",
+    "Regenerate or correct the guardrail assessment so its changed-files list matches the actual implementation diff and flags any remaining files outside the allowed areas.",
+    "Re-run the focused and full test suites after cleaning the scope and confirm both still pass."
+  ],
+  "risks": [
+    "Out-of-scope automation state and report changes could affect orchestration behavior or leave misleading repository state.",
+    "The current completion report contradicts the authoritative test results, making the audit trail unreliable.",
+    "The discrepancy between guardrail output and the actual changed-files list may conceal additional scope violations."
+  ]
+}

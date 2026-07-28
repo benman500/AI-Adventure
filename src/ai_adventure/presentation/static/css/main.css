@@ -1136,12 +1136,27 @@ button.danger {
   box-shadow: var(--shadow-soft);
 }
 
+.bg-card:has(input:checked):hover,
+.bg-card.is-selected:hover,
+.answer-card:has(input:checked):hover,
+.answer-card.is-selected:hover {
+  border-color: #d4b888;
+  background: linear-gradient(145deg, rgba(196, 165, 116, 0.28), transparent 55%), var(--ink-hover);
+}
+
 .bg-card:has(input:focus-visible),
 .answer-card:has(input:focus-visible) {
   border-color: var(--jade);
   box-shadow: 0 0 0 3px rgba(111, 143, 97, 0.35), var(--shadow-soft);
   outline: 2px solid var(--jade);
   outline-offset: 2px;
+}
+
+.bg-card:has(input:checked:focus-visible),
+.answer-card:has(input:checked:focus-visible) {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(196, 165, 116, 0.4), var(--shadow-soft);
+  outline-color: var(--gold);
 }
 
 .bg-accent {
@@ -1184,11 +1199,16 @@ button.danger {
 
 .vn-nav {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  align-items: center;
   gap: 0.75rem;
   margin-top: 1.75rem;
   padding-top: 1.15rem;
   border-top: 1px solid var(--line);
+}
+
+.vn-nav .btn-secondary {
+  margin-right: auto;
 }
 
 .vn-nav .btn-primary {

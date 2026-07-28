@@ -123,6 +123,12 @@ def test_new_game_template_groups_choices_under_fieldsets() -> None:
     assert 'name="answer_{{ question.id }}"' in template
     assert "{{ answer.id }}" in template
     assert "{{ answer.label }}" in template
+    assert 'id="vn-next"' in template
+    assert 'id="vn-submit"' in template
+    assert "btn-primary" in template
+    assert "btn-secondary" in template
+    assert "<noscript>" in template
+    assert 'role="radiogroup"' in template
 
     # Answers render inside the same fieldset as the question legend/prompt.
     answer_loop = template.index("{% for answer in question.answers %}")
@@ -146,7 +152,8 @@ def test_new_game_template_groups_choices_under_fieldsets() -> None:
     assert ":has(input:focus-visible)" in css
     assert "@media (max-width: 560px)" in css
     assert ".vn-fieldset" in css
-
+    assert ".vn-nav .btn-secondary" in css
+    assert ".vn-nav .btn-primary" in css
 
 @pytest.mark.asyncio
 async def test_new_game_form_contract_and_question_grouping(tmp_path: Path) -> None:
@@ -228,3 +235,9 @@ async def test_new_game_form_contract_and_question_grouping(tmp_path: Path) -> N
         assert re.search(r'class="[^"]*\banswer-card\b', html)
         assert html.count("<fieldset") >= 2 + len(questions)
         assert html.count("<legend") >= 2 + len(questions)
+        assert 'id="vn-next"' in html
+        assert 'id="vn-submit"' in html
+        assert "btn-primary" in html
+        assert "btn-secondary" in html
+        assert 'role="radiogroup"' in html
+        assert html.count('role="radiogroup"') >= 1 + len(questions)

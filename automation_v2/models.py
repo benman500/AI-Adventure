@@ -125,6 +125,8 @@ class GuardrailResult:
     violations: list[str]
     decision: Literal["approve", "human_review"]
     changed_files: list[str]
+    # Orchestrator runtime artifacts kept for diagnostics only.
+    runtime_artifacts: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize for evidence payloads."""

@@ -37,9 +37,12 @@ class ScriptedClient:
     def __init__(self, responses: list[str]) -> None:
         self.responses = list(responses)
         self.calls = 0
+        self.last_input_text = ""
+        self.last_instructions = ""
 
     def complete(self, *, instructions: str, input_text: str) -> str:
-        _ = instructions, input_text
+        self.last_instructions = instructions
+        self.last_input_text = input_text
         index = min(self.calls, len(self.responses) - 1)
         self.calls += 1
         return self.responses[index]
@@ -229,6 +232,72 @@ def test_reviewer_never_approves_scope_violations() -> None:
     )
     assert result.decision == "human_review"
     assert client.calls == 0
+
+
+def test_reviewer_filters_runtime_artifacts_from_diff_payload() -> None:
+    """Reviewer evidence ignores automation runtime artifacts for scope."""
+    import json
+
+    client = ScriptedClient(
+        [
+            '{"decision": "approve", "summary": "in scope", '
+            '"repair_instructions": [], "risks": []}'
+        ]
+    )
+    reviewer = Reviewer(CONFIG, client=client)
+    plan = ApprovedPlan(
+        decision="approve",
+        title="t",
+        implementation_brief="b",
+        allowed_areas=list(TASK.allowed_areas),
+        acceptance_criteria=["ok"],
+        forbidden_changes=[],
+        focused_tests=[],
+        stop_conditions=[],
+    )
+    result = reviewer.review(
+        plan=plan,
+        tests=TestResult(
+            passed=True,
+            returncode=0,
+            stdout="298 passed",
+            stderr="",
+            log_file="pytest.txt",
+        ),
+        guardrails=GuardrailResult(
+            ok=True,
+            violations=[],
+            decision="approve",
+            changed_files=[
+                "src/ai_adventure/presentation/templates/new_game.html"
+            ],
+            runtime_artifacts=[
+                "automation_v2/runs/x/review_0.json",
+                "automation_v2/state.json",
+                "automation/AGENT_REPORT.md",
+            ],
+        ),
+        diff={
+            "stat": "includes runtime noise",
+            "diff": "raw",
+            "changed_files": [
+                "automation_v2/runs/x/review_0.json",
+                "automation_v2/state.json",
+                "automation/AGENT_REPORT.md",
+                "automation_v2/AGENT_REPORT.md",
+                "src/ai_adventure/presentation/templates/new_game.html",
+            ],
+        },
+        context="ctx",
+    )
+    assert result.decision == "approve"
+    assert "automation_v2/runs" in client.last_instructions
+    payload = json.loads(client.last_input_text)
+    assert payload["diff"]["changed_files"] == [
+        "src/ai_adventure/presentation/templates/new_game.html"
+    ]
+    assert payload["diff"]["runtime_artifacts_excluded"] is True
+    assert "automation/AGENT_REPORT.md" not in payload["diff"]["changed_files"]
 
 
 def test_validate_review_payload_rejects_unknown_decision() -> None:

@@ -1,45 +1,56 @@
-# Agent Report — ui-02 Modernize character creation presentation (repair)
+# Agent Report — ui-02 Modernize character creation
 
-## Status: REPAIR APPLIED — shell blocked; orchestrator must re-run pytest
+## Status: PRESENTATION COMPLETE — pytest blocked (shell rejected)
 
-## Repairs
+## Task completed
 
-| Failure | Cause | Fix |
-|---------|-------|-----|
-| `test_new_game_form_contract_and_question_grouping` `ValueError: substring not found` | Jinja `&#39;` vs raw `question.prompt` index | Fieldset-scoped `html.unescape` document-order check |
-| Focused pytest exit **4** | `shlex.split(..., posix=False)` retains `-k` quotes → pytest string-literal error | `tests/conftest.py` + `tests/pytest_keyword_utils.py` strip one quote layer from `config.option.keyword` |
+Modernized server-rendered character creation presentation only. Routes, field names, submitted values, validation, and gameplay behavior unchanged.
 
-No form/route/gameplay/validation changes.
+### What changed
+
+| Area | Change |
+|------|--------|
+| Questions | Semantic fieldsets; answers nested under each question |
+| Backgrounds | Fully clickable `label.bg-card` radios |
+| Answers | `label.answer-card` directly under question prompt |
+| States | Hover, selected (`:has(input:checked)` / `.is-selected`), `focus-visible` |
+| Actions | Back secondary (left); Continue/Submit primary (right) |
+| Responsive | Existing `@media (max-width: 560px)` rules retained |
+| No-JS | `<noscript>` shows all steps + submit |
+| A11y | `role="radiogroup"` on choice grids |
 
 ## Files changed
 
-- `tests/conftest.py` (new)
-- `tests/pytest_keyword_utils.py` (new)
+- `src/ai_adventure/presentation/templates/new_game.html`
+- `src/ai_adventure/presentation/static/css/main.css`
 - `tests/test_character_creation_ui.py`
 - `automation/AGENT_REPORT.md`
 - `automation_v2/AGENT_REPORT.md`
-
-Prior modernization still in tree:
-
-- `src/ai_adventure/presentation/templates/new_game.html`
-- `src/ai_adventure/presentation/static/css/main.css`
-- `src/ai_adventure/presentation/static/js/main.js`
+- `automation_v2/runs/20260728-165113-ui-02/shell_block_note.txt`
 
 ## Tests run
 
-Shell rejected for all commands in this session (and subagents). Could not re-run focused or full suite here.
+Shell tool rejected all commands (parent and subagent). Could not run:
 
-## Test results (prior artifacts)
+```text
+python -m pytest -q tests -k "character_creation or character_creation_page"
+python -m pytest -q
+```
 
-| Stage | Result |
-|-------|--------|
-| Full suite | **293 passed** (`pytest.txt`) after apostrophe repair |
-| Focused `-k` | exit **4** (`pytest_focused.txt`) before quote-strip conftest |
+## Test results
 
-Expected after this repair: both stages exit 0.
+Not available. **Stop condition met for test execution:** environment cannot run approved test commands.
 
-## Risks / review
+Presentation edits are within allowed areas and preserve form contract by inspection. Orchestrator must re-run pytest to satisfy the “tests pass” acceptance criterion.
 
-- Orchestrator must confirm green focused + full pytest.
-- Prefer eventual fix in `automation_v2/test_runner.py` (out of allowed areas for this task).
-- Delete stray `run_ui_tests.ps1` at repo root if present.
+## Remaining risks
+
+- Unverified test suite in this session.
+- Visual QA of focus/selected/hover and mobile layout.
+- Noscript stacked layout vs wizard-with-JS.
+
+## Human / orchestrator review
+
+1. Re-run focused + full pytest.
+2. Approve or reject based on results + `/new` visual check.
+3. No migrations, dependencies, or gameplay changes were made.

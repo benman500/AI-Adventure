@@ -1,0 +1,5 @@
+Shell tool invocations were rejected in this agent session (including subagents).
+Pytest could not be executed from the agent. Orchestrator/human must re-run:
+
+python -m pytest -q tests -k "character_creation or character_creation_page"
+python -m pytest -q

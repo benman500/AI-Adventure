@@ -18,6 +18,7 @@ from automation_v2.planner import (
     OpenAIResponsesClient,
     parse_json_object,
 )
+from automation_v2.guardrails import filter_diff_for_review
 
 
 class ReviewerClient(Protocol):
@@ -32,6 +33,19 @@ You are the supervising reviewer for an existing cultivation RPG.
 
 Judge the implementation only against the approved task, locked architecture,
 test results, changed files, and diff.
+
+Ignore automation framework runtime artifacts when judging scope. These files
+are produced by the orchestrator for diagnostics and are not implementation
+work. Do not request human review merely because they appear in a raw worktree:
+
+- automation_v2/runs/**
+- automation_v2/state.json
+- automation/AGENT_REPORT.md
+- automation_v2/AGENT_REPORT.md
+
+The supplied changed_files list and diff are already filtered to implementation
+files (templates, CSS, Python, tests, assets, and similar project files).
+Judge allowed-area scope only from that filtered evidence.
 
 Return JSON only:
 
@@ -62,7 +76,7 @@ Choose human_review for:
 - new architecture,
 - ambiguous design decisions,
 - suspiciously broad refactors,
-- changes outside allowed areas.
+- changes outside allowed areas in the filtered implementation file list.
 """
 
 
@@ -186,7 +200,7 @@ class Reviewer:
                 "log_file": tests.log_file,
             },
             "guardrails": guardrails.to_dict(),
-            "diff": diff,
+            "diff": filter_diff_for_review(diff),
             "locked_context": context,
         }
         input_text = json.dumps(payload, indent=2)

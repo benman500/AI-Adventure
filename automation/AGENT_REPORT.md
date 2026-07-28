@@ -1,57 +1,56 @@
-# Agent Report — ui-02 Modernize character creation presentation (repair)
+# Agent Report — ui-02 Modernize character creation
 
 ## Task completed
 
-Repaired character-creation presentation test failures that blocked orchestrator approval.
+Modernized server-rendered character creation presentation only (templates/CSS/JS contract preserved).
 
-### 1) Assertion repair (retained)
+### Presentation changes
 
-`test_new_game_form_contract_and_question_grouping` failed on prompts with apostrophes (`elder's` → Jinja `&#39;`). Document-order check now scopes to the question fieldset and searches `html.unescape(...)`. Form contract assertions unchanged.
+- Each creation step remains a semantic `fieldset`/`legend`; personality answers stay nested under their question (`data-question-id`, `answer_{{ question.id }}`).
+- Background and personality options remain fully clickable `label` cards wrapping existing radio controls (`bg-card` / `answer-card`).
+- Clearer selected, hover, and keyboard `focus-visible` states (including selected+hover and selected+focus).
+- Action hierarchy: secondary Back left-aligned; primary Continue / Enter the world right-aligned.
+- Mobile rules retained under `@media (max-width: 560px)`.
+- `<noscript>` fallback shows all question blocks and the submit button so the form remains usable without the wizard JS.
+- `role="radiogroup"` added on choice grids for accessibility labeling (no field-name or value changes).
+- Existing wizard JS unchanged in behavior (selection sync + step flow).
 
-### 2) Focused-run exit 4 (this pass)
+### Form / gameplay contract preserved
 
-Plan focused command: `python -m pytest -q tests -k "character and creation"`.
-
-On Windows, `automation_v2` uses `shlex.split(..., posix=False)`, which keeps quote characters inside the `-k` value. Pytest then errors (`string literal`, exit 4, `no tests ran`) even when the full suite is green.
-
-**In-scope fix:** strip one matching surrounding quote layer from `config.option.keyword` in `tests/conftest.py` (also `pytest_configure`), helper in `tests/pytest_keyword_utils.py`, unit test in `test_character_creation_ui.py`.
-
-Presentation modernization already present: fieldsets/legends, answers under questions, clickable `bg-card` labels, hover/selected/`focus-visible`, responsive CSS, preserved `POST /new` contract.
+- `POST /new`, `character_name`, `background_id`, `answer_<question_id>` values, validation path, and routes untouched.
 
 ## Files changed
 
-- `tests/conftest.py` (new)
-- `tests/pytest_keyword_utils.py` (new)
-- `tests/test_character_creation_ui.py`
-- `src/ai_adventure/presentation/templates/new_game.html` (prior)
-- `src/ai_adventure/presentation/static/css/main.css` (prior)
-- `src/ai_adventure/presentation/static/js/main.js` (prior)
+- `src/ai_adventure/presentation/templates/new_game.html`
+- `src/ai_adventure/presentation/static/css/main.css`
+- `tests/test_character_creation_ui.py` (assertions added; none removed/weakened)
 - `automation/AGENT_REPORT.md`
 - `automation_v2/AGENT_REPORT.md`
+- `automation_v2/runs/20260728-165113-ui-02/shell_block_note.txt` (diagnostic only)
 
-Note: `run_ui_tests.ps1` may exist at repo root from a blocked subagent; safe to delete (outside task scope).
+Unchanged but in-scope from prior work on branch: `src/ai_adventure/presentation/static/js/main.js`, `tests/conftest.py`, `tests/pytest_keyword_utils.py`.
 
 ## Tests run
 
-Shell is blocked in this agent session — pytest could not be executed here.
+**Not executed.** Every Shell invocation in this session (and a subagent) was rejected before any command ran. No pytest output was produced.
 
-Prior artifact `automation_v2/runs/20260728-135905-ui-02/pytest.txt`: **293 passed** (after apostrophe repair, before quote-strip conftest).
-Prior focused: exit **4** (`pytest_focused.txt`).
+Intended commands (from plan):
 
-Orchestrator should re-run focused + full suite after this repair.
+1. `python -m pytest -q tests -k "character_creation or character_creation_page"`
+2. `python -m pytest -q`
 
 ## Test results
 
-Not re-verified in-agent. Expected: focused exit 0; full suite exit 0 (~294 tests with new unit test).
+Unavailable in-agent. Orchestrator/human must re-run the commands above.
 
 ## Remaining risks
 
-- Confirm via orchestrator/human pytest re-run.
-- Long-term fix belongs in `automation_v2/test_runner.py` (outside allowed areas).
-- `:has()` focus/selected CSS plus JS `.is-selected` fallback.
+- Full acceptance hinges on orchestrator pytest re-run after this UI polish.
+- `:has()` selected/focus styling plus JS `.is-selected` fallback for older browsers.
+- Noscript path stacks all steps; visual QA recommended with JS on and off.
 
 ## Human review needed
 
-1. Confirm focused + full pytest pass.
-2. Optional `/new` keyboard and mobile check.
-3. Delete `run_ui_tests.ps1` if present.
+1. Run focused + full pytest and confirm green.
+2. Spot-check `/new` on desktop/mobile: card click, keyboard focus ring, Back/Continue/Submit hierarchy.
+3. Optional: confirm noscript stacked form still posts the same fields.

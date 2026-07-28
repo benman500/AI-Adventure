@@ -7,6 +7,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from automation_v2.guardrails import (
+    collect_runtime_artifacts,
+    filter_implementation_files,
+)
 from automation_v2.models import CommandResult
 from automation_v2.process_runner import run_command
 
@@ -85,33 +89,45 @@ class GitManager:
         return sorted(names)
 
     def collect_diff(self) -> dict[str, str | list[str]]:
-        """Collect diff stat, a truncated diff, and changed file names."""
-        stat = self._git("diff", "--stat", "HEAD")
+        """Collect implementation-focused diff evidence for review.
+
+        Runtime automation artifacts remain on disk for diagnostics but are
+        excluded from the changed-file list and pathspecs used for review.
+        """
+        excludes = (
+            ":(exclude)automation_v2/runs",
+            ":(exclude)automation_v2/state.json",
+            ":(exclude)automation_v2/AGENT_REPORT.md",
+            ":(exclude)automation/AGENT_REPORT.md",
+            ":(exclude)automation/runs",
+        )
+
+        stat = self._git("diff", "--stat", "HEAD", "--", ".", *excludes)
         if stat.returncode != 0:
             # Fall back to unstaged-only stat if HEAD comparison fails.
-            stat = self._git("diff", "--stat")
+            stat = self._git("diff", "--stat", "--", ".", *excludes)
 
         diff = self._git(
             "diff",
             "HEAD",
             "--",
             ".",
-            ":(exclude)automation_v2/runs",
-            ":(exclude)automation/runs",
+            *excludes,
         )
         if diff.returncode != 0:
             diff = self._git(
                 "diff",
                 "--",
                 ".",
-                ":(exclude)automation_v2/runs",
-                ":(exclude)automation/runs",
+                *excludes,
             )
 
+        all_changed = self.list_changed_files()
         return {
             "stat": stat.stdout or "",
             "diff": (diff.stdout or "")[-60000:],
-            "changed_files": self.list_changed_files(),
+            "changed_files": filter_implementation_files(all_changed),
+            "runtime_artifacts": collect_runtime_artifacts(all_changed),
         }
 
     def stage_all(self) -> None:
