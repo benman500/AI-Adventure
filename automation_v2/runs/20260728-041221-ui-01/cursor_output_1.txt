@@ -1,0 +1,11 @@
+COMMAND
+=======
+C:\Users\benjamyn\AppData\Local\cursor-agent\agent.CMD -p <prompt> --output-format text
+
+STDOUT
+======
+
+
+STDERR
+======
+Error: No prompt provided for print mode

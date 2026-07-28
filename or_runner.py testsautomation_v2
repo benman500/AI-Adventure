@@ -1,0 +1,196 @@
+[1mdiff --git a/automation_v2/cursor_runner.py b/automation_v2/cursor_runner.py[m
+[1mindex f2da993..ee86f02 100644[m
+[1m--- a/automation_v2/cursor_runner.py[m
+[1m+++ b/automation_v2/cursor_runner.py[m
+[36m@@ -2,6 +2,7 @@[m
+ [m
+ from __future__ import annotations[m
+ [m
+[32m+[m[32mimport re[m
+ import shutil[m
+ from dataclasses import dataclass[m
+ from pathlib import Path[m
+[36m@@ -9,6 +10,10 @@[m [mfrom pathlib import Path[m
+ from automation_v2.config import AutomationConfig[m
+ from automation_v2.process_runner import run_command[m
+ [m
+[32m+[m[32m_VERSION_DIR_RE = re.compile([m
+[32m+[m[32m    r"^\d{4}\.\d{1,2}\.\d{1,2}(-\d{2}-\d{2}-\d{2})?-[a-f0-9]+$"[m
+[32m+[m[32m)[m
+[32m+[m
+ [m
+ class CursorNotFoundError(RuntimeError):[m
+     """Raised when no configured Cursor agent executable is on PATH."""[m
+[36m@@ -39,21 +44,91 @@[m [mdef resolve_cursor_executable(config: AutomationConfig) -> str:[m
+     )[m
+ [m
+ [m
+[32m+[m[32mdef _version_sort_key(name: str) -> tuple[int, str]:[m
+[32m+[m[32m    """Sort Cursor version directory names newest-first."""[m
+[32m+[m[32m    date_part = name.split("-")[0][m
+[32m+[m[32m    parts = date_part.split(".")[m
+[32m+[m[32m    if len(parts) != 3:[m
+[32m+[m[32m        return (0, name)[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        year, month, day = (int(parts[0]), int(parts[1]), int(parts[2]))[m
+[32m+[m[32m    except ValueError:[m
+[32m+[m[32m        return (0, name)[m
+[32m+[m[32m    return (year * 10_000 + month * 100 + day, name)[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef unwrap_windows_cmd_wrapper(cmd_path: Path) -> list[str] | None:[m
+[32m+[m[32m    """Resolve ``agent.CMD`` to ``[node.exe, index.js]`` when possible.[m
+[32m+[m
+[32m+[m[32m    Windows ``agent.CMD`` forwards ``%*`` into PowerShell, which corrupts[m
+[32m+[m[32m    multiline prompt arguments. Invoking Node directly preserves argv.[m
+[32m+[m[32m    """[m
+[32m+[m[32m    script_dir = cmd_path.resolve().parent[m
+[32m+[m[32m    local_node = script_dir / "node.exe"[m
+[32m+[m[32m    local_index = script_dir / "index.js"[m
+[32m+[m[32m    if local_node.is_file() and local_index.is_file():[m
+[32m+[m[32m        return [str(local_node), str(local_index)][m
+[32m+[m
+[32m+[m[32m    versions_root = script_dir / "versions"[m
+[32m+[m[32m    if not versions_root.is_dir():[m
+[32m+[m[32m        return None[m
+[32m+[m
+[32m+[m[32m    version_dirs = [[m
+[32m+[m[32m        path[m
+[32m+[m[32m        for path in versions_root.iterdir()[m
+[32m+[m[32m        if path.is_dir() and _VERSION_DIR_RE.match(path.name)[m
+[32m+[m[32m    ][m
+[32m+[m[32m    if not version_dirs:[m
+[32m+[m[32m        return None[m
+[32m+[m
+[32m+[m[32m    version_dirs.sort(key=lambda path: _version_sort_key(path.name), reverse=True)[m
+[32m+[m[32m    latest = version_dirs[0][m
+[32m+[m[32m    node = latest / "node.exe"[m
+[32m+[m[32m    index = latest / "index.js"[m
+[32m+[m[32m    if node.is_file() and index.is_file():[m
+[32m+[m[32m        return [str(node), str(index)][m
+[32m+[m[32m    return None[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef resolve_cursor_argv_prefix(config: AutomationConfig) -> list[str]:[m
+[32m+[m[32m    """Return the argv prefix used to launch Cursor without shell wrappers."""[m
+[32m+[m[32m    resolved = resolve_cursor_executable(config)[m
+[32m+[m[32m    path = Path(resolved)[m
+[32m+[m[32m    if path.suffix.lower() in {".cmd", ".bat"}:[m
+[32m+[m[32m        unwrapped = unwrap_windows_cmd_wrapper(path)[m
+[32m+[m[32m        if unwrapped is not None:[m
+[32m+[m[32m            return unwrapped[m
+[32m+[m[32m    return [resolved][m
+[32m+[m
+[32m+[m
+ def build_cursor_command([m
+[31m-    executable: str,[m
+[32m+[m[32m    executable: str | list[str],[m
+     prompt_text: str,[m
+     config: AutomationConfig,[m
+ ) -> list[str]:[m
+     """Build the argv list for headless print mode.[m
+ [m
+[31m-    The complete prompt string is placed immediately after ``-p`` (or[m
+[31m-    ``--print``). Remaining items from ``config.cursor_print_args`` follow.[m
+[32m+[m[32m    ``-p`` / ``--print`` is a boolean flag. The complete prompt string is the[m
+[32m+[m[32m    next argv element (one list item, including spaces and newlines). Remaining[m
+[32m+[m[32m    items from ``config.cursor_print_args`` follow.[m
+ [m
+     Intended shape::[m
+ [m
+[31m-        [executable, "-p", prompt_text, "--output-format", "text"][m
+[32m+[m[32m        [executable..., "-p", prompt_text, "--output-format", "text"][m
+     """[m
+[31m-    command: list[str] = [executable][m
+[32m+[m[32m    if isinstance(executable, str):[m
+[32m+[m[32m        command: list[str] = [executable][m
+[32m+[m[32m    else:[m
+[32m+[m[32m        command = list(executable)[m
+[32m+[m
+[32m+[m[32m    if not prompt_text:[m
+[32m+[m[32m        raise ValueError("prompt_text must be a non-empty string")[m
+[32m+[m[32m    if prompt_text in {"<prompt>", "{prompt}", "prompt_file"}:[m
+[32m+[m[32m        raise ValueError([m
+[32m+[m[32m            "prompt_text must be the actual prompt contents, "[m
+[32m+[m[32m            f"not the placeholder {prompt_text!r}"[m
+[32m+[m[32m        )[m
+[32m+[m
+     print_args = list(config.cursor_print_args)[m
+     prompt_inserted = False[m
+ [m
+[36m@@ -66,11 +141,15 @@[m [mdef build_cursor_command([m
+     if not prompt_inserted:[m
+         command.append(prompt_text)[m
+ [m
+[32m+[m[32m    if "<prompt>" in command:[m
+[32m+[m[32m        raise RuntimeError([m
+[32m+[m[32m            "Refusing to launch Cursor with literal '<prompt>' in argv"[m
+[32m+[m[32m        )[m
+     return command[m
+ [m
+ [m
+ def _command_for_log(command: list[str], prompt_text: str) -> str:[m
+[31m-    """Render argv for logs with the prompt redacted (not sent to the CLI)."""[m
+[32m+[m[32m    """Render argv for logs with the prompt redacted (display only)."""[m
+     redacted: list[str] = [][m
+     for arg in command:[m
+         if arg == prompt_text:[m
+[36m@@ -91,16 +170,26 @@[m [mdef invoke_cursor([m
+ [m
+     Never uses ``shell=True`` and does not route through PowerShell.[m
+     The prompt file is written for debugging, then its UTF-8 contents are[m
+[31m-    read back and passed as the ``-p`` argument.[m
+[32m+[m[32m    read back and passed as a single argv element immediately after ``-p``.[m
+     """[m
+     run_dir.mkdir(parents=True, exist_ok=True)[m
+     prompt_file = run_dir / f"cursor_prompt_{attempt}.md"[m
+     log_file = run_dir / f"cursor_output_{attempt}.txt"[m
+     prompt_file.write_text(prompt, encoding="utf-8")[m
+     prompt_text = prompt_file.read_text(encoding="utf-8")[m
+[32m+[m[32m    if not prompt_text.strip():[m
+[32m+[m[32m        raise ValueError(f"Prompt file is empty: {prompt_file}")[m
+[32m+[m
+[32m+[m[32m    resolved_executable = resolve_cursor_executable(config)[m
+[32m+[m[32m    argv_prefix = resolve_cursor_argv_prefix(config)[m
+[32m+[m[32m    command = build_cursor_command(argv_prefix, prompt_text, config)[m
+ [m
+[31m-    executable = resolve_cursor_executable(config)[m
+[31m-    command = build_cursor_command(executable, prompt_text, config)[m
+[32m+[m[32m    # Real subprocess argv must contain the prompt, never the log placeholder.[m
+[32m+[m[32m    dash_p_index = command.index("-p")[m
+[32m+[m[32m    if command[dash_p_index + 1] != prompt_text:[m
+[32m+[m[32m        raise RuntimeError("Cursor argv does not place prompt text immediately after -p")[m
+[32m+[m[32m    if "<prompt>" in command:[m
+[32m+[m[32m        raise RuntimeError("Cursor argv still contains literal '<prompt>' placeholder")[m
+ [m
+     result = run_command([m
+         command,[m
+[36m@@ -109,10 +198,16 @@[m [mdef invoke_cursor([m
+     )[m
+ [m
+     log_file.write_text([m
+[31m-        "COMMAND\n"[m
+[31m-        "=======\n"[m
+[32m+[m[32m        "COMMAND (displayed; prompt redacted)\n"[m
+[32m+[m[32m        "====================================\n"[m
+         + _command_for_log(command, prompt_text)[m
+[31m-        + "\n\nSTDOUT\n"[m
+[32m+[m[32m        + "\n\nARGV NOTES\n"[m
+[32m+[m[32m        "==========\n"[m
+[32m+[m[32m        f"executable_resolved={resolved_executable}\n"[m
+[32m+[m[32m        f"argv_prefix={argv_prefix!r}\n"[m
+[32m+[m[32m        f"prompt_chars={len(prompt_text)}\n"[m
+[32m+[m[32m        f"prompt_follows_-p={command[command.index('-p') + 1] == prompt_text}\n"[m
+[32m+[m[32m        "\n\nSTDOUT\n"[m
+         "======\n"[m
+         + result.stdout[m
+         + "\n\nSTDERR\n"[m
+[36m@@ -127,7 +222,7 @@[m [mdef invoke_cursor([m
+     )[m
+ [m
+     return CursorRunResult([m
+[31m-        executable=executable,[m
+[32m+[m[32m        executable=resolved_executable,[m
+         returncode=result.returncode,[m
+         timed_out=result.timed_out,[m
+         prompt_file=prompt_file,[m
