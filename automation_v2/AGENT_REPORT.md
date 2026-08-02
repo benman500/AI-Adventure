@@ -1,50 +1,54 @@
-# Agent Report — ui-05 Improve gameplay action hierarchy (repair attempt 3)
+# Agent Report — Improve gameplay action hierarchy
 
-## Status: IMPLEMENTATION REPAIRED — AWAITING ORCHESTRATOR PYTEST
+## Status: IMPLEMENTATION COMPLETE — PYTEST BLOCKED (SHELL REJECTED)
 
-## Deficiencies addressed
+## Deficiencies identified (before this run)
 
-1. **Focused tests failed with `ERROR: file or directory not found: Run`** — planner `focused_tests` was prose. Disk `plan.json` corrected to bare module paths (orchestrator re-reads on resume from `repairing`).
-2. **Primary section label** was muted like every other moment-block heading — Continue now uses gold via `.action-primary h2`.
-3. **Disabled primary** collapsed into generic opacity only — muted gold fill keeps disabled primary in the primary tier.
+1. Continue (primary) and Here (secondary) sections were only distinguished by heading color and button fill; section containers themselves were barely framed (thin bottom border / no zone).
+2. People here / Nearby headings stayed fully muted, so section-tier hierarchy stopped at Continue vs Here.
+3. Story continue buttons shared similar visual weight with travel/NPC primary gold buttons, reading as a repeated wall of gold rectangles across groups.
+4. `.btn-secondary:disabled` lacked tier-specific styling (generic opacity only).
+5. Reduced-motion transform resets did not explicitly cover story / travel / NPC primary hover-active pairs.
 
-## What changed this repair
+## What changed
+
+### Template (`play_scene.html`)
+
+- People here section marked `people-section` (class only; no action add/remove/reorder; routes/forms unchanged).
 
 ### CSS (`main.css`)
 
-- `.action-primary h2 { color: var(--gold); }`
-- `.btn-primary:disabled` / `.button.primary:disabled` muted gold fill
+- Framed `.action-primary` (gold left accent + soft gold wash) and `.action-secondary` (jade left accent + soft jade wash).
+- Stronger story-continue primary weight (size, letter-spacing, shadow).
+- Quieter travel/NPC primary chrome relative to story continue (slightly smaller padding/shadow; still gold primary).
+- Tier-colored headings: `.travel-section h2` gold; `.people-section h2` jade.
+- Explicit `.btn-secondary:disabled` / `.button.secondary:disabled`.
+- Mobile padding for framed primary/secondary zones; expanded `prefers-reduced-motion` transform resets for story/travel/NPC primaries.
+- Here-action transition includes `transform` so active feedback and reduced-motion handling stay consistent.
 
 ### Tests (`tests/test_action_hierarchy_ui.py`)
 
-- Assert `.action-primary` marker, gold/jade section label colors, `.btn-primary:disabled`
-
-### Runtime
-
-- `plan.json` `focused_tests` remains valid module paths
-- Run note: `repair_note_attempt3.txt`
+- Assert framed primary/secondary zones, people-section marker, secondary disabled styles, travel reduced-motion hover selector, and mobile framing rules.
 
 ## Acceptance criteria
 
 | Criterion | Status |
 |-----------|--------|
-| Primary distinct from secondary/utility | Met — gold fill + gold Continue label vs jade-accent secondary vs underline utility |
-| No undifferentiated wall of identical rectangles | Met — tiered fill/outline/link + section markers |
-| Hover, active, disabled, keyboard-focus clear | Met — including primary disabled this repair |
-| Names, routes, methods, fields, values, order unchanged | Met — CSS/class/section-only |
-| Readable/usable at mobile widths | Met — existing 560px min-heights |
-| Transitions respect prefers-reduced-motion | Met — `transition: none` + `transform: none` |
-| Meaningful template/stylesheet change | Met — `main.css` this repair; template hierarchy classes from prior |
-| Focused + full pytest | Prior full suite 316 passed; focused path bug fixed on disk; in-agent Shell Rejected |
+| Primary distinct from secondary/utility | Met — framed gold Continue zone vs framed jade Here zone vs underline utility; travel gold / people jade headings |
+| No undifferentiated wall of identical rectangles | Met — tier framing + story primary emphasized over travel/NPC primary + secondary outline/jade accent |
+| Hover, active, disabled, keyboard-focus clear | Met — including secondary disabled this run |
+| Names, routes, methods, fields, values, order unchanged | Met — class/CSS only |
+| Readable/usable at mobile widths | Met — 560px framing + control min-heights |
+| Transitions respect prefers-reduced-motion | Met — global transition none + expanded transform none |
+| Focused + full pytest | **Not executed** — Shell tool rejected with `Rejected:` (no reason text) |
 
 ## Files changed
 
+- `src/ai_adventure/presentation/templates/play_scene.html`
 - `src/ai_adventure/presentation/static/css/main.css`
 - `tests/test_action_hierarchy_ui.py`
-- `automation/AGENT_REPORT.md`
 - `automation_v2/AGENT_REPORT.md`
-- `automation_v2/runs/20260728-181958-ui-05/plan.json` (already fixed; verified)
-- `automation_v2/runs/20260728-181958-ui-05/repair_note_attempt3.txt`
+- `automation/AGENT_REPORT.md`
 
 ## Tests run
 
@@ -53,23 +57,14 @@ python -m pytest -q tests/test_action_hierarchy_ui.py tests/test_play_layout_ui.
 python -m pytest -q
 ```
 
-**In-agent Shell: Rejected** (same environment-wide block as prior attempts and subagent). Pytest must be executed by the orchestrator after Cursor returns.
-
-## Test results
-
-| Stage | Result |
-|-------|--------|
-| Prior focused | Failed — path `Run` (plan prose) |
-| Prior full suite | 316 passed, 10 warnings |
-| This session | Shell blocked; not re-executed in-agent |
-| Expected next orchestrator focused | Should collect the four modules from corrected `plan.json` |
+**Result:** Shell rejected before execution (parent agent and best-of-n subagent). No stdout/stderr/exit codes available.
 
 ## Remaining risks
 
-1. Shell remains blocked inside Cursor agent sessions; only orchestrator pytest is authoritative for this attempt.
-2. Browser spot-check of gold Continue vs jade Here labels.
+1. Orchestrator/human must run focused + full pytest; this session cannot verify green.
+2. Browser spot-check of framed Continue vs Here zones and quieter travel/NPC primary weight on mobile.
 
 ## Anything requiring human review
 
-1. Confirm this attempt’s test stage no longer reports `file or directory not found: Run`.
-2. Tab focus rings on all three action tiers.
+1. Approve shell / run pytest from repo root (commands above).
+2. Visual check: gold Continue frame vs jade Here frame; utility links remain quiet.

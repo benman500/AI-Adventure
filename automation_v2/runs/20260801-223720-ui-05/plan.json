@@ -1,0 +1,40 @@
+{
+  "decision": "approve",
+  "title": "Improve gameplay action hierarchy",
+  "implementation_brief": "Inspect the existing gameplay templates, stylesheets, and presentation tests to identify where actions currently use indistinguishable styling or lack clear interaction states. Establish a consistent visual hierarchy using the existing server-rendered templates and CSS: emphasize primary decisions, visually quiet secondary and utility controls, and improve grouping or spacing where needed without adding, removing, renaming, or reordering actions. Preserve every existing route, form method, field name, submitted value, and gameplay behavior. Add or refine hover, active, disabled, and keyboard-focus-visible states; ensure controls remain readable and usable at mobile widths; and place any motion behind reduced-motion preference handling. Make meaningful changes to at least one implementation file under the allowed template or static paths, update focused presentation tests where appropriate, run the focused tests and full suite, and record files, results, and remaining risks in automation/AGENT_REPORT.md.",
+  "allowed_areas": [
+    "src/ai_adventure/presentation/templates",
+    "src/ai_adventure/presentation/static",
+    "tests",
+    "automation/AGENT_REPORT.md"
+  ],
+  "acceptance_criteria": [
+    "Existing gameplay views consistently distinguish primary actions from secondary and utility actions through styling, grouping, or emphasis.",
+    "Action controls no longer present as an undifferentiated wall of identical rectangles.",
+    "Interactive controls have clear hover, active, disabled, and keyboard-focus-visible states.",
+    "Existing action names, order, routes, form methods, field names, submitted values, and gameplay behavior remain unchanged.",
+    "Controls remain accessible, readable, and usable at mobile widths without clipping or harmful overflow.",
+    "Any transitions respect reduced-motion preferences.",
+    "Focused presentation tests and the full test suite pass."
+  ],
+  "forbidden_changes": [
+    "Gameplay rules, progression, engine behavior, or action availability",
+    "Adding, removing, renaming, or reordering gameplay actions",
+    "Changing routes, form methods, field names, or submitted values",
+    "Database models, migrations, catalogs, or save formats",
+    "New dependencies, JavaScript frameworks, systems, or architectural layers",
+    "Conversion away from the existing server-rendered presentation architecture",
+    "Weakening, deleting, or skipping existing tests",
+    "Changes outside the listed allowed areas"
+  ],
+  "focused_tests": [
+    "tests"
+  ],
+  "stop_conditions": [
+    "The desired primary versus secondary classification is ambiguous and cannot be inferred safely from current templates, styling, tests, or established usage.",
+    "A required improvement would change action semantics, order, availability, submitted data, or gameplay rules.",
+    "The work requires a migration, new dependency, architecture change, or edits outside the allowed areas.",
+    "Focused or full-suite failures reveal unrelated defects that cannot be resolved within the allowed scope.",
+    "The bounded task would require changes to more than 25 files."
+  ]
+}

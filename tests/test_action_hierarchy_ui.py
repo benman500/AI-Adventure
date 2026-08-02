@@ -58,6 +58,12 @@ def test_action_hierarchy_classes_and_interactive_states() -> None:
         css,
         re.DOTALL,
     )
+    # Primary / secondary decision zones are framed, not bare heading stacks.
+    assert re.search(
+        r"\.action-primary\s*\{[^}]*border-left:\s*3px solid var\(--gold\)",
+        css,
+        re.DOTALL,
+    )
     assert ".action-secondary" in css
     assert ".action-secondary h2" in css
     assert re.search(
@@ -65,6 +71,14 @@ def test_action_hierarchy_classes_and_interactive_states() -> None:
         css,
         re.DOTALL,
     )
+    assert re.search(
+        r"\.action-secondary\s*\{[^}]*border-left:\s*3px solid var\(--jade\)",
+        css,
+        re.DOTALL,
+    )
+    assert ".travel-section h2" in css
+    assert ".people-section h2" in css
+    assert 'class="moment-block people-section"' in template
 
     assert ".btn-primary:hover:not(:disabled)" in css
     assert ".btn-primary:active:not(:disabled)" in css
@@ -80,6 +94,7 @@ def test_action_hierarchy_classes_and_interactive_states() -> None:
     assert ".btn-utility:focus-visible" in css
     assert ".button:disabled" in css
     assert ".btn-primary:disabled" in css
+    assert ".btn-secondary:disabled" in css
     assert ".btn-utility:disabled" in css
 
     assert ".here-action-secondary" in css
@@ -113,6 +128,7 @@ def test_action_hierarchy_classes_and_interactive_states() -> None:
     assert "@media (prefers-reduced-motion: reduce)" in css
     assert "transition: none !important" in css
     assert "transform: none !important" in css
+    assert "travel-action-primary:hover:not(:disabled)" in css
     assert (
         ".method-list .method-action-secondary:hover:not(:disabled)" in css
         or ".method-list .method-action-secondary:active:not(:disabled)" in css
@@ -125,6 +141,10 @@ def test_action_hierarchy_classes_and_interactive_states() -> None:
     )
     assert re.search(
         r"@media \(max-width: 560px\)[\s\S]*\.method-action-secondary\s*\{",
+        css,
+    )
+    assert re.search(
+        r"@media \(max-width: 560px\)[\s\S]*\.action-primary\s*,\s*\.action-secondary\s*\{",
         css,
     )
 
