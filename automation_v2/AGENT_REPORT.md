@@ -1,82 +1,75 @@
-# Agent Report — ui-04 Modernize travel destination presentation
+# Agent Report — ui-05 Improve gameplay action hierarchy (repair attempt 3)
 
-## Status: IMPLEMENTATION COMPLETE (pytest blocked in-agent)
+## Status: IMPLEMENTATION REPAIRED — AWAITING ORCHESTRATOR PYTEST
 
-## Task completed
+## Deficiencies addressed
 
-Modernized the Nearby travel section into clearer destination cards that distinguish the current location from available open routes, surface only view-model descriptive context, and make the primary Travel control obvious (NPC-style action strip with day cost). Form contracts, location IDs, routes, and travel behavior are unchanged. Unavailable destinations are not inferred or rendered (none are supplied by the play-scene view model).
+1. **Focused tests failed with `ERROR: file or directory not found: Run`** — planner `focused_tests` was prose. Disk `plan.json` corrected to bare module paths (orchestrator re-reads on resume from `repairing`).
+2. **Primary section label** was muted like every other moment-block heading — Continue now uses gold via `.action-primary h2`.
+3. **Disabled primary** collapsed into generic opacity only — muted gold fill keeps disabled primary in the primary tier.
 
-## Deficiencies identified (before this pass)
-
-1. Current-location card repeated a redundant invented “Current location” blurb after “You are here”.
-2. Travel day cost used a falsy fallback label “Nearby” instead of always showing the supplied `dest.days` value.
-3. Primary Travel buttons were full-width centered chrome without a dedicated action strip, weaker hierarchy than NPC cards.
-4. Unused `.travel-destination--unavailable` CSS implied unavailable routes exist; the clarified acceptance criterion forbids inventing them when absent from the view model.
-
-## What changed
-
-### Template (`play_scene.html`)
-
-- Current location card: name + “You are here” status only (no invented blurb).
-- Available destination cards: name, `{{ dest.days }}d` meta, descriptive blurb from `ambience` → `environment_tags` → `tags` → `kind` (view-model fields only).
-- Primary Travel button shows label + day meta; same `POST /play/{{ scene.save_id }}/travel` with `name="to_location_id"` / `value="{{ dest.location_id }}"`.
-- No unavailable destination markup.
+## What changed this repair
 
 ### CSS (`main.css`)
 
-- Stronger card hierarchy aligned with NPC cards (gold current / jade available accents).
-- Travel actions use inset action-strip styling; label/meta flex layout.
-- Mobile (`max-width: 560px`): stacked header, padded action strip, min-height Travel control.
-- Removed unused unavailable-state rules.
+- `.action-primary h2 { color: var(--gold); }`
+- `.btn-primary:disabled` / `.button.primary:disabled` muted gold fill
 
-### Tests (`tests/test_travel_destinations_ui.py`)
+### Tests (`tests/test_action_hierarchy_ui.py`)
 
-- Assert hierarchy, form contract substring, days display, action label/meta, no unavailable class in template/CSS/render.
-- Rendered integration check still verifies current-before-available and one submit control per destination.
+- Assert `.action-primary` marker, gold/jade section label colors, `.btn-primary:disabled`
+
+### Runtime
+
+- `plan.json` `focused_tests` remains valid module paths
+- Run note: `repair_note_attempt3.txt`
 
 ## Acceptance criteria
 
 | Criterion | Status |
 |-----------|--------|
-| Readable destination cards/rows | Met — `travel-destination` articles in `travel-list` |
-| Name + existing descriptive context | Met — `display_name` + ambience/env/tags/kind only |
-| Current vs available distinguishable; unavailable neither inferred nor added | Met — `--current` / `--available` only; no unavailable markup |
-| Primary travel actions easy to identify | Met — inset `travel-actions` + `travel-action-primary` |
-| IDs, routes, forms, values, behavior unchanged | Met — same method/action/field/value |
-| Desktop / mobile usable | Met — card CSS + 560px travel rules |
-| Focused + full pytest | Blocked in-agent — orchestrator must run |
-| Meaningful template/static change | Met — template + CSS changed |
+| Primary distinct from secondary/utility | Met — gold fill + gold Continue label vs jade-accent secondary vs underline utility |
+| No undifferentiated wall of identical rectangles | Met — tiered fill/outline/link + section markers |
+| Hover, active, disabled, keyboard-focus clear | Met — including primary disabled this repair |
+| Names, routes, methods, fields, values, order unchanged | Met — CSS/class/section-only |
+| Readable/usable at mobile widths | Met — existing 560px min-heights |
+| Transitions respect prefers-reduced-motion | Met — `transition: none` + `transform: none` |
+| Meaningful template/stylesheet change | Met — `main.css` this repair; template hierarchy classes from prior |
+| Focused + full pytest | Prior full suite 316 passed; focused path bug fixed on disk; in-agent Shell Rejected |
 
 ## Files changed
 
-- `src/ai_adventure/presentation/templates/play_scene.html`
 - `src/ai_adventure/presentation/static/css/main.css`
-- `tests/test_travel_destinations_ui.py`
+- `tests/test_action_hierarchy_ui.py`
 - `automation/AGENT_REPORT.md`
 - `automation_v2/AGENT_REPORT.md`
-- `automation_v2/runs/20260728-181606-ui-04/shell_block_note.txt`
+- `automation_v2/runs/20260728-181958-ui-05/plan.json` (already fixed; verified)
+- `automation_v2/runs/20260728-181958-ui-05/repair_note_attempt3.txt`
 
 ## Tests run
 
 ```text
-python -m pytest -q tests/test_travel_destinations_ui.py
+python -m pytest -q tests/test_action_hierarchy_ui.py tests/test_play_layout_ui.py tests/test_npc_cards_ui.py tests/test_travel_destinations_ui.py
 python -m pytest -q
 ```
 
-In-agent Shell (and worktree/subagent Shell) returned `Rejected:` for every invocation. Pytest could not be executed from this session.
+**In-agent Shell: Rejected** (same environment-wide block as prior attempts and subagent). Pytest must be executed by the orchestrator after Cursor returns.
 
 ## Test results
 
-Unavailable in-agent. Static review: form-contract substring, hierarchy classes, and days/`to_location_id` contracts match the updated tests.
+| Stage | Result |
+|-------|--------|
+| Prior focused | Failed — path `Run` (plan prose) |
+| Prior full suite | 316 passed, 10 warnings |
+| This session | Shell blocked; not re-executed in-agent |
+| Expected next orchestrator focused | Should collect the four modules from corrected `plan.json` |
 
 ## Remaining risks
 
-- Orchestrator must confirm focused + full suite.
-- Current location has only `current_location_name` in the scene model (no ambience); card intentionally shows status + name only.
-- Unavailable / locked routes remain out of scope until the view model supplies them.
+1. Shell remains blocked inside Cursor agent sessions; only orchestrator pytest is authoritative for this attempt.
+2. Browser spot-check of gold Continue vs jade Here labels.
 
 ## Anything requiring human review
 
-1. Re-run focused + full pytest after Shell is available.
-2. Visual check that Travel action strips read clearly next to NPC cards.
-3. Confirm no desire to expose locked routes (would need backend/view-model work outside this task).
+1. Confirm this attempt’s test stage no longer reports `file or directory not found: Run`.
+2. Tab focus rings on all three action tiers.

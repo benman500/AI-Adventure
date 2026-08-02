@@ -1,0 +1,35 @@
+COMMAND (displayed; prompt redacted)
+====================================
+C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\node.exe C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\index.js -p <prompt> --output-format text
+
+ARGV NOTES
+==========
+executable_resolved=C:\Users\benjamyn\AppData\Local\cursor-agent\agent.CMD
+argv_prefix=['C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\node.exe', 'C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\index.js']
+prompt_chars=5788
+prompt_follows_-p=True
+
+
+STDOUT
+======
+Implemented a clear primary / secondary / utility action hierarchy without changing gameplay behavior.
+
+**What was wrong:** Shared buttons lacked active/focus states; location “Here” and cultivation method controls looked like the same bordered rectangles as each other; utility chrome wasn’t quieter than secondary; reduced-motion didn’t kill hover transforms.
+
+**What changed:**
+- `play_scene.html` — tagged location actions and cultivation methods as secondary (`here-action-secondary` / `method-action-secondary` + existing `btn-secondary`); forms/routes/fields/order untouched
+- `main.css` — distinct tiers (gold primary, jade-outline secondary, underline utility), hover/active/disabled/`focus-visible`, mobile min-heights, stronger `prefers-reduced-motion`
+- `tests/test_action_hierarchy_ui.py` — focused presentation assertions
+
+**Blocked:** Every Shell call (including subagents) returned `Rejected`, so pytest could not run here. Re-run:
+
+```powershell
+python -m pytest -q tests/test_action_hierarchy_ui.py tests/test_play_layout_ui.py tests/test_npc_cards_ui.py tests/test_travel_destinations_ui.py
+python -m pytest -q
+```
+
+Reports: `automation/AGENT_REPORT.md` and `automation_v2/AGENT_REPORT.md`.
+
+
+STDERR
+======

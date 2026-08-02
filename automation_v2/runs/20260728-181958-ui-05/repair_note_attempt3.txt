@@ -1,0 +1,15 @@
+Repair attempt 3 (cursor prompt_3 / state attempt_number 3)
+
+Root cause of prior focused failure:
+- plan.json focused_tests[0] was prose ("Run the existing…"); pytest looked for path "Run".
+- Disk plan.json already corrected to:
+  tests/test_action_hierarchy_ui.py
+  tests/test_play_layout_ui.py
+  tests/test_npc_cards_ui.py
+  tests/test_travel_destinations_ui.py
+
+This repair implementation changes:
+- main.css: .action-primary h2 gold label; .btn-primary:disabled tier-aware disabled fill
+- tests/test_action_hierarchy_ui.py: assert gold/jade section labels + primary disabled
+
+Shell tool: Rejected (cannot run pytest in-agent). Orchestrator must run focused + full suite after Cursor returns; on resume from repairing it re-reads plan.json.

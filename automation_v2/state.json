@@ -1,11 +1,16 @@
 {
-  "task_id": "ui-04",
-  "current_stage": "reviewing",
-  "attempt_number": 0,
+  "task_id": "ui-05",
+  "current_stage": "human_review",
+  "attempt_number": 3,
   "last_successful_stage": "testing",
-  "last_error": null,
-  "started_at": "2026-07-28T22:16:06+00:00",
-  "completed_tasks": [],
-  "run_dir": "C:\\Users\\benjamyn\\Desktop\\ai-projects\\AI- Adventure\\automation_v2\\runs\\20260728-181606-ui-04",
-  "repair_instructions": []
+  "last_error": "Repair limit reached",
+  "started_at": "2026-07-28T22:19:58+00:00",
+  "completed_tasks": [
+    "ui-04"
+  ],
+  "run_dir": "C:\\Users\\benjamyn\\Desktop\\ai-projects\\AI- Adventure\\automation_v2\\runs\\20260728-181958-ui-05",
+  "repair_instructions": [
+    "Fix failing tests without weakening or deleting them.",
+    "Re-run focused tests and the full suite."
+  ]
 }

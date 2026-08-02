@@ -141,6 +141,22 @@ def test_unsafe_shell_syntax_is_rejected() -> None:
         assert raised is True, bad
 
 
+def test_prose_focused_entry_is_rejected_not_run_as_filename() -> None:
+    """Instructional prose must not become a pytest path like 'Run'."""
+    prose = (
+        "Run the existing presentation/template test module "
+        "for character creation"
+    )
+    try:
+        tokens = normalize_focused_test_entry(prose)
+        raised = False
+    except ValueError:
+        tokens = []
+        raised = True
+    assert raised is True
+    assert "Run" not in tokens
+
+
 def test_run_focused_tests_builds_argv_list_not_one_path(
     tmp_path: Path,
 ) -> None:

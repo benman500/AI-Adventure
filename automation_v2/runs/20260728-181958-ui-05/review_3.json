@@ -1,0 +1,11 @@
+{
+  "decision": "repair",
+  "summary": "Tests did not pass; repair required before approval.",
+  "repair_instructions": [
+    "Fix failing tests without weakening or deleting them.",
+    "Re-run focused tests and the full suite."
+  ],
+  "risks": [
+    "Failed or timed-out tests"
+  ]
+}

@@ -1,0 +1,15 @@
+REPAIR ATTEMPT 3 — focused_tests plan.json corrected on disk
+
+Previous planner entry (caused ERROR: file or directory not found: Run):
+  "Run the existing presentation/template test module ..."
+  "python -m pytest -q"
+
+Corrected focused_tests now in plan.json:
+  tests/test_action_hierarchy_ui.py
+  tests/test_play_layout_ui.py
+  tests/test_npc_cards_ui.py
+  tests/test_travel_destinations_ui.py
+
+NOTE: The live orchestrator process already holds the OLD focused_tests
+in memory for this attempt. Disk plan.json is fixed for resume/retry.
+In-agent Shell remains Rejected; orchestrator must run pytest.

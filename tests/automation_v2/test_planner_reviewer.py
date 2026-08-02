@@ -111,6 +111,76 @@ def test_planner_rejects_widened_allowed_areas() -> None:
     assert raised is True
 
 
+def test_planner_accepts_empty_focused_tests() -> None:
+    """When no focused tests apply, an empty array is valid."""
+    payload = parse_json_object(VALID_PLAN_JSON)
+    payload["focused_tests"] = []
+    plan = validate_plan_payload(payload, TASK)
+    assert plan.focused_tests == []
+
+
+def test_planner_accepts_file_directory_and_node_id_targets() -> None:
+    """Valid focused_tests are bare files, directories, or node ids."""
+    payload = parse_json_object(VALID_PLAN_JSON)
+    payload["focused_tests"] = [
+        "tests/test_play_layout_ui.py",
+        "tests",
+        "tests/automation_v2",
+        "tests/test_play_layout_ui.py::test_specific_behavior",
+        "tests/test_foo.py::TestClass::test_method",
+        "tests/test_foo.py::test_bar[case-1]",
+    ]
+    plan = validate_plan_payload(payload, TASK)
+    assert plan.focused_tests == payload["focused_tests"]
+
+
+def test_planner_rejects_prose_focused_tests() -> None:
+    """Prose instructions must not be accepted as focused_tests."""
+    payload = parse_json_object(VALID_PLAN_JSON)
+    payload["focused_tests"] = [
+        "Run the existing presentation/template test module for character creation"
+    ]
+    try:
+        validate_plan_payload(payload, TASK)
+        raised = False
+    except ValueError as exc:
+        raised = True
+        assert "prose" in str(exc).lower() or "pytest target" in str(exc).lower()
+    assert raised is True
+
+
+def test_planner_rejects_command_focused_tests() -> None:
+    """Commands and option strings are rejected from focused_tests."""
+    payload = parse_json_object(VALID_PLAN_JSON)
+    for bad in (
+        ["python -m pytest -q tests/test_play_layout_ui.py"],
+        ["pytest tests"],
+        ['tests -k "character_creation or character_create"'],
+        ["# run the tests"],
+    ):
+        payload["focused_tests"] = bad
+        try:
+            validate_plan_payload(payload, TASK)
+            raised = False
+        except ValueError:
+            raised = True
+        assert raised is True, bad
+
+
+def test_planner_retries_invalid_focused_tests_then_accepts() -> None:
+    """Invalid focused_tests are treated as schema errors and retried."""
+    bad = VALID_PLAN_JSON.replace(
+        '["tests/test_play_layout_ui.py"]',
+        '["Run the existing presentation/template test module"]',
+    )
+    client = ScriptedClient([bad, VALID_PLAN_JSON])
+    planner = Planner(CONFIG, client=client)
+    plan = planner.plan(TASK, context="locked context")
+    assert plan.decision == "approve"
+    assert plan.focused_tests == ["tests/test_play_layout_ui.py"]
+    assert client.calls == 2
+
+
 def test_reviewer_retries_malformed_json() -> None:
     """Malformed reviewer JSON is retried with a mock client."""
     client = ScriptedClient(

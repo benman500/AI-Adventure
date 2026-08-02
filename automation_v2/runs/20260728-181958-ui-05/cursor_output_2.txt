@@ -1,0 +1,39 @@
+COMMAND (displayed; prompt redacted)
+====================================
+C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\node.exe C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\index.js -p <prompt> --output-format text
+
+ARGV NOTES
+==========
+executable_resolved=C:\Users\benjamyn\AppData\Local\cursor-agent\agent.CMD
+argv_prefix=['C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\node.exe', 'C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\index.js']
+prompt_chars=8577
+prompt_follows_-p=True
+
+
+STDOUT
+======
+Repaired the action hierarchy and fixed the focused-test plan bug on disk.
+
+### Implementation
+- **Secondary tier unified:** shared `.btn-secondary` and NPC secondary now use the same jade left accent as Here/method controls (not gold fill).
+- **NPC secondary states:** explicit hover, active, `:focus-visible`, and disabled.
+- **Here section:** `action-secondary` marker + jade section label (forms/routes/fields/order unchanged).
+- **Reduced motion:** NPC secondary transforms cleared under `prefers-reduced-motion`.
+
+### Focused-test failure root cause
+`plan.json` had prose starting with `"Run the existing…"`; pytest treated `Run` as a path. Disk `focused_tests` is now:
+
+`tests/test_action_hierarchy_ui.py`, `tests/test_play_layout_ui.py`, `tests/test_npc_cards_ui.py`, `tests/test_travel_destinations_ui.py`
+
+### Blockers for this session
+1. **Shell Rejected** — cannot run pytest in-agent (same as prior attempts).
+2. **In-memory plan** — the live orchestrator still holds the old `focused_tests`; this attempt may fail on `Run` until the process reloads `plan.json`.
+
+### Resume path
+After this attempt ends, restart automation so it re-reads the fixed `plan.json` (stage `repairing` is fine). Prior full suite was **316 passed**.
+
+Reports: `automation/AGENT_REPORT.md`, `automation_v2/AGENT_REPORT.md`.
+
+
+STDERR
+======

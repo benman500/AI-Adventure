@@ -150,8 +150,10 @@ def normalize_focused_test_entry(entry: str) -> list[str]:
     strings are accepted only after stripping the executable prefix.
 
     Raises:
-        ValueError: When the entry is unsafe or not a pytest invocation.
+        ValueError: When the entry is unsafe, prose, or not a pytest invocation.
     """
+    from automation_v2.planner import is_valid_focused_test_target
+
     raw = entry.strip()
     if not raw:
         return []
@@ -159,6 +161,21 @@ def normalize_focused_test_entry(entry: str) -> list[str]:
     if _contains_unsafe_shell_syntax(raw):
         raise ValueError(
             f"Unsafe shell syntax in focused test entry: {entry!r}"
+        )
+
+    lower = raw.lower()
+    if lower.startswith(
+        (
+            "run ",
+            "running ",
+            "please ",
+            "execute ",
+            "invoke ",
+        )
+    ):
+        raise ValueError(
+            "Focused test entry looks like prose, not a pytest target: "
+            f"{entry!r}"
         )
 
     if not _looks_like_pytest_command(raw):
@@ -169,11 +186,21 @@ def normalize_focused_test_entry(entry: str) -> list[str]:
             )
         # Single path / node id: keep as one argv element.
         if " " not in raw and "\t" not in raw:
-            return [raw]
+            if not is_valid_focused_test_target(raw):
+                raise ValueError(
+                    "Focused test entry must be a test file, test directory, "
+                    f"or pytest node id; got: {entry!r}"
+                )
+            return [raw.replace("\\", "/")]
         # Path plus options (for example: tests -k "a or b").
         tokens = _split_pytest_spec(raw)
         if not tokens:
             return []
+        if not is_valid_focused_test_target(tokens[0]):
+            raise ValueError(
+                "Focused test entry must start with a pytest target; "
+                f"got: {entry!r}"
+            )
         _validate_pytest_spec_tokens(tokens, entry=entry)
         return tokens
 

@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "violations": [],
+  "decision": "approve",
+  "changed_files": [
+    "src/ai_adventure/presentation/static/css/main.css",
+    "src/ai_adventure/presentation/templates/play_scene.html",
+    "tests/test_action_hierarchy_ui.py"
+  ],
+  "runtime_artifacts": [
+    "automation/AGENT_REPORT.md",
+    "automation_v2/AGENT_REPORT.md",
+    "automation_v2/runs/20260728-181958-ui-05/cursor_output_0.txt",
+    "automation_v2/runs/20260728-181958-ui-05/cursor_output_1.txt",
+    "automation_v2/runs/20260728-181958-ui-05/cursor_output_2.txt",
+    "automation_v2/runs/20260728-181958-ui-05/cursor_prompt_0.md",
+    "automation_v2/runs/20260728-181958-ui-05/cursor_prompt_1.md",
+    "automation_v2/runs/20260728-181958-ui-05/cursor_prompt_2.md",
+    "automation_v2/runs/20260728-181958-ui-05/focused_tests_plan_bug.txt",
+    "automation_v2/runs/20260728-181958-ui-05/guardrails_0.json",
+    "automation_v2/runs/20260728-181958-ui-05/guardrails_1.json",
+    "automation_v2/runs/20260728-181958-ui-05/plan.json",
+    "automation_v2/runs/20260728-181958-ui-05/pytest.txt",
+    "automation_v2/runs/20260728-181958-ui-05/pytest_focused.txt",
+    "automation_v2/runs/20260728-181958-ui-05/review_0.json",
+    "automation_v2/runs/20260728-181958-ui-05/review_1.json",
+    "automation_v2/runs/20260728-181958-ui-05/shell_block_note.txt",
+    "automation_v2/runs/20260728-181958-ui-05/tests_0.json",
+    "automation_v2/runs/20260728-181958-ui-05/tests_1.json",
+    "automation_v2/state.json"
+  ]
+}

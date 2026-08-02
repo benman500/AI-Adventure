@@ -1,0 +1,38 @@
+COMMAND (displayed; prompt redacted)
+====================================
+C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\node.exe C:\Users\benjamyn\AppData\Local\cursor-agent\versions\2026.07.23-e383d2b\index.js -p <prompt> --output-format text
+
+ARGV NOTES
+==========
+executable_resolved=C:\Users\benjamyn\AppData\Local\cursor-agent\agent.CMD
+argv_prefix=['C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\node.exe', 'C:\\Users\\benjamyn\\AppData\\Local\\cursor-agent\\versions\\2026.07.23-e383d2b\\index.js']
+prompt_chars=8577
+prompt_follows_-p=True
+
+
+STDOUT
+======
+Repair done on the presentation side; the focused-test failure is an orchestrator plan bug, not a bad application test.
+
+**Implementation (this repair)**
+- Cultivation method controls now match the secondary Here tier: transparent fill + jade left accent (no longer filled boxes competing with primary).
+- Explicit disabled styles for utility and method secondary.
+- `prefers-reduced-motion` also clears method-button transforms.
+- Focused presentation tests extended for those CSS contracts (routes/forms/order untouched).
+
+**Why focused tests “failed”**
+`plan.json` has:
+
+`"Run the existing presentation/template test module..."`
+
+The test runner treats that as a pytest path, so pytest gets `Run` → `ERROR: file or directory not found: Run`. The full suite on that attempt already passed (**316 passed**). Fixing `plan.json` is outside allowed areas (would trip guardrails).
+
+**Blocked here**
+Shell is `Rejected` in this session, so pytest could not be re-run in-agent.
+
+**Human action needed**
+Set `focused_tests` to real targets, e.g. `tests/test_action_hierarchy_ui.py`, then re-run the orchestrator test stage. Details are in `automation_v2/AGENT_REPORT.md` and `automation_v2/runs/20260728-181958-ui-05/focused_tests_plan_bug.txt`.
+
+
+STDERR
+======

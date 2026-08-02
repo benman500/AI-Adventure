@@ -1,0 +1,44 @@
+{
+  "decision": "approve",
+  "title": "Improve gameplay action hierarchy",
+  "implementation_brief": "Read the required project documentation, then inspect the current gameplay templates, stylesheets, and relevant presentation tests. Identify concrete locations where actions are rendered as visually identical controls or become crowded at mobile widths. Make meaningful changes to at least one template or stylesheet within the allowed areas to establish a consistent visual hierarchy for existing primary, secondary, and utility actions. Reuse the current server-rendered structure and styling conventions where practical. Add or refine hover, active, disabled, and visible keyboard-focus states; keep text and controls readable and usable at mobile widths; and ensure any transitions are disabled or minimized under prefers-reduced-motion. Preserve the exact action set and behavior: do not add, remove, rename, or reorder gameplay actions, and do not change routes, form methods, field names, submitted values, validation, or mechanics. Add or update focused presentation tests where the existing test approach supports stable assertions, then run focused tests and the complete suite. Update automation/AGENT_REPORT.md with the required completion details.",
+  "allowed_areas": [
+    "src/ai_adventure/presentation/templates",
+    "src/ai_adventure/presentation/static",
+    "tests",
+    "automation/AGENT_REPORT.md"
+  ],
+  "acceptance_criteria": [
+    "Primary actions are visually distinct from secondary and utility actions.",
+    "Buttons and action controls no longer appear as an undifferentiated wall of identical rectangles.",
+    "Hover, active, disabled, and keyboard-focus states are clear.",
+    "Existing action names, routes, form methods, field names, submitted values, and action ordering remain unchanged.",
+    "Controls remain accessible, readable, and usable at mobile widths.",
+    "Any transitions respect the prefers-reduced-motion user preference.",
+    "At least one allowed template or stylesheet receives a meaningful implementation change; report-only or test-only changes are insufficient.",
+    "Focused presentation tests and the full test suite pass."
+  ],
+  "forbidden_changes": [
+    "Adding, removing, renaming, or behaviorally reordering gameplay actions",
+    "Changing routes, HTTP methods, form field names, submitted values, validation, services, or game rules",
+    "Adding JavaScript frameworks, dependencies, systems, catalogs, or architecture",
+    "Database or migration changes",
+    "Conversion away from the existing server-rendered presentation architecture",
+    "Unrelated visual redesigns or refactors outside action hierarchy and control usability",
+    "Weakening, deleting, or skipping existing tests"
+  ],
+  "focused_tests": [
+    "tests/test_action_hierarchy_ui.py",
+    "tests/test_play_layout_ui.py",
+    "tests/test_npc_cards_ui.py",
+    "tests/test_travel_destinations_ui.py"
+  ],
+  "stop_conditions": [
+    "A required hierarchy cannot be implemented without changing action behavior, order, routes, methods, names, or submitted values.",
+    "Classifying an action as primary, secondary, or utility requires an unclear product or gameplay decision.",
+    "The work would require a migration, new dependency, architectural change, new framework, or gameplay-rule change.",
+    "The necessary implementation lies outside the allowed areas.",
+    "Focused or full-suite failures indicate behavior changes that cannot be resolved within this bounded presentation task.",
+    "Completing the task would require changes to more than 25 files."
+  ]
+}

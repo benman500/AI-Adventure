@@ -53,10 +53,23 @@ Return JSON only with this exact shape:
   "implementation_brief": "precise bounded instructions for Cursor",
   "allowed_areas": ["path prefixes"],
   "acceptance_criteria": ["criterion"],
-  "forbidden_changes": ["change"],
   "focused_tests": ["pytest target"],
+  "forbidden_changes": ["change"],
   "stop_conditions": ["condition"]
 }
+
+focused_tests rules (mandatory):
+
+- focused_tests must be a JSON array of pytest targets only.
+- Every entry must be exactly one of:
+  - a test file path (for example tests/test_play_layout_ui.py),
+  - a test directory path (for example tests or tests/automation_v2),
+  - or a pytest node id (for example tests/test_foo.py::test_bar).
+- Never output prose, commands, markdown, explanations, or instructions.
+- Never output entries that start with "Run", "Please", or similar wording.
+- Never output "python -m pytest...", "pytest ...", shell commands, or -k/-m
+  option strings. Those belong elsewhere; focused_tests are targets only.
+- If no focused tests can be determined, return an empty array: [].
 
 Rules:
 
@@ -75,6 +88,125 @@ Rules:
 - Require criterion-by-criterion evidence in the completion report only when
   claiming every acceptance criterion is already satisfied before the run.
 """
+
+
+_NODE_SEGMENT_RE = re.compile(
+    r"^[A-Za-z_][\w]*(?:\[[^\]]+\])?$"
+)
+
+
+def is_valid_focused_test_target(entry: str) -> bool:
+    """Return True when ``entry`` is a bare pytest file, directory, or node id.
+
+    Rejects prose, commands, markdown, explanations, and option strings.
+    """
+    value = entry.strip().replace("\\", "/")
+    if not value:
+        return False
+    if any(char.isspace() for char in value):
+        return False
+    if value.startswith("-"):
+        return False
+    if any(char in value for char in ("|", "&", ";", ">", "<", "`", "#", "*")):
+        return False
+
+    lower = value.lower()
+    if lower in {"python", "pytest", "py"} or lower.endswith(".exe"):
+        return False
+    if lower.startswith(("python-", "pytest-")):
+        return False
+
+    if "::" in value:
+        path_part, *node_parts = value.split("::")
+        if not path_part.endswith(".py"):
+            return False
+        if not node_parts or any(not part for part in node_parts):
+            return False
+        if not _is_relative_test_path(path_part):
+            return False
+        return all(_NODE_SEGMENT_RE.match(part) for part in node_parts)
+
+    if value.endswith(".py"):
+        return _is_relative_test_path(value)
+
+    return _is_relative_test_directory(value)
+
+
+def _is_relative_test_path(path: str) -> bool:
+    """Return True for a relative file path with ``.py`` suffix."""
+    if not path.endswith(".py"):
+        return False
+    body = path[: -len(".py")]
+    if not body or body.startswith("/") or body.startswith("~"):
+        return False
+    if len(body) >= 2 and body[1] == ":":
+        return False
+    if ".." in body.split("/"):
+        return False
+    return bool(re.match(r"^[\w][\w./-]*$", body))
+
+
+def _is_relative_test_directory(path: str) -> bool:
+    """Return True for a relative directory pytest target."""
+    if not path or path.startswith("/") or path.startswith("~"):
+        return False
+    if len(path) >= 2 and path[1] == ":":
+        return False
+    if ".." in path.split("/"):
+        return False
+    name = path.rsplit("/", 1)[-1]
+    if "." in name:
+        return False
+    if not re.match(r"^[\w][\w./-]*$", path):
+        return False
+    # Bare instructional words must not count as directories.
+    if "/" not in path and path.lower() not in {"tests", "test"}:
+        return False
+    return True
+
+
+def validate_focused_tests(entries: list[str]) -> list[str]:
+    """Validate planner focused_tests as bare pytest targets only.
+
+    Raises:
+        ValueError: When any entry is prose, a command, or otherwise invalid.
+    """
+    validated: list[str] = []
+    for entry in entries:
+        if not isinstance(entry, str):
+            raise ValueError("focused_tests entries must be strings")
+        cleaned = entry.strip()
+        if not cleaned:
+            raise ValueError(
+                "focused_tests must not contain empty strings; "
+                "use [] when no focused tests apply"
+            )
+        lower = cleaned.lower()
+        if lower.startswith(
+            (
+                "run ",
+                "running ",
+                "please ",
+                "execute ",
+                "invoke ",
+                "use ",
+                "call ",
+                "python ",
+                "pytest ",
+                "py ",
+            )
+        ) or "-m pytest" in lower:
+            raise ValueError(
+                "focused_tests must contain pytest targets only, not prose "
+                f"or commands: {entry!r}"
+            )
+        if not is_valid_focused_test_target(cleaned):
+            raise ValueError(
+                "focused_tests entries must be a test file, test directory, "
+                f"or pytest node id; got: {entry!r}"
+            )
+        validated.append(cleaned.replace("\\", "/"))
+    return validated
 
 
 def clean_json_text(raw: str) -> str:
@@ -132,7 +264,7 @@ def validate_plan_payload(
     allowed_areas = _require_string_list(data, "allowed_areas")
     acceptance = _require_string_list(data, "acceptance_criteria")
     forbidden = _require_string_list(data, "forbidden_changes")
-    focused = _require_string_list(data, "focused_tests")
+    focused = validate_focused_tests(_require_string_list(data, "focused_tests"))
     stops = _require_string_list(data, "stop_conditions")
 
     # Do not allow the planner to widen beyond the queued task areas.
