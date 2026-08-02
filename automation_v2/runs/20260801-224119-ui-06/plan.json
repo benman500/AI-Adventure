@@ -1,0 +1,43 @@
+{
+  "decision": "approve",
+  "title": "Polish player-facing visual consistency",
+  "implementation_brief": "Inspect the current player-facing templates, stylesheets, and presentation tests to identify concrete inconsistencies in typography, spacing, hierarchy, borders, color usage, contrast, and keyboard-focus treatment. Make a restrained polish pass in at least one existing template or stylesheet within the allowed implementation areas. Reuse the current server-rendered structure and existing style conventions; consolidate or adjust existing CSS where practical rather than introducing a new styling system. Preserve all text, forms, routes, controls, responsive behavior, and gameplay behavior. Update or add narrowly scoped presentation tests only where needed to verify stable structural or accessibility-facing expectations. Record changed files, tests, results, and remaining risks in automation/AGENT_REPORT.md.",
+  "allowed_areas": [
+    "src/ai_adventure/presentation/templates",
+    "src/ai_adventure/presentation/static",
+    "tests",
+    "automation/AGENT_REPORT.md"
+  ],
+  "acceptance_criteria": [
+    "Location titles, section headings, body text, helper text, and labels have a clear and consistent visual hierarchy.",
+    "Paragraphs, cards, sections, form controls, and action groups use consistent spacing across existing player-facing screens.",
+    "The existing dark cultivation theme uses restrained parchment, gold, and muted natural accents without introducing a replacement theme.",
+    "Story, character information, actions, cards, and helper content remain visually distinguishable without excessive borders.",
+    "No existing text, form behavior, routes, navigation, responsive behavior, or gameplay behavior is removed or changed.",
+    "Text contrast and visible keyboard-focus states remain adequate for interactive controls.",
+    "At least one allowed template or stylesheet implementation file receives a meaningful presentation improvement; report-only or test-only changes are insufficient.",
+    "Focused presentation tests and the full test suite pass."
+  ],
+  "forbidden_changes": [
+    "Gameplay rules, progression, engine logic, services, persistence, catalogs, or authored content",
+    "Database schema changes or migrations",
+    "New dependencies, JavaScript frameworks, architecture, or styling systems",
+    "Changes to routes, request handling, form semantics, submitted values, or control behavior",
+    "Removal or rewriting of existing player-facing text",
+    "Conversion away from the current server-rendered architecture",
+    "Weakening, deleting, or skipping tests",
+    "Edits outside the listed allowed areas",
+    "Large unrelated refactors"
+  ],
+  "focused_tests": [
+    "tests"
+  ],
+  "stop_conditions": [
+    "A desired visual change requires modifying gameplay, routes, persistence, form behavior, or application architecture.",
+    "The existing templates or styles do not provide enough information to preserve current behavior safely.",
+    "The task would require a new dependency, framework, migration, or product-level visual decision not established by the existing theme.",
+    "Required work cannot be completed within the allowed areas.",
+    "Focused or full-suite failures reveal behavior changes or unrelated defects that cannot be resolved within this bounded presentation task.",
+    "More than 25 files would need to be changed."
+  ]
+}

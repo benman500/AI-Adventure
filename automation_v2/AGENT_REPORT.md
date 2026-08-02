@@ -1,70 +1,75 @@
-# Agent Report — Improve gameplay action hierarchy
+# Agent Report — Polish player-facing visual consistency
 
 ## Status: IMPLEMENTATION COMPLETE — PYTEST BLOCKED (SHELL REJECTED)
 
 ## Deficiencies identified (before this run)
 
-1. Continue (primary) and Here (secondary) sections were only distinguished by heading color and button fill; section containers themselves were barely framed (thin bottom border / no zone).
-2. People here / Nearby headings stayed fully muted, so section-tier hierarchy stopped at Continue vs Here.
-3. Story continue buttons shared similar visual weight with travel/NPC primary gold buttons, reading as a repeated wall of gold rectangles across groups.
-4. `.btn-secondary:disabled` lacked tier-specific styling (generic opacity only).
-5. Reduced-motion transform resets did not explicitly cover story / travel / NPC primary hover-active pairs.
+1. **Type hierarchy drift:** Location kickers (`.location-kicker` 0.78rem), section headings (`.moment-block h2` 0.78rem), and aspiration headings (`.aspiration-side h2` 0.7rem) used mismatched sizes; helper text varied across `.side-note` (0.82rem), `.drawer-note` (0.88rem), `.meta` (0.9rem), and `.hint` (0.82rem).
+2. **Spacing drift:** Story stage bottom margin (1.85rem) and moment-action section gap (1.75rem) were close but not shared; many one-off rem values and inline `margin-top` / `width` styles duplicated layout that CSS already could own.
+3. **Keyboard focus gaps:** Plain links, `<summary>` controls (side panels, drawers, learn-more), and `.stack-form` inputs lacked `:focus-visible` treatment while buttons already had gold/jade rings.
+4. **Helper contrast:** `--muted: #8f8878` was darker than needed for helper/meta text on the ink background.
+5. **Nested card chrome:** NPC/travel action footers used full-opacity `var(--line)` dividers plus darker washes, stacking borders inside already-bordered cards.
 
 ## What changed
 
-### Template (`play_scene.html`)
-
-- People here section marked `people-section` (class only; no action add/remove/reorder; routes/forms unchanged).
-
 ### CSS (`main.css`)
 
-- Framed `.action-primary` (gold left accent + soft gold wash) and `.action-secondary` (jade left accent + soft jade wash).
-- Stronger story-continue primary weight (size, letter-spacing, shadow).
-- Quieter travel/NPC primary chrome relative to story continue (slightly smaller padding/shadow; still gold primary).
-- Tier-colored headings: `.travel-section h2` gold; `.people-section h2` jade.
-- Explicit `.btn-secondary:disabled` / `.button.secondary:disabled`.
-- Mobile padding for framed primary/secondary zones; expanded `prefers-reduced-motion` transform resets for story/travel/NPC primaries.
-- Here-action transition includes `transform` so active feedback and reduced-motion handling stay consistent.
+- Added shared tokens: `--text-kicker`, `--text-helper`, `--text-label`, `--text-body`, `--space-xs/sm/md/section`, `--focus-ring`, `--focus-offset`.
+- Lightened `--muted` to `#9a9282` for helper contrast; kept parchment / gold / jade theme.
+- Applied kicker/helper tokens to location titles, section headings, aspiration headings, meta, breadcrumb, side-note, drawer-note, hints.
+- Unified story→actions spacing via `--space-section`.
+- Added `:focus-visible` for links, side-panel/drawer/learn-more summaries, and stack-form inputs.
+- Softened internal NPC/travel action divider chrome; story stage remains borderless.
+- Moved nav CTA auto-width and play sidebar full-width button sizing into CSS.
 
-### Tests (`tests/test_action_hierarchy_ui.py`)
+### Templates
 
-- Assert framed primary/secondary zones, people-section marker, secondary disabled styles, travel reduced-motion hover selector, and mobile framing rules.
+- `home.html`, `saves.html`, `play_status.html`: removed redundant `style="width: auto;"`.
+- `play_scene.html`: removed static inline margin/width styles; added `session-note` class for last-session spacing. Forms, routes, field names, values, and copy unchanged. Dynamic progress-bar width inline retained.
+
+### Tests
+
+- Added `tests/test_visual_consistency_ui.py` for type/spacing tokens, focus treatment, and template contract preservation.
 
 ## Acceptance criteria
 
 | Criterion | Status |
 |-----------|--------|
-| Primary distinct from secondary/utility | Met — framed gold Continue zone vs framed jade Here zone vs underline utility; travel gold / people jade headings |
-| No undifferentiated wall of identical rectangles | Met — tier framing + story primary emphasized over travel/NPC primary + secondary outline/jade accent |
-| Hover, active, disabled, keyboard-focus clear | Met — including secondary disabled this run |
-| Names, routes, methods, fields, values, order unchanged | Met — class/CSS only |
-| Readable/usable at mobile widths | Met — 560px framing + control min-heights |
-| Transitions respect prefers-reduced-motion | Met — global transition none + expanded transform none |
-| Focused + full pytest | **Not executed** — Shell tool rejected with `Rejected:` (no reason text) |
+| Clear hierarchy for titles, headings, body, helpers, labels | Met — shared `--text-*` tokens applied |
+| Consistent spacing across screens | Met — `--space-section` + consolidated panel padding / CSS-owned gaps |
+| Restrained parchment/gold/jade theme | Met — no replacement theme |
+| Regions distinguishable without excessive borders | Met — story unboxed; softer inner card dividers |
+| No text/forms/routes/nav/responsive/gameplay changes | Met — presentation-only |
+| Contrast + keyboard focus adequate | Met — lighter muted + focus rings for links/summaries/inputs |
+| Meaningful template or stylesheet change | Met — `main.css` + templates |
+| Focused + full pytest | **Not executed** — Shell tool rejected (`Rejected:`) |
 
 ## Files changed
 
-- `src/ai_adventure/presentation/templates/play_scene.html`
 - `src/ai_adventure/presentation/static/css/main.css`
-- `tests/test_action_hierarchy_ui.py`
-- `automation_v2/AGENT_REPORT.md`
+- `src/ai_adventure/presentation/templates/play_scene.html`
+- `src/ai_adventure/presentation/templates/home.html`
+- `src/ai_adventure/presentation/templates/saves.html`
+- `src/ai_adventure/presentation/templates/play_status.html`
+- `tests/test_visual_consistency_ui.py`
 - `automation/AGENT_REPORT.md`
+- `automation_v2/AGENT_REPORT.md`
 
 ## Tests run
 
 ```text
-python -m pytest -q tests/test_action_hierarchy_ui.py tests/test_play_layout_ui.py tests/test_npc_cards_ui.py tests/test_travel_destinations_ui.py
+python -m pytest -q tests/test_visual_consistency_ui.py tests/test_play_layout_ui.py tests/test_action_hierarchy_ui.py tests/test_npc_cards_ui.py tests/test_travel_destinations_ui.py tests/test_character_creation_ui.py
 python -m pytest -q
 ```
 
-**Result:** Shell rejected before execution (parent agent and best-of-n subagent). No stdout/stderr/exit codes available.
+**Result:** Shell rejected before execution (including smart-mode retry and `python --version`). No stdout/stderr/exit codes available. Static review of CSS/templates against new assertions looks consistent.
 
 ## Remaining risks
 
 1. Orchestrator/human must run focused + full pytest; this session cannot verify green.
-2. Browser spot-check of framed Continue vs Here zones and quieter travel/NPC primary weight on mobile.
+2. Browser spot-check: focus rings on links/summaries, helper text contrast, aspiration/section kicker alignment.
 
 ## Anything requiring human review
 
-1. Approve shell / run pytest from repo root (commands above).
-2. Visual check: gold Continue frame vs jade Here frame; utility links remain quiet.
+1. Approve shell / run the pytest commands above from the repo root.
+2. Visual check of play scene hierarchy and keyboard focus on `/play/{save_id}`, `/saves`, and delete-confirm form.

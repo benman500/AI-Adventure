@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "violations": [],
+  "decision": "approve",
+  "changed_files": [
+    "src/ai_adventure/presentation/static/css/main.css",
+    "src/ai_adventure/presentation/templates/home.html",
+    "src/ai_adventure/presentation/templates/play_scene.html",
+    "src/ai_adventure/presentation/templates/play_status.html",
+    "src/ai_adventure/presentation/templates/saves.html",
+    "tests/test_visual_consistency_ui.py"
+  ],
+  "runtime_artifacts": [
+    "automation/AGENT_REPORT.md",
+    "automation_v2/AGENT_REPORT.md",
+    "automation_v2/runs/20260801-224119-ui-06/cursor_output_0.txt",
+    "automation_v2/runs/20260801-224119-ui-06/cursor_prompt_0.md",
+    "automation_v2/runs/20260801-224119-ui-06/plan.json",
+    "automation_v2/runs/20260801-224119-ui-06/shell_block_note.txt",
+    "automation_v2/state.json"
+  ]
+}

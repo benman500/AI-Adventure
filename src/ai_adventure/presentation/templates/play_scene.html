@@ -237,13 +237,13 @@
           <p class="fantasy">{{ toward.fantasy }}</p>
 
           {% if scene.aspiration_panel.fulfilled_previous %}
-          <p class="flash success" style="margin-top: 0.75rem;">
+          <p class="flash success">
             Fulfilled: <strong>{{ scene.aspiration_panel.fulfilled_previous.display_name }}</strong>
           </p>
           {% endif %}
 
           {% if scene.aspiration_panel.all_primary_complete %}
-          <p class="flash success" style="margin-top: 0.75rem;">This season’s purpose is fulfilled.</p>
+          <p class="flash success">This season’s purpose is fulfilled.</p>
           {% elif scene.aspiration_panel.current_gaps %}
           <h3>Current Gaps</h3>
           <ul>
@@ -265,7 +265,7 @@
           {% endif %}
 
           {% if scene.aspiration_panel.next_preview and not scene.aspiration_panel.all_primary_complete %}
-          <p class="meta-line" style="margin-top: 0.75rem;">
+          <p class="meta-line">
             Beyond this: <strong>{{ scene.aspiration_panel.next_preview.display_name }}</strong>
           </p>
           {% endif %}
@@ -284,7 +284,7 @@
             {% if scene.sect_membership %}
             <p>{{ scene.sect_membership.display_name }} · {{ scene.sect_membership.rank_display_name }}</p>
             {% endif %}
-            <p class="side-note" style="margin-top: 0.65rem;">
+            <p class="side-note">
               Path: {{ scene.cultivation.cultivation_path }}
             </p>
           </div>
@@ -361,13 +361,12 @@
                 </p>
                 {% endif %}
                 {% if scene.cultivation_methods %}
-                <form method="post" action="/play/{{ scene.save_id }}/action" style="margin-top: 0.65rem;">
+                <form method="post" action="/play/{{ scene.save_id }}/action">
                   <button
                     type="submit"
                     name="action_id"
                     value="attempt_breakthrough"
                     class="button primary btn-primary"
-                    style="width: 100%;"
                     {% if not scene.breakthrough_can_attempt %}disabled{% endif %}
                   >
                     Attempt Breakthrough
@@ -377,7 +376,7 @@
                 {% endif %}
 
                 {% if scene.last_cultivation_result %}
-                <p style="margin-top: 0.75rem;">
+                <p class="session-note">
                   <strong>Last session:</strong> {{ scene.last_cultivation_result.method_label }}
                   — {{ scene.last_cultivation_result.summary }}
                 </p>
@@ -408,8 +407,8 @@
                   {% endif %}
                 </span>
                 {% if not tech.known and tech.learnable %}
-                <form method="post" action="/play/{{ scene.save_id }}/techniques/learn" style="margin-top: 0.35rem;">
-                  <button type="submit" name="technique_id" value="{{ tech.id }}" class="button secondary btn-secondary" style="width: 100%;">
+                <form method="post" action="/play/{{ scene.save_id }}/techniques/learn">
+                  <button type="submit" name="technique_id" value="{{ tech.id }}" class="button secondary btn-secondary">
                     Learn
                   </button>
                 </form>
