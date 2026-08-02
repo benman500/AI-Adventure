@@ -1,0 +1,44 @@
+{
+  "decision": "approve",
+  "title": "Responsive and accessibility audit",
+  "implementation_brief": "Read the required project documentation, then inspect the current player-facing templates, CSS, existing client-side behavior, and presentation tests. Audit representative character creation and living-loop pages at narrow mobile, tablet, and desktop widths for overflow, overlap, alignment, keyboard navigation, focus visibility, collapsible-section semantics, clickable-card keyboard access, and reduced-motion behavior. Identify concrete presentation deficiencies and correct them by making meaningful changes to at least one allowed template or static implementation file. Use existing server-rendered patterns and native HTML/CSS wherever possible; preserve routes, form field names, submitted values, service boundaries, and gameplay behavior. Add or adjust focused presentation tests for stable accessibility and markup requirements where practical. Do not treat updates to tests or automation/AGENT_REPORT.md alone as implementation. Record files changed, tests run, results, and remaining risks in automation/AGENT_REPORT.md.",
+  "allowed_areas": [
+    "src/ai_adventure/presentation/templates",
+    "src/ai_adventure/presentation/static",
+    "tests",
+    "automation/AGENT_REPORT.md"
+  ],
+  "acceptance_criteria": [
+    "Player-facing pages remain usable at narrow mobile, tablet, and desktop widths.",
+    "Important text, cards, controls, and panels do not overlap or cause unintended horizontal scrolling.",
+    "Interactive elements display clearly visible keyboard-focus states.",
+    "Clickable cards are keyboard accessible where applicable without changing their submitted values or behavior.",
+    "Collapsed and expanded sections use understandable labels, states, and accessible semantics.",
+    "Reduced-motion preferences disable or minimize nonessential transitions and animations.",
+    "Existing routes, field names, submitted values, service boundaries, and gameplay behavior remain unchanged.",
+    "At least one allowed template or static implementation file receives a meaningful presentation correction.",
+    "Focused presentation tests and the full test suite pass."
+  ],
+  "forbidden_changes": [
+    "Gameplay, progression, engine-rule, catalog, or persistence changes",
+    "Database migrations or save-format changes",
+    "New dependencies, frameworks, systems, or architectural layers",
+    "Conversion away from the current server-rendered architecture",
+    "Route, endpoint, form field name, or submitted-value changes",
+    "Deployment, secret, environment, or production database changes",
+    "Weakening, deleting, or skipping existing tests",
+    "Report-only, test-only, or automation-only completion without an implementation change",
+    "Large unrelated refactors or changes to more than 25 files"
+  ],
+  "focused_tests": [
+    "tests"
+  ],
+  "stop_conditions": [
+    "A required correction cannot be completed within the allowed areas.",
+    "A correction would require changing gameplay rules, backend service behavior, routes, field names, or submitted values.",
+    "A correction would require a migration, new dependency, architecture change, or JavaScript framework.",
+    "Expected accessible behavior is ambiguous and selecting an approach would require a product decision.",
+    "The task would exceed 25 changed files or require a broad unrelated refactor.",
+    "Focused or full-suite failures indicate behavior outside the presentation scope must change."
+  ]
+}

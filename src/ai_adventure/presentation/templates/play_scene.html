@@ -273,7 +273,9 @@
         {% endif %}
 
         <details class="side-panel" open>
-          <summary>Identity</summary>
+          <summary>
+            <span class="disclosure-label">Identity</span>
+          </summary>
           <div class="side-panel-body identity-brief">
             <p><strong>{{ scene.character_name }}</strong></p>
             <p>{{ scene.background_display_name }}</p>
@@ -291,7 +293,9 @@
         </details>
 
         <details class="side-panel">
-          <summary>Cultivation</summary>
+          <summary>
+            <span class="disclosure-label">Cultivation</span>
+          </summary>
           <div class="side-panel-body">
             <div class="cultivation-compact">
               <div class="row"><span>Realm</span><strong>{{ scene.cultivation.realm_name }}</strong></div>
@@ -391,7 +395,9 @@
 
         {% if scene.techniques %}
         <details class="side-panel">
-          <summary>Techniques</summary>
+          <summary>
+            <span class="disclosure-label">Techniques</span>
+          </summary>
           <div class="side-panel-body">
             <ul class="side-list">
               {% for tech in scene.techniques %}
@@ -422,7 +428,9 @@
 
         {% if scene.spiritual_roots %}
         <details class="side-panel">
-          <summary>Spiritual Roots</summary>
+          <summary>
+            <span class="disclosure-label">Spiritual Roots</span>
+          </summary>
           <div class="side-panel-body">
             <ul class="side-list">
               {% for root in scene.spiritual_roots %}
@@ -441,7 +449,9 @@
 
         {% if scene.sect_membership %}
         <details class="side-panel">
-          <summary>Sect</summary>
+          <summary>
+            <span class="disclosure-label">Sect</span>
+          </summary>
           <div class="side-panel-body">
             <p><strong>{{ scene.sect_membership.display_name }}</strong></p>
             <p class="meta-line">{{ scene.sect_membership.rank_display_name }}</p>
@@ -454,7 +464,9 @@
         {% endif %}
 
         <details class="side-panel">
-          <summary>Inventory</summary>
+          <summary>
+            <span class="disclosure-label">Inventory</span>
+          </summary>
           <div class="side-panel-body">
             <p class="side-note">{{ scene.money_copper }} copper</p>
             <ul class="side-list">
@@ -472,6 +484,6 @@
       </aside>
     </div>
   </main>
-  <script src="/static/js/main.js?v=ui2"></script>
+  <script src="/static/js/main.js?v=ui6"></script>
 </body>
 </html>

@@ -18,7 +18,9 @@
     </p>
 
     <details class="drawer" open>
-      <summary>Character</summary>
+      <summary>
+        <span class="disclosure-label">Character</span>
+      </summary>
       <div class="drawer-body status-grid">
         <p><strong>Background:</strong> {{ save.background_display_name }}</p>
         <p><strong>Location:</strong> {{ save.current_location_name }}</p>
@@ -28,7 +30,9 @@
     </details>
 
     <details class="drawer">
-      <summary>Inventory</summary>
+      <summary>
+        <span class="disclosure-label">Inventory</span>
+      </summary>
       <div class="drawer-body">
         <p><strong>Money:</strong> {{ save.money_copper }} copper</p>
         <ul>
@@ -42,7 +46,9 @@
     </details>
 
     <details class="drawer">
-      <summary>Identity</summary>
+      <summary>
+        <span class="disclosure-label">Identity</span>
+      </summary>
       <div class="drawer-body">
         <p class="drawer-note">Stored answers only—no traits assigned at creation.</p>
         <ul>

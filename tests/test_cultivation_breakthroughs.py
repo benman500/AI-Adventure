@@ -316,7 +316,7 @@ def test_breakthrough_ui_disabled_states(tmp_path: Path) -> None:
     )
     save_id = created.headers["location"].rsplit("/", 1)[-1]
     early = client.get(f"/play/{save_id}")
-    assert b"<summary>Cultivation</summary>" in early.content
+    assert b'class="disclosure-label">Cultivation</span>' in early.content
     assert b"Attempt Breakthrough" not in early.content
 
     # Walk to hall
@@ -338,6 +338,6 @@ def test_breakthrough_ui_disabled_states(tmp_path: Path) -> None:
 
     hall = client.get(f"/play/{save_id}")
     assert hall.status_code == 200
-    assert b"<summary>Cultivation</summary>" in hall.content
+    assert b'class="disclosure-label">Cultivation</span>' in hall.content
     assert b"<summary>Learn more</summary>" in hall.content
     assert b"Attempt Breakthrough" in hall.content

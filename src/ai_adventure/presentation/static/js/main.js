@@ -20,6 +20,7 @@ function initCreationWizard() {
 
   const steps = Array.from(form.querySelectorAll(".vn-step"));
   const progress = document.getElementById("vn-progress");
+  const stepStatus = document.getElementById("vn-step-status");
   const backBtn = document.getElementById("vn-back");
   const nextBtn = document.getElementById("vn-next");
   const submitBtn = document.getElementById("vn-submit");
@@ -29,9 +30,19 @@ function initCreationWizard() {
 
   let index = firstIncompleteStep(steps);
 
+  function announceStep() {
+    if (!stepStatus) {
+      return;
+    }
+    stepStatus.textContent = `Step ${index + 1} of ${steps.length}`;
+  }
+
   function paint() {
     steps.forEach((step, i) => {
-      step.classList.toggle("is-active", i === index);
+      const active = i === index;
+      step.classList.toggle("is-active", active);
+      // Keep inactive steps in the form for constraint validation; hide via CSS only.
+      step.setAttribute("aria-hidden", active ? "false" : "true");
     });
     if (progress) {
       progress.querySelectorAll("span").forEach((dot, i) => {
@@ -45,6 +56,7 @@ function initCreationWizard() {
     const last = index === steps.length - 1;
     nextBtn.hidden = last;
     submitBtn.hidden = !last;
+    announceStep();
   }
 
   function clearIncomplete(step) {

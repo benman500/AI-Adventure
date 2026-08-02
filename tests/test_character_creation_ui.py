@@ -138,6 +138,9 @@ def test_new_game_template_groups_choices_under_fieldsets() -> None:
     assert 'aria-labelledby="question-legend-{{ question.id }}"' in template
     assert 'class="error vn-error"' in template
     assert 'id="vn-form-error"' in template
+    assert 'id="vn-step-status"' in template
+    assert 'aria-live="polite"' in template
+    assert "visually-hidden" in template
 
     # Answers render inside the same fieldset as the question legend/prompt.
     answer_loop = template.index("{% for answer in question.answers %}")
@@ -174,6 +177,10 @@ def test_new_game_template_groups_choices_under_fieldsets() -> None:
     assert ".bg-card:has(input:checked)::after" in css
     assert ".answer-card:has(input:checked)::after" in css
     assert "outline-offset: 3px" in css
+    assert "clip-path: inset(50%)" in css
+    assert ".visually-hidden" in css
+    assert "@media (max-width: 768px)" in css
+    assert "@media (prefers-reduced-motion: reduce)" in css
 
 
 def test_new_game_template_associates_choice_labels_with_controls() -> None:

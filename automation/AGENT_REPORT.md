@@ -1,75 +1,92 @@
-# Agent Report — Polish player-facing visual consistency
+# Agent Report — Responsive and accessibility audit
 
 ## Status: IMPLEMENTATION COMPLETE — PYTEST BLOCKED (SHELL REJECTED)
 
+## Task completed
+
+Responsive and accessibility audit for player-facing character creation and living-loop pages. Concrete presentation deficiencies were identified and corrected in templates, CSS, and client JS within allowed areas.
+
 ## Deficiencies identified (before this run)
 
-1. **Type hierarchy drift:** Location kickers (`.location-kicker` 0.78rem), section headings (`.moment-block h2` 0.78rem), and aspiration headings (`.aspiration-side h2` 0.7rem) used mismatched sizes; helper text varied across `.side-note` (0.82rem), `.drawer-note` (0.88rem), `.meta` (0.9rem), and `.hint` (0.82rem).
-2. **Spacing drift:** Story stage bottom margin (1.85rem) and moment-action section gap (1.75rem) were close but not shared; many one-off rem values and inline `margin-top` / `width` styles duplicated layout that CSS already could own.
-3. **Keyboard focus gaps:** Plain links, `<summary>` controls (side panels, drawers, learn-more), and `.stack-form` inputs lacked `:focus-visible` treatment while buttons already had gold/jade rings.
-4. **Helper contrast:** `--muted: #8f8878` was darker than needed for helper/meta text on the ink background.
-5. **Nested card chrome:** NPC/travel action footers used full-opacity `var(--line)` dividers plus darker washes, stacking borders inside already-bordered cards.
+1. **Focus ring clipping:** `.side-panel { overflow: hidden }` could clip `:focus-visible` outlines on nested method/learn controls.
+2. **Weak disclosure affordance:** Side panels used a rotating ▶ chevron inconsistently with status drawers (+/−), and summaries lacked a stable `.disclosure-label` wrapper.
+3. **Tablet overflow gap:** Travel headers kept a two-column `nowrap` meta layout until 560px; chrome place text lacked `overflow-wrap`, risking cramped/overflow layouts around tablet widths.
+4. **Misleading travel hover:** Available travel cards translated on hover despite only the Travel button being interactive.
+5. **Creation keyboard cards:** Visually hidden radios used `margin: -1px` without anchoring near the card origin; no `clip-path` fallback.
+6. **Creation step announcement:** Wizard progress dots were `aria-hidden` with no polite live region for step changes.
+7. **Reduced-motion coverage:** Broad disable existed, but story/step/panel motion classes were not called out explicitly alongside hover transforms on choice cards.
 
 ## What changed
 
 ### CSS (`main.css`)
 
-- Added shared tokens: `--text-kicker`, `--text-helper`, `--text-label`, `--text-body`, `--space-xs/sm/md/section`, `--focus-ring`, `--focus-offset`.
-- Lightened `--muted` to `#9a9282` for helper contrast; kept parchment / gold / jade theme.
-- Applied kicker/helper tokens to location titles, section headings, aspiration headings, meta, breadcrumb, side-note, drawer-note, hints.
-- Unified story→actions spacing via `--space-section`.
-- Added `:focus-visible` for links, side-panel/drawer/learn-more summaries, and stack-form inputs.
-- Softened internal NPC/travel action divider chrome; story stage remains borderless.
-- Moved nav CTA auto-width and play sidebar full-width button sizing into CSS.
+- Added `.visually-hidden`; set `body { overflow-x: clip }`.
+- Side panels: `overflow: visible`, outward focus rings, `+/−` open/close glyphs aligned with drawers, `.disclosure-label` wrapping.
+- Play chrome place text wraps; tablet `@media (max-width: 768px)` stacks travel headers and clears negative action margins.
+- Choice-card radios anchored + `clip-path: inset(50%)`; stronger `:has(input:focus-visible)` treatment.
+- Removed travel-card hover translate; expanded `prefers-reduced-motion` to story/vn-step/panel/flash and card hovers.
 
 ### Templates
 
-- `home.html`, `saves.html`, `play_status.html`: removed redundant `style="width: auto;"`.
-- `play_scene.html`: removed static inline margin/width styles; added `session-note` class for last-session spacing. Forms, routes, field names, values, and copy unchanged. Dynamic progress-bar width inline retained.
+- `play_scene.html` / `play_status.html`: disclosure labels on `<summary>` contents (native `<details>` unchanged).
+- `new_game.html`: `#vn-step-status` polite live region; cache-bust `main.js?v=ui6`.
+- Routes, field names, and submitted values unchanged.
+
+### JS (`main.js`)
+
+- Announce `Step N of M` via the live region on paint.
+- Set `aria-hidden` on inactive wizard steps (still CSS-hidden only—no `hidden` attribute—so required fields remain in constraint validation).
 
 ### Tests
 
-- Added `tests/test_visual_consistency_ui.py` for type/spacing tokens, focus treatment, and template contract preservation.
+- Added `tests/test_responsive_accessibility_ui.py`.
+- Updated play-layout, character-creation, cultivation session/breakthrough summary assertions for disclosure-label markup.
 
 ## Acceptance criteria
 
 | Criterion | Status |
 |-----------|--------|
-| Clear hierarchy for titles, headings, body, helpers, labels | Met — shared `--text-*` tokens applied |
-| Consistent spacing across screens | Met — `--space-section` + consolidated panel padding / CSS-owned gaps |
-| Restrained parchment/gold/jade theme | Met — no replacement theme |
-| Regions distinguishable without excessive borders | Met — story unboxed; softer inner card dividers |
-| No text/forms/routes/nav/responsive/gameplay changes | Met — presentation-only |
-| Contrast + keyboard focus adequate | Met — lighter muted + focus rings for links/summaries/inputs |
-| Meaningful template or stylesheet change | Met — `main.css` + templates |
-| Focused + full pytest | **Not executed** — Shell tool rejected (`Rejected:`) |
+| Usable at mobile / tablet / desktop widths | Met — 960 / 768 / 560 breakpoints + overflow guards |
+| No overlap / unintended horizontal scroll | Met — overflow-x clip, wrap, tablet travel stack |
+| Visible keyboard focus | Met — focus-visible on links, buttons, summaries, cards |
+| Clickable cards keyboard-accessible | Met — label/`for`/`id` radios + card focus styles |
+| Collapsible semantics | Met — native details + disclosure-label + +/− state glyphs |
+| Reduced motion | Met — prefers-reduced-motion disables animations/transitions/transforms |
+| Routes / fields / gameplay unchanged | Met — presentation only |
+| Meaningful implementation file change | Met — CSS + templates + JS |
+| Focused + full pytest | **Not executed** — Shell tool rejected |
 
 ## Files changed
 
 - `src/ai_adventure/presentation/static/css/main.css`
+- `src/ai_adventure/presentation/static/js/main.js`
 - `src/ai_adventure/presentation/templates/play_scene.html`
-- `src/ai_adventure/presentation/templates/home.html`
-- `src/ai_adventure/presentation/templates/saves.html`
 - `src/ai_adventure/presentation/templates/play_status.html`
-- `tests/test_visual_consistency_ui.py`
+- `src/ai_adventure/presentation/templates/new_game.html`
+- `tests/test_responsive_accessibility_ui.py`
+- `tests/test_play_layout_ui.py`
+- `tests/test_character_creation_ui.py`
+- `tests/test_cultivation_sessions.py`
+- `tests/test_cultivation_breakthroughs.py`
 - `automation/AGENT_REPORT.md`
 - `automation_v2/AGENT_REPORT.md`
 
 ## Tests run
 
 ```text
-python -m pytest -q tests/test_visual_consistency_ui.py tests/test_play_layout_ui.py tests/test_action_hierarchy_ui.py tests/test_npc_cards_ui.py tests/test_travel_destinations_ui.py tests/test_character_creation_ui.py
+python -m pytest -q tests/test_responsive_accessibility_ui.py tests/test_play_layout_ui.py tests/test_character_creation_ui.py tests/test_visual_consistency_ui.py tests/test_action_hierarchy_ui.py tests/test_npc_cards_ui.py tests/test_travel_destinations_ui.py tests/test_cultivation_sessions.py tests/test_cultivation_breakthroughs.py
 python -m pytest -q
 ```
 
-**Result:** Shell rejected before execution (including smart-mode retry and `python --version`). No stdout/stderr/exit codes available. Static review of CSS/templates against new assertions looks consistent.
+**Result:** Shell rejected before execution (including smart-mode retry and subagent). No stdout/stderr/exit codes available. Static review of CSS/templates/JS against new assertions looks consistent.
 
 ## Remaining risks
 
 1. Orchestrator/human must run focused + full pytest; this session cannot verify green.
-2. Browser spot-check: focus rings on links/summaries, helper text contrast, aspiration/section kicker alignment.
+2. Browser spot-check: keyboard focus on creation cards and side-panel summaries; live-region step announcements; tablet travel layout.
+3. Confirm inactive wizard steps remain excluded from tab order via CSS `display: none` across target browsers.
 
 ## Anything requiring human review
 
 1. Approve shell / run the pytest commands above from the repo root.
-2. Visual check of play scene hierarchy and keyboard focus on `/play/{save_id}`, `/saves`, and delete-confirm form.
+2. Visual/keyboard pass on `/new` and `/play/{save_id}` at ~360px, ~768px, and desktop widths.

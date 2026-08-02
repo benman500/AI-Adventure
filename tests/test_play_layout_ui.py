@@ -91,10 +91,10 @@ async def test_play_scene_uses_story_first_layout(tmp_path: Path) -> None:
         story_idx = html.index('id="narration"')
         assert main_idx < story_idx < side_idx
 
-        assert "<summary>Identity</summary>" in html
+        assert 'class="disclosure-label">Identity</span>' in html
         assert '<details class="side-panel" open>' in html
-        assert "<summary>Cultivation</summary>" in html
-        assert "<summary>Inventory</summary>" in html
+        assert 'class="disclosure-label">Cultivation</span>' in html
+        assert 'class="disclosure-label">Inventory</span>' in html
 
         assert 'method="post" action="/play/' in html
         assert f'action="/play/{save_id}/action"' in html

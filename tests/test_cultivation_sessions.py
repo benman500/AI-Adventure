@@ -191,7 +191,7 @@ def test_cultivation_ui_methods_and_disabled_states(tmp_path: Path) -> None:
 
     early = client.get(f"/play/{save_id}")
     assert early.status_code == 200
-    assert b"<summary>Cultivation</summary>" in early.content
+    assert b'class="disclosure-label">Cultivation</span>' in early.content
     assert b'value="cautious"' not in early.content
     assert b"Cautious" not in early.content
 
@@ -211,7 +211,7 @@ def test_cultivation_ui_methods_and_disabled_states(tmp_path: Path) -> None:
 
     hall = client.get(f"/play/{save_id}")
     assert hall.status_code == 200
-    assert b"<summary>Cultivation</summary>" in hall.content
+    assert b'class="disclosure-label">Cultivation</span>' in hall.content
     assert b"Cautious" in hall.content
     assert b"Balanced" in hall.content
     assert b"Aggressive" in hall.content
