@@ -115,7 +115,7 @@ h1 {
   border-bottom-color: var(--gold);
 }
 
-/* ——— Buttons ——— */
+/* ——— Buttons (primary / secondary / utility hierarchy) ——— */
 
 .button,
 button {
@@ -137,11 +137,25 @@ button {
     box-shadow var(--ease);
 }
 
+.button:focus,
+button:focus {
+  outline: none;
+}
+
+.button:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--ink-deep);
+}
+
 .button:disabled,
 button:disabled {
-  opacity: 0.4;
+  opacity: 0.42;
   cursor: not-allowed;
   transform: none !important;
+  box-shadow: none !important;
+  pointer-events: none;
 }
 
 button[hidden],
@@ -163,14 +177,39 @@ button[hidden],
 .btn-primary:hover:not(:disabled),
 .button.primary:hover:not(:disabled) {
   background: #d4b888;
+  border-color: #d4b888;
   transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled),
+.button.primary:active:not(:disabled) {
+  background: #b89660;
+  border-color: #b89660;
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(196, 165, 116, 0.12);
+}
+
+.btn-primary:focus-visible,
+.button.primary:focus-visible {
+  outline-color: var(--parchment);
+}
+
+.btn-primary:disabled,
+.button.primary:disabled {
+  background: rgba(196, 165, 116, 0.35);
+  border-color: rgba(196, 165, 116, 0.35);
+  color: var(--ink);
+  box-shadow: none;
 }
 
 .btn-secondary,
 .button.secondary {
   background: transparent;
   color: var(--parchment-soft);
-  border-color: var(--line-soft);
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--jade);
+  font-weight: 500;
+  box-shadow: none;
 }
 
 .btn-secondary:hover:not(:disabled),
@@ -180,6 +219,19 @@ button[hidden],
   color: var(--parchment);
 }
 
+.btn-secondary:active:not(:disabled),
+.button.secondary:active:not(:disabled) {
+  background: rgba(111, 143, 97, 0.22);
+  border-color: var(--jade);
+  color: var(--parchment);
+  transform: translateY(1px);
+}
+
+.btn-secondary:focus-visible,
+.button.secondary:focus-visible {
+  outline-color: var(--jade);
+}
+
 .btn-utility,
 .button.utility {
   background: transparent;
@@ -187,12 +239,38 @@ button[hidden],
   border-color: transparent;
   padding: 0.35rem 0.55rem;
   font-size: 0.9rem;
+  font-weight: 400;
+  box-shadow: none;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.2em;
 }
 
-.btn-utility:hover,
-.button.utility:hover {
+.btn-utility:hover:not(:disabled),
+.button.utility:hover:not(:disabled) {
   color: var(--parchment);
-  border-color: var(--line);
+  border-color: transparent;
+  text-decoration-color: var(--line-soft);
+  background: transparent;
+}
+
+.btn-utility:active:not(:disabled),
+.button.utility:active:not(:disabled) {
+  color: var(--parchment-soft);
+  text-decoration-color: var(--muted);
+}
+
+.btn-utility:focus-visible,
+.button.utility:focus-visible {
+  outline-color: var(--muted);
+  border-radius: var(--radius);
+}
+
+.btn-utility:disabled,
+.button.utility:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  text-decoration-color: transparent;
 }
 
 .button.danger,
@@ -200,6 +278,21 @@ button.danger {
   background: var(--danger);
   color: #fff;
   border-color: var(--danger);
+}
+
+.button.danger:hover:not(:disabled),
+button.danger:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.button.danger:active:not(:disabled),
+button.danger:active:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.button.danger:focus-visible,
+button.danger:focus-visible {
+  outline-color: #f0cfc8;
 }
 
 .nav-actions {
@@ -433,6 +526,24 @@ button.danger {
   width: 100%;
   font-size: 1.05rem;
   padding: 0.95rem 1.35rem;
+  min-height: 2.85rem;
+}
+
+.action-primary {
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.action-primary h2 {
+  color: var(--gold);
+}
+
+.action-secondary {
+  padding-top: 0.15rem;
+}
+
+.action-secondary h2 {
+  color: var(--jade);
 }
 
 /* ——— NPC cards ——— */
@@ -540,14 +651,34 @@ button.danger {
   font-size: 0.95rem;
   padding: 0.6rem 0.85rem;
   background: transparent;
-  border-color: var(--line-soft);
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--jade);
   color: var(--parchment-soft);
+  box-shadow: none;
 }
 
 .npc-actions .npc-action-secondary:hover:not(:disabled) {
   background: var(--jade-soft);
   color: var(--parchment);
   border-color: var(--jade);
+  border-left-color: var(--jade);
+}
+
+.npc-actions .npc-action-secondary:active:not(:disabled) {
+  background: rgba(111, 143, 97, 0.22);
+  border-color: var(--jade);
+  transform: translateY(1px);
+}
+
+.npc-actions .npc-action-secondary:focus-visible {
+  outline: 2px solid var(--jade);
+  outline-offset: 2px;
+}
+
+.npc-actions .npc-action-secondary:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .npc-action-label {
@@ -721,15 +852,16 @@ button.danger {
   letter-spacing: 0.02em;
 }
 
-/* ——— Location actions ——— */
+/* ——— Location actions (secondary tier vs story/travel primary) ——— */
 
 .here-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.55rem;
 }
 
-.here-item {
+.here-item,
+.here-action-secondary {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -737,18 +869,43 @@ button.danger {
   width: 100%;
   text-align: left;
   padding: 0.8rem 1rem;
+  min-height: 2.75rem;
   background: transparent;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--jade);
   border-radius: var(--radius);
   color: var(--parchment-soft);
+  font-weight: 500;
+  box-shadow: none;
   cursor: pointer;
-  transition: border-color var(--ease), background var(--ease);
+  transition: border-color var(--ease), background var(--ease), color var(--ease);
 }
 
-.here-item:hover {
-  border-color: var(--line-soft);
-  background: rgba(36, 42, 32, 0.55);
+.here-item:hover:not(:disabled),
+.here-action-secondary:hover:not(:disabled) {
+  border-color: var(--jade);
+  border-left-color: var(--jade);
+  background: var(--jade-soft);
   color: var(--parchment);
+}
+
+.here-item:active:not(:disabled),
+.here-action-secondary:active:not(:disabled) {
+  background: rgba(111, 143, 97, 0.22);
+  transform: translateY(1px);
+}
+
+.here-item:focus-visible,
+.here-action-secondary:focus-visible {
+  outline: 2px solid var(--jade);
+  outline-offset: 3px;
+}
+
+.here-item:disabled,
+.here-action-secondary:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .here-item .choice-label {
@@ -957,20 +1114,48 @@ button.danger {
   gap: 0.4rem;
 }
 
-.method-list button {
+.method-list button,
+.method-list .method-action-secondary {
   width: 100%;
   text-align: left;
   padding: 0.65rem 0.75rem;
-  background: var(--ink-raised);
-  border: 1px solid var(--line);
+  min-height: 2.6rem;
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--jade);
   border-radius: var(--radius);
   color: var(--parchment-soft);
   font-size: 0.92rem;
+  font-weight: 500;
+  box-shadow: none;
+  transition: border-color var(--ease), background var(--ease), color var(--ease), transform var(--ease);
 }
 
-.method-list button:hover:not(:disabled) {
+.method-list button:hover:not(:disabled),
+.method-list .method-action-secondary:hover:not(:disabled) {
   border-color: var(--jade);
+  border-left-color: var(--jade);
+  background: var(--jade-soft);
   color: var(--parchment);
+}
+
+.method-list button:active:not(:disabled),
+.method-list .method-action-secondary:active:not(:disabled) {
+  background: rgba(111, 143, 97, 0.2);
+  transform: translateY(1px);
+}
+
+.method-list button:focus-visible,
+.method-list .method-action-secondary:focus-visible {
+  outline: 2px solid var(--jade);
+  outline-offset: 2px;
+}
+
+.method-list button:disabled,
+.method-list .method-action-secondary:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .method-list .method-label {
@@ -1572,6 +1757,41 @@ button.danger {
   .npc-actions .npc-action-secondary {
     padding-left: 0.8rem;
     padding-right: 0.8rem;
+    min-height: 2.75rem;
+  }
+
+  .story-actions .btn-primary,
+  .action-primary .btn-primary {
+    min-height: 3rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .here-item,
+  .here-action-secondary {
+    padding: 0.85rem 0.9rem;
+    min-height: 3rem;
+  }
+
+  .method-list button,
+  .method-list .method-action-secondary {
+    min-height: 2.75rem;
+    padding: 0.7rem 0.8rem;
+  }
+
+  .utility-bar,
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+  }
+
+  .btn-utility,
+  .button.utility {
+    min-height: 2.4rem;
+    padding: 0.45rem 0.35rem;
+    display: inline-flex;
+    align-items: center;
   }
 
   .save-row {
@@ -1586,5 +1806,24 @@ button.danger {
   *::after {
     animation: none !important;
     transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .button:hover:not(:disabled),
+  button:hover:not(:disabled),
+  .button:active:not(:disabled),
+  button:active:not(:disabled),
+  .here-item:hover:not(:disabled),
+  .here-item:active:not(:disabled),
+  .here-action-secondary:hover:not(:disabled),
+  .here-action-secondary:active:not(:disabled),
+  .method-list button:hover:not(:disabled),
+  .method-list button:active:not(:disabled),
+  .method-list .method-action-secondary:hover:not(:disabled),
+  .method-list .method-action-secondary:active:not(:disabled),
+  .npc-actions .npc-action-secondary:hover:not(:disabled),
+  .npc-actions .npc-action-secondary:active:not(:disabled),
+  .travel-destination--available:hover {
+    transform: none !important;
   }
 }

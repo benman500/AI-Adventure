@@ -195,7 +195,7 @@
           {% if scene.location_actions %}
           {% set available_location = scene.location_actions | selectattr('available') | list %}
           {% if available_location %}
-          <section class="moment-block" aria-label="At this location">
+          <section class="moment-block action-secondary" aria-label="At this location">
             <h2>Here</h2>
             <form method="post" action="/play/{{ scene.save_id }}/location-action" class="here-list">
               {% for action in scene.location_actions %}
@@ -204,7 +204,7 @@
                 type="submit"
                 name="action_id"
                 value="{{ action.id }}"
-                class="here-item"
+                class="here-item here-action-secondary button secondary btn-secondary"
                 title="{{ action.description }}"
               >
                 <span class="choice-label">{{ action.label }}</span>
@@ -318,6 +318,7 @@
                 type="submit"
                 name="action_id"
                 value="{{ method.id }}"
+                class="method-action method-action-secondary button secondary btn-secondary"
                 {% if not scene.cultivation_available %}disabled{% endif %}
               >
                 <span class="method-label">{{ method.label }}</span>
